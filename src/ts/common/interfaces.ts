@@ -1093,6 +1093,7 @@ export const enum Action {
 	SwitchToolRev,
 	SwitchToPlaceTool,
 	SwitchToTileTool,
+	Excite,
 }
 
 export const enum InfoFlags {
@@ -1103,7 +1104,7 @@ export const enum InfoFlags {
 }
 
 export function isExpressionAction(action: Action) {
-	return action === Action.Yawn || action === Action.Laugh || action === Action.Sneeze;
+	return action === Action.Yawn || action === Action.Laugh || action === Action.Sneeze || action === Action.Excite;
 }
 
 export interface EditorPlaceAction {
