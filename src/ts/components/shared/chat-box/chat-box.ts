@@ -9,7 +9,7 @@ import { faComment, faAngleDoubleRight } from '../../../client/icons';
 import { isInParty } from '../../../client/partyUtils';
 import { handleActionCommand } from '../../../client/playerActions';
 import { hasHeadAnimation } from '../../../common/pony';
-import { AutocompleteState, autocompleteMesssage, replaceEmojis } from '../../../client/emoji';
+import { AutocompleteState, autocompleteMesssage, replaceEmojis, emojis } from '../../../client/emoji';
 import { replaceNodes } from '../../../client/htmlUtils';
 import { invalidEnumReturn } from '../../../common/utils';
 import { findMatchingEntityNames, findEntityOrMockByAnyMeans, findBestEntityByName } from '../../../client/handlers';
@@ -45,6 +45,8 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	readonly maxSayLength = SAY_MAX_LENGTH;
 	readonly commentIcon = faComment;
 	readonly sendIcon = faAngleDoubleRight;
+	readonly emotes = emojis.map(e => e);
+	emojiBoxState = 'none';
 	@ViewChild('inputElement', { static: true }) inputElement!: ElementRef;
 	@ViewChild('typeBox', { static: true }) typeBox!: ElementRef;
 	@ViewChild('typePrefix', { static: true }) typePrefix!: ElementRef;
@@ -54,6 +56,7 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	isOpen = false;
 	message: string | undefined = '';
 	chatType = ChatType.Say;
+	btnEmoji = emojis[0].names[0];
 	private pasted = false;
 	private lastMessages: string[] = [];
 	private state: AutocompleteState = {};
@@ -91,6 +94,18 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	ngOnDestroy() {
 		this.subscriptions.forEach(s => s.unsubscribe());
+	}
+	addEmoji(emoji: string) {
+		this.emojiBoxState = 'none';
+		if (!this.message) this.message = emoji;
+		else if (this.input.maxLength > this.message.length) {
+			this.message += emoji;
+		}
+	}
+	openBox() {
+		if (this.emojiBoxState === 'none')
+			this.emojiBoxState = 'inline-block';
+		else this.emojiBoxState = 'none';
 	}
 	send(_event: Event | undefined) {
 		let chatType = this.chatType;
@@ -136,7 +151,6 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 					this.lastMessages.shift();
 				}
 			}
-
 			this.close();
 		}
 	}
@@ -259,6 +273,7 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	private close() {
 		if (this.isOpen) {
+			this.emojiBoxState = 'none';
 			this.input.blur();
 			this.isOpen = false;
 			this.chatBox.nativeElement.hidden = true;
@@ -272,6 +287,11 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 		} else {
 			this.open();
 		}
+	}
+	onMouseEnter(event: MouseEvent) {
+		if (!event.target) return;
+		const value = emojis[Math.floor(Math.random() * emojis.length)];
+		this.btnEmoji = value.names[0];
 	}
 	toggleChatType() {
 		const chatTypes = getChatTypes(this.game);
