@@ -196,6 +196,7 @@ export function createCommands(world: World): Command[] {
 		command(['t', 'think'], '/t - thinking balloon', '', shouldNotBeCalled),
 		command(['w', 'whisper'], '/w <name> - whisper to player', '', shouldNotBeCalled),
 		command(['r', 'reply'], '/r - reply to whisper', '', shouldNotBeCalled),
+		command(['shrug'], '/shrug - ¯\\_(ツ)_/¯', '', shouldNotBeCalled),
 		command(['e'], '/e - set permanent expression', '', ({ }, { pony }, message) => {
 			pony.exprPermanent = parseExpression(message, true);
 			setEntityExpression(pony, undefined, 0);
@@ -608,7 +609,7 @@ chatTypes.set('w', ChatType.Whisper);
 chatTypes.set('whisper', ChatType.Whisper);
 
 export function parseCommand(text: string, type: ChatType): { command?: string; args: string; type: ChatType; } {
-	if (!isCommand(text)) {
+	if (!isCommand(text) || text.toLowerCase().startsWith('/shrug')) {
 		return { args: text, type };
 	}
 
