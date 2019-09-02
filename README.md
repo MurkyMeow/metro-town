@@ -1,6 +1,6 @@
-# Pony Town
+# pixel.horse
 
-A game of ponies building a town
+A fork of Pony Town, a game of ponies building a town.
 
 ## Prerequisites
 

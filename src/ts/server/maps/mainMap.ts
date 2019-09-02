@@ -2590,7 +2590,7 @@ export function createMainMap(world: World): ServerMap {
 	add(entities.rock(98.63, 38.04));
 	add(entities.rock(117.22, 24.63));
 
-	add(createSignWithText(70.5, 70.5, 'Pony Town', '      Pony Town\n[under construction]', entities.sign));
+	add(createSignWithText(70.5, 70.5, 'pixel.horse', '      pixel.horse\n[under construction]', entities.sign));
 
 	addEntities(createToyStash(47.00, 55.00));
 

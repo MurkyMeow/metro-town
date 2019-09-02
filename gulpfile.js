@@ -70,8 +70,8 @@ const manifest = cb => {
 		short_name: config.title,
 		start_url: '/',
 		scope: '/',
-		theme_color: '#333333',
-		background_color: '#333333',
+		theme_color: '#5b6ee1',
+		background_color: '#5b6ee1',
 		display: 'standalone',
 		icons: [
 			{
