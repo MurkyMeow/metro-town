@@ -79,6 +79,11 @@
 					| Clear action bar
 				button.btn.btn-outline-secondary.mr-2.mb-2((click)="undo()")
 					| Undo
+				button.btn.btn-outline-secondary.mr-2.mb-2((click)="export()")
+					| Export actions
+				button.btn.btn-outline-secondary.mr-2.mb-2((click)="importFile.click()")
+					| Import actions
+				input.d-none(#importFile type="file" (change)="import(importFile.files[0])")
 
 		tab(*ngIf="dev" title="Dev" [icon]="devIcon")
 			div(*tabContent)

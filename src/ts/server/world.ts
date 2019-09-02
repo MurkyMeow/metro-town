@@ -57,6 +57,8 @@ interface ReservedID {
 	time: number;
 }
 
+const MAP_SOFT_LIMIT = 10000;
+
 export class World {
 	season = Season.Summer;
 	holiday = Holiday.None;
@@ -488,7 +490,8 @@ export class World {
 		timingEnd();
 
 		timingStart('cleanup unused maps');
-		const mapDiscardThreshold = now - MAP_DISCARD_TIMEOUT;
+		const discardTimeout = this.maps.length > MAP_SOFT_LIMIT ? 5 * MINUTE : MAP_DISCARD_TIMEOUT;
+		const mapDiscardThreshold = now - discardTimeout;
 
 		for (const map of this.maps) {
 			if (map.instance && (hasAnyClients(map) || this.mapSwitchQueue.some(q => q.map === map))) {

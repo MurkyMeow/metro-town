@@ -135,7 +135,7 @@ export function isPaletteSpriteBatch(batch: SpriteBatch | PaletteSpriteBatch): b
 
 export interface ServerFeatureFlags {
 	test?: boolean; // test server
-	objects?: boolean; // editor
+	editor?: boolean; // editor
 	// more flags here ...
 }
 

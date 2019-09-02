@@ -123,10 +123,15 @@
 						| Disable function keys (F1-F12)
 
 .modal-footer.d-flex
-	button.btn.btn-outline-secondary.d-none.d-sm-block((click)="reset()")
+	button.btn.btn-wide.btn-outline-secondary.d-none.d-sm-block((click)="reset()")
 		| Reset
+	button.btn.btn-outline-secondary.d-none.d-sm-block((click)="export()" title="Export settings")
+		fa-icon([icon]="exportIcon" [fixedWidth]="true")
+	button.btn.btn-outline-secondary.d-none.d-sm-block((click)="importFile.click()" title="Import settings")
+		fa-icon([icon]="importIcon" [fixedWidth]="true")
+		input.d-none(#importFile type="file" (change)="import(importFile.files[0])")
 	.flex-grow-1
-	button.btn.btn-outline-secondary((click)="cancel()")
+	button.btn.btn-wide.btn-outline-secondary((click)="cancel()")
 		| Cancel
-	button.btn.btn-outline-secondary.ml-2((click)="ok()")
+	button.btn.btn-wide.btn-outline-secondary.ml-2((click)="ok()")
 		| OK

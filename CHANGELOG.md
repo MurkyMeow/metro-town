@@ -1,3 +1,12 @@
+#### v0.53.1
+- Switched to autumn season
+- Updated custom servers (about page)
+- Added option to import and export settings and actions on action bar
+- Added different colors of cushions for house customization
+- Fixed scroll wheel not working on Firefox
+- Fixed not being able to place items behind interactive items like boxes or barrels
+- Fixed issue with crystal light
+
 #### v0.53.0
 - Added custom servers (about page)
 - Added export option for ponies (character page)
@@ -12,7 +21,7 @@
 - Unlocked walls in front of windows from being placed
 - Increased house object limit
 - Fixed issues with house map saving using <code>/savehouse</code> command
-- Fixed being able to plain object in house behind wall
+- Fixed being able to place objects in the house behind wall
 
 #### v0.52.0
 - Added cave/mines map

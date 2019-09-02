@@ -2327,7 +2327,9 @@ export const stashEntities = [
 ];
 
 export const placeableEntities: { type: number; name: string; }[] = [
-	{ type: cushion1.type, name: 'Cushion' },
+	{ type: cushion1.type, name: 'Cushion (red)' },
+	{ type: cushion2.type, name: 'Cushion (blue)' },
+	{ type: cushion3.type, name: 'Cushion (green)' },
 	{ type: barrel.type, name: 'Barrel' },
 	{ type: box.type, name: 'Box' },
 	{ type: boxLanterns.type, name: 'Box of lanterns' },

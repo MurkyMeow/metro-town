@@ -17,6 +17,7 @@ export class MouseController implements InputController {
 			element.addEventListener('mousedown', this.mousedown);
 			element.addEventListener('mouseup', this.mouseup);
 			element.addEventListener('mousewheel', this.mousewheel);
+			element.addEventListener('wheel', this.mousewheel);
 			element.addEventListener('contextmenu', this.contextmenu);
 			element.addEventListener('click', this.click);
 			window.addEventListener('blur', this.blur);
@@ -30,6 +31,7 @@ export class MouseController implements InputController {
 			this.element.removeEventListener('mousedown', this.mousedown);
 			this.element.removeEventListener('mouseup', this.mouseup);
 			this.element.removeEventListener('mousewheel', this.mousewheel);
+			this.element.removeEventListener('wheel', this.mousewheel);
 			this.element.removeEventListener('contextmenu', this.contextmenu);
 			this.element.removeEventListener('click', this.click);
 			this.element = undefined;

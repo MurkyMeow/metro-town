@@ -14,7 +14,7 @@ import {
 } from '../client/ponyUtils';
 import { CM_SIZE } from './constants';
 
-export const VERSION = 3;
+export const VERSION = 4;
 
 interface FieldDefinition<T> {
 	name: keyof PonyInfo;
@@ -186,7 +186,7 @@ const COLORS_LENGTH_BITS = 10; // max 1024
 const BOOLEAN_FIELDS_LENGTH_BITS = 4; // max 15
 const NUMBER_FIELDS_LENGTH_BITS = 4; // max 15
 const COLOR_FIELDS_LENGTH_BITS = 4; // max 15
-const SET_FIELDS_LENGTH_BITS = 5; // max 31
+const SET_FIELDS_LENGTH_BITS = 6; // max 63
 const CM_LENGTH_BITS = 5; // max 31
 const NUMBERS_BITS = 6; // max 63
 
@@ -552,6 +552,11 @@ const readNumber = readBits(NUMBERS_BITS);
 
 export function readPony(read: ReadBits): Precompressed {
 	const version = read(VERSION_BITS);
+
+	if (version > VERSION) {
+		throw new Error('Invalid version');
+	}
+
 	const colors = readFields(read, COLORS_LENGTH_BITS, readColorValue);
 	const colorBits = Math.max(numberToBitCount(colors.length), 1);
 	const readColor = readBits(colorBits);
@@ -559,7 +564,7 @@ export function readPony(read: ReadBits): Precompressed {
 	const customOutlines = !!booleanFields[0];
 	const numberFields = readFields(read, NUMBER_FIELDS_LENGTH_BITS, readNumber);
 	const colorFields = readFields(read, COLOR_FIELDS_LENGTH_BITS, readColor);
-	const setFields = readFields(read, SET_FIELDS_LENGTH_BITS, read => readSet(read, colorBits, customOutlines));
+	const setFields = readFields(read, version < 4 ? 5 : SET_FIELDS_LENGTH_BITS, read => readSet(read, colorBits, customOutlines));
 	const cm = readFields(read, CM_LENGTH_BITS, readColor);
 	return { version, colors, booleanFields, numberFields, colorFields, setFields, cm };
 }

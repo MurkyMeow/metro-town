@@ -1,6 +1,6 @@
 .action-bar(
 	[class.has-scroller]="hasScroller" [class.is-mobile]="mobile" [class.is-blurred]="blurred"
-	#scroller (mousewheel)="scroll($event)" (scroll)="true")
+	#scroller (mousewheel)="scroll($event)" (wheel)="scroll($event)" (scroll)="true")
 	action-button(
 		*ngFor="let a of actions; let i = index"
 		[class.blur-me]="i < blurCount"
