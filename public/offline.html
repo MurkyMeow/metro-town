@@ -5,37 +5,49 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<title>pixel.horse (offline)</title>
 	<style>
-		body {
-			background: #333;
+		* { box-sizing: border-box }
+
+		html, body { 
+			height: 100%;
+			width: 100%;
+			margin: 0;
+			padding: 0;
 		}
 
-		div {
-			position: fixed;
-			width: 100%;
-			height: 100%;
-			background: #333 url('/images/offline-pony.png') no-repeat center center;
+		body {
+			color: #888;
+			background-color: #333;
+			font: normal 16px sans-serif;
 			display: flex;
-			justify-content: center;
 			align-items: center;
+			flex-direction: column;
+			text-align: center;
+		}
+
+		body::before, body::after {
+			content: "";
+			display: block;
+			margin: auto;
 		}
 
 		p {
-			color: #888;
-			font: normal 16px sans-serif;
-			margin-top: 350px;
-			text-align: center;
-			padding: 30px;
+			padding: 0 30px;
+			margin-top: 0;
+			margin-bottom: 30px;
+		}
+
+		a, a:hover, a:active, a:visited {
+			color: #aaa;
 		}
 	</style>
 </head>
 <body>
-	<div>
-		<p>
-			pixel.horse is undergoing maintenance, please check back later.
-		</p>
-		<p>
-			In the meantime, you can <a href="https://chat.pixel.horse">join our Discord server</a> to stay informed.
-		</p>
-	</div>
+	<img src="/images/offline-pony.png"/>
+	<p>
+		pixel.horse is undergoing maintenance, please check back later.
+	</p>
+	<p>
+		In the meantime, you can <a href="https://chat.pixel.horse">join our Discord server</a> to stay informed.
+	</p>
 </body>
 </html>
