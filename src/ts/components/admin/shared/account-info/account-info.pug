@@ -1,4 +1,4 @@
-﻿ng-template(#notePopover)
+ng-template(#notePopover)
 	textarea.form-control.note-editor(
 		cols="20" rows="15" agAutoFocus [(ngModel)]="note" (keydown.escape)="blur()" (blur)="blur()")
 
