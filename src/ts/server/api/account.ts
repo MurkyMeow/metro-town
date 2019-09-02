@@ -57,7 +57,7 @@ const actions = [
 	{ name: 'ban', action: ModAction.Ban },
 ];
 
-export const modCheck = { xcz: { vdw: { qwe: { mnb: {} } } }, actions };
+export const modCheck = { hgf: { bvc: { wer: { ngf: {} } } }, actions };
 
 function fixUpdateAccountData(update: UpdateAccountData | undefined) {
 	const fixed: UpdateAccountData = {} as any;
