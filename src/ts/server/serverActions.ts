@@ -631,7 +631,7 @@ export class ServerActions implements IServerActions, SocketServer {
 	}
 	@Method({ binary: [Bin.Obj] })
 	editorAction(action: EditorAction) {
-		if (this.server.flags.objects && this.client.isMod) {
+		if (this.server.flags.editor && this.client.isMod) {
 			const added = editorAdded.get(this.client.accountId) || [];
 			editorAdded.set(this.client.accountId, added);
 

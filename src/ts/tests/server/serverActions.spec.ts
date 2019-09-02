@@ -1012,28 +1012,28 @@ describe('ServerActions', () => {
 	describe('editorAction()', () => {
 		it('places', () => {
 			client.isMod = true;
-			server.flags.objects = true;
+			server.flags.editor = true;
 
 			serverActions.editorAction({ type: 'place', x: 0, y: 0, entity: 'foo' });
 		});
 
 		it('undos', () => {
 			client.isMod = true;
-			server.flags.objects = true;
+			server.flags.editor = true;
 
 			serverActions.editorAction({ type: 'undo' });
 		});
 
 		it('clears', () => {
 			client.isMod = true;
-			server.flags.objects = true;
+			server.flags.editor = true;
 
 			serverActions.editorAction({ type: 'clear' });
 		});
 
 		it('does nothing for non-mod client', () => {
 			client.isMod = false;
-			server.flags.objects = true;
+			server.flags.editor = true;
 
 			serverActions.editorAction({ type: 'undo' });
 		});

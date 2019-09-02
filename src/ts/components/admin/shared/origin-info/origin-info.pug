@@ -1,4 +1,4 @@
-﻿.d-flex.align-items-center(*ngIf="origin")
+.d-flex.align-items-center(*ngIf="origin")
 	a.origin-info-ip.mr-1([routerLink]="['/origins', origin.ip, origin.country]" [title]="origin.ip")
 		| {{origin.ip}}
 	span([title]="countryName") [{{origin.country}}]

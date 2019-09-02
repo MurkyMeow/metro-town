@@ -1475,15 +1475,24 @@ export function isAscii(text: string) {
 const unicode = createBadWords(false);
 const ascii = createBadWords(true);
 
-const replaceRegex = (values: string[]) => new RegExp(`\\b(?:${values.join('|')})\\b`, 'ugi');
-const replaceRegexRU = (values: string[]) => new RegExp(`${wordStartRU}(?:${values.join('|')})${wordEndRU}`, 'ugi');
-const replaceRegexOther = (values: string[]) => new RegExp(`(?:${values.join('|')})`, 'ugi');
-const replaceRegexSpecific = (values: string[]) => new RegExp(`(?:${values.join('|')})`, 'ug');
+function tryRegex(value: string, flags: string) {
+	try {
+		return new RegExp(value, flags);
+	} catch (e) {
+		console.error(e.message);
+		return new RegExp(/(?!.*)/);
+	}
+}
 
-const testRegex = (values: string[]) => new RegExp(`\\b(?:${values.join('|')})\\b`, 'ui');
-const testRegexRU = (values: string[]) => new RegExp(`${wordStartRU}(?:${values.join('|')})${wordEndRU}`, 'ui');
-const testRegexOther = (values: string[]) => new RegExp(`(?:${values.join('|')})`, 'ui');
-const testRegexSpecific = (values: string[]) => new RegExp(`(?:${values.join('|')})`, 'u');
+const replaceRegex = (values: string[]) => tryRegex(`\\b(?:${values.join('|')})\\b`, 'ugi');
+const replaceRegexRU = (values: string[]) => tryRegex(`${wordStartRU}(?:${values.join('|')})${wordEndRU}`, 'ugi');
+const replaceRegexOther = (values: string[]) => tryRegex(`(?:${values.join('|')})`, 'ugi');
+const replaceRegexSpecific = (values: string[]) => tryRegex(`(?:${values.join('|')})`, 'ug');
+
+const testRegex = (values: string[]) => tryRegex(`\\b(?:${values.join('|')})\\b`, 'ui');
+const testRegexRU = (values: string[]) => tryRegex(`${wordStartRU}(?:${values.join('|')})${wordEndRU}`, 'ui');
+const testRegexOther = (values: string[]) => tryRegex(`(?:${values.join('|')})`, 'ui');
+const testRegexSpecific = (values: string[]) => tryRegex(`(?:${values.join('|')})`, 'u');
 
 const regexReplace = replaceRegex(unicode.all);
 const regexReplaceRU = replaceRegexRU(unicode.foreign);
@@ -1507,8 +1516,8 @@ const regexTestSpecificFast = testRegexSpecific(ascii.specific);
 
 const regexTestFuck = testRegex(unicode.fuck);
 
-const regexReplaceRUSingle = new RegExp(`${unicode.foreign.join('|')}`, 'ugi');
-const regexReplacePartial = new RegExp(`${[
+const regexReplaceRUSingle = tryRegex(`${unicode.foreign.join('|')}`, 'ugi');
+const regexReplacePartial = tryRegex(`${[
 	...unicode.all, ...unicode.foreign, ...unicode.other, ...unicode.specific
 ].join('|')}`, 'ugi');
 
@@ -1579,17 +1588,17 @@ export function filterBadWordsPartial(text: string, replacer = defaultReplacer):
 }
 
 export function findMatch(text: string): string | undefined {
-	return unicode.all.find(x => (new RegExp(`\\b(?:${x})\\b`, 'ui')).test(text))
-		|| unicode.foreign.find(x => (new RegExp(`${wordStartRU}(?:${x})${wordEndRU}`, 'ui')).test(text))
-		|| unicode.other.find(x => (new RegExp(`${x}`, 'u')).test(text))
-		|| unicode.specific.find(x => (new RegExp(`${x}`, 'u')).test(text));
+	return unicode.all.find(x => (tryRegex(`\\b(?:${x})\\b`, 'ui')).test(text))
+		|| unicode.foreign.find(x => (tryRegex(`${wordStartRU}(?:${x})${wordEndRU}`, 'ui')).test(text))
+		|| unicode.other.find(x => (tryRegex(`${x}`, 'u')).test(text))
+		|| unicode.specific.find(x => (tryRegex(`${x}`, 'u')).test(text));
 }
 
 export function createMatchEntries() {
 	return [
-		...unicode.all.map(line => ({ line, regex: new RegExp(`\\b(?:${line})\\b`, 'ui') })),
-		...unicode.foreign.map(line => ({ line, regex: new RegExp(`${wordStartRU}(?:${line})${wordEndRU}`, 'ui') })),
-		...unicode.other.map(line => ({ line, regex: new RegExp(line, 'ui') })),
-		...unicode.specific.map(line => ({ line, regex: new RegExp(line, 'u') })),
+		...unicode.all.map(line => ({ line, regex: tryRegex(`\\b(?:${line})\\b`, 'ui') })),
+		...unicode.foreign.map(line => ({ line, regex: tryRegex(`${wordStartRU}(?:${line})${wordEndRU}`, 'ui') })),
+		...unicode.other.map(line => ({ line, regex: tryRegex(line, 'ui') })),
+		...unicode.specific.map(line => ({ line, regex: tryRegex(line, 'u') })),
 	];
 }

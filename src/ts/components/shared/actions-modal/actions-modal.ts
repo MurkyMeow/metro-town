@@ -2,14 +2,14 @@ import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/cor
 import { Subscription } from 'rxjs';
 import {
 	createButtionActionActions, expressionButtonAction, createButtonCommandActions,
-	createDefaultButtonActions, actionExpressionDefaultPalette, entityButtonAction
+	createDefaultButtonActions, actionExpressionDefaultPalette, entityButtonAction, serializeActions, deserializeActions
 } from '../../../client/buttonActions';
 import * as sprites from '../../../generated/sprites';
 import {
 	Eye, Muzzle, ColorExtraSet, ColorExtra, Iris, ExpressionExtra, PonyEye, ButtonAction, Action,
 	ButtonActionSlot, EntityButtonAction
 } from '../../../common/interfaces';
-import { createExpression } from '../../../client/clientUtils';
+import { createExpression, readFileAsText } from '../../../client/clientUtils';
 import { ACTION_EXPRESSION_BG, ACTION_EXPRESSION_EYE_COLOR, fillToOutline } from '../../../common/colors';
 import { faLock, faApple, faLaughBeam, faComment, faCog, faCogs } from '../../../client/icons';
 import { createEyeSprite } from '../../../client/spriteUtils';
@@ -149,6 +149,18 @@ export class ActionsModal implements OnInit, OnDestroy {
 	updateEntity() {
 		if (BETA) {
 			this.entityAction = entityButtonAction(this.entityName);
+		}
+	}
+	export() {
+		const data = serializeActions(this.game.actions);
+		saveAs(new Blob([data], { type: 'text/plain;charset=utf-8' }), `pony-town-actions.json`);
+	}
+	async import(file: File | undefined) {
+		if (file) {
+			const text = await readFileAsText(file);
+			this.game.actions = deserializeActions(text);
+			this.game.editingActions = false;
+			setTimeout(() => this.game.editingActions = true, 500);
 		}
 	}
 }

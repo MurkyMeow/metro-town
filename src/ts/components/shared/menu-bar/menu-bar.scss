@@ -23,7 +23,6 @@
 }
 
 .logo-large {
-	width: 287px;
 	display: none;
 
 	@include media-breakpoint-up(lg) {
@@ -32,7 +31,6 @@
 }
 
 .logo-small {
-	width: 37px;
 	display: block;
 
 	@include media-breakpoint-up(lg) {

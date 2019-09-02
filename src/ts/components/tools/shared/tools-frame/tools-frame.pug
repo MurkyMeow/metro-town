@@ -1,4 +1,4 @@
-﻿ng-template(#selectFrame)
+ng-template(#selectFrame)
 	.frame-select-container
 		a.frame-select(*ngFor="let s of sprites; index as i" [class.active]="frame === i"
 		               (mousedown)="select(i)" (mouseenter)="enter(i)" (mouseleave)="leave()")

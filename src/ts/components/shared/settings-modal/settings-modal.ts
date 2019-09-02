@@ -8,8 +8,8 @@ import {
 import { StorageService } from '../../services/storageService';
 import { cloneDeep } from '../../../common/utils';
 import { PonyTownGame } from '../../../client/game';
-import { updateRangeIndicator } from '../../../client/clientUtils';
-import { faSlidersH, faCommentSlash, faGamepad, faImage } from '../../../client/icons';
+import { updateRangeIndicator, readFileAsText } from '../../../client/clientUtils';
+import { faSlidersH, faCommentSlash, faGamepad, faImage, faDownload, faUpload } from '../../../client/icons';
 
 @Component({
 	selector: 'settings-modal',
@@ -24,6 +24,8 @@ export class SettingsModal implements OnInit, OnDestroy {
 	readonly filtersIcon = faCommentSlash;
 	readonly controlsIcon = faGamepad;
 	readonly graphicsIcon = faImage;
+	readonly exportIcon = faDownload;
+	readonly importIcon = faUpload;
 	@Output() close = new EventEmitter();
 	account: AccountSettings = {};
 	browser: BrowserSettings = {};
@@ -117,6 +119,21 @@ export class SettingsModal implements OnInit, OnDestroy {
 
 		if (this.account.filterWords === undefined) {
 			this.account.filterWords = '';
+		}
+	}
+	export() {
+		const account = { ...this.account, actions: undefined };
+		const browser = this.browser;
+		const data = JSON.stringify({ account, browser });
+		saveAs(new Blob([data], { type: 'text/plain;charset=utf-8' }), `pony-town-settings.json`);
+	}
+	async import(file: File | undefined) {
+		if (file) {
+			const text = await readFileAsText(file);
+			const { account, browser } = JSON.parse(text);
+			const actions = this.account.actions;
+			Object.assign(this.account, { ...account, actions });
+			Object.assign(this.browser, browser);
 		}
 	}
 }

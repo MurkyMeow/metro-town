@@ -5,7 +5,7 @@ A game of ponies building a town
 ## Prerequisites
 
 * [Node.js](https://nodejs.org/download/release/v9.11.2/) (version 9)
-* [gulp](http://gulpjs.com/) `npm install -g gulp`
+* gulp `npm install -g gulp`
 * MongoDB: [download link](https://www.mongodb.com/download-center/community) and [installation instructions](https://docs.mongodb.com/manual/administration/install-community/)
 * [ImageMagick](https://imagemagick.org/script/download.php#windows) (optional, required for generating preview gifs in animation tool)
 * [Git LFS](https://git-lfs.github.com/)
@@ -143,7 +143,10 @@ Add `config.json` file in root directory with following content. You can use `co
   "twitterLink": "https://twitter.com/<twitter_name>", // optional
   "contactEmail": "<your_contact_email>",
   "port": 8090,
+  "adminPort": 8091,
   "host": "http://localhost:8090/",
+  "local": "localhost:8090",
+	"adminLocal": "localhost:8091",
   "secret": "<some_random_string_here>",
   "token": "<some_random_string_here>",
   "db": "mongodb://<username>:<password>@localhost:27017/<database_name>", // use values you used when setting up database
@@ -170,7 +173,7 @@ Add `config.json` file in root directory with following content. You can use `co
       "flag": "test", // optional flag ("test", "star" or space separated list of country flags)
       "flags": { // optional feature flags
         "test": true, // test server
-        "objects": true, // in-game editor
+        "editor": true, // in-game editor
       },
       "alert": "18+", // optional 18+ alert (also blocks underage players)
     },

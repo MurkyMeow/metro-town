@@ -924,8 +924,8 @@ export class PonyTownGame implements Game {
 			const hover = screenToWorld(camera, point(input.pointerX / scale, input.pointerY / scale));
 
 			if (input.usingTouch && !input.wasPressed(Key.TOUCH_CLICK) && !input.isPressed(Key.TOUCH)) {
-				hover.x = 0;
-				hover.y = 0;
+				hover.x = -1;
+				hover.y = -1;
 			}
 
 			this.hover = hover;
@@ -957,11 +957,13 @@ export class PonyTownGame implements Game {
 					const pickedEntities = pickEntities(this.map, hover, shift, this.mod);
 					const pickedEntity = pickedEntities[(pickedEntities.indexOf(this.selected!) + 1) % pickedEntities.length];
 					const holdingRemoveTool = player.hold === removeEntitiesTool.type;
+					const holdingPlaceTool = player.hold === placeEntitiesTool.type;
 					const editableMap = hasFlag(this.map.flags, MapFlags.EditableEntities);
+					const holdingTool = holdingRemoveTool || holdingPlaceTool;
 
 					if (BETA && this.editor.selectingEntities) {
 						editorSelectEntities(this, hover, shift);
-					} else if (pickedEntity && (!holdingRemoveTool || !editableMap || hasFlag(pickedEntity.flags, EntityFlags.IgnoreTool))) {
+					} else if (pickedEntity && (!holdingTool || !editableMap || hasFlag(pickedEntity.flags, EntityFlags.IgnoreTool))) {
 						if (pickedEntity.type === PONY_TYPE) {
 							this.select(pickedEntity as Pony);
 						} else if (entityInRange(pickedEntity, player)) {
@@ -987,7 +989,7 @@ export class PonyTownGame implements Game {
 					} else if (holdingRemoveTool && this.highlightEntity && editableMap) {
 						const id = this.highlightEntity.id;
 						this.send(server => server.actionParam(Action.RemoveEntity, id));
-					} else if (player.hold === placeEntitiesTool.type && this.highlightEntity && editableMap) {
+					} else if (holdingPlaceTool && this.highlightEntity && editableMap) {
 						const { x, y, type } = this.highlightEntity;
 						this.send(server => server.actionParam(Action.PlaceEntity, { x, y, type }));
 					} else if (this.selected) {
