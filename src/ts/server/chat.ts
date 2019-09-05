@@ -121,7 +121,7 @@ export const createSay =
 						}
 					}
 				} else {
-					const expression = parseExpression(text.substr(1));
+					const expression = parseExpression(text.substr(1), true);
 
 					if (expression) {
 						setEntityExpression(client.pony, expression);

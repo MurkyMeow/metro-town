@@ -178,9 +178,9 @@ const verticalLeftRegex = new RegExp(`^${any(muzzlesLeft)}-?${tears}${any(vertic
 const horizontalRegex = new RegExp(`^${any(horizontalEyesRight)}(//)?${any(horizontalMuzzles)}(//)?${any(horizontalEyesLeft)}$`);
 
 function matchVertical(
-	text: string, regex: RegExp, flip: boolean, muzzleMap: Dict<Muzzle>, eyesMap: Dict<Eye>
+	text: string, regex: RegExp, flip: boolean, muzzleMap: Dict<Muzzle>, eyesMap: Dict<Eye>, command: boolean = false
 ): Expression | undefined {
-	if (/^([|]{2,}|BS|8x|x8|x-?x|\d+)$/i.test(text))
+	if (!command && /^([|]{2,}|BS|8x|x8|x-?x|\d+)$/i.test(text))
 		return undefined;
 
 	const match = regex.exec(text);
@@ -205,15 +205,15 @@ function matchVertical(
 	return { right, left, muzzle, rightIris, leftIris, extra };
 }
 
-function matchHorizontal(text: string): Expression | undefined {
-	if (/\.\.|--|vv|uu|qq|pp|nn|^\d+$/i.test(text)) {
+function matchHorizontal(text: string, command: boolean = false): Expression | undefined {
+	if (!command && /\.\.|--|vv|uu|qq|pp|nn|^\d+$/i.test(text)) {
 		return undefined;
 	}
 
 	if (/[a-zA-Z][a-z][a-z]|[A-Z]{3}/.test(text)) {
 		const clear = text.replace(/[^a-z]/ig, '').toLowerCase();
 
-		if (clear.length === 3 && threeLetterWords.test(clear)) {
+		if (clear.length === 3 && (!command && threeLetterWords.test(clear))) {
 			return undefined;
 		}
 	}
@@ -221,7 +221,7 @@ function matchHorizontal(text: string): Expression | undefined {
 	if (/[a-z][a-z][.,*-]/i.test(text)) {
 		const clear = text.replace(/[^a-z]/ig, '').toLowerCase();
 
-		if (clear.length === 2 && twoLetterWords.test(clear)) {
+		if (clear.length === 2 && (!command && twoLetterWords.test(clear))) {
 			return undefined;
 		}
 	}
@@ -297,7 +297,7 @@ function matchOther(text: string): Expression | undefined {
 	}
 }
 
-export function matchExpression(text: string): Expression | undefined {
+export function matchExpression(text: string, command: boolean = false): Expression | undefined {
 	if (/тот/ui.test(text)) {
 		return undefined;
 	}
@@ -307,16 +307,16 @@ export function matchExpression(text: string): Expression | undefined {
 		.replace(/\\/g, '/')
 		.replace(/\/{3,}/g, '//');
 
-	return matchVertical(text, verticalRightRegex, false, muzzlesRight, verticalEyesRight)
-		|| matchVertical(text, verticalLeftRegex, true, muzzlesLeft, verticalEyesLeft)
-		|| matchHorizontal(text)
+	return matchVertical(text, verticalRightRegex, false, muzzlesRight, verticalEyesRight, command)
+		|| matchVertical(text, verticalLeftRegex, true, muzzlesLeft, verticalEyesLeft, command)
+		|| matchHorizontal(text, command)
 		|| matchOther(text);
 }
 
-export function parseExpression(text: string): Expression | undefined {
+export function parseExpression(text: string, command = false): Expression | undefined {
 	const emoteMatch = /(?:^| )(\S+)\s*$/.exec(text);
 	const emote = emoteMatch && emoteMatch[1].trim();
-	return emote ? matchExpression(emote) : undefined;
+	return emote ? matchExpression(emote, command) : undefined;
 }
 
 function createMap<T>(values: any[][]): Dict<T> {

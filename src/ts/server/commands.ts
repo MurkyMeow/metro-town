@@ -197,7 +197,7 @@ export function createCommands(world: World): Command[] {
 		command(['w', 'whisper'], '/w <name> - whisper to player', '', shouldNotBeCalled),
 		command(['r', 'reply'], '/r - reply to whisper', '', shouldNotBeCalled),
 		command(['e'], '/e - set permanent expression', '', ({ }, { pony }, message) => {
-			pony.exprPermanent = parseExpression(message);
+			pony.exprPermanent = parseExpression(message, true);
 			setEntityExpression(pony, undefined, 0);
 		}),
 
@@ -206,7 +206,7 @@ export function createCommands(world: World): Command[] {
 			execAction(client, Action.TurnHead, settings);
 		}),
 		command(['boop', ')'], '/boop or /) - a boop', '', ({ }, client, message, _, __, settings) => {
-			const expression = parseExpression(message);
+			const expression = parseExpression(message, true);
 
 			if (expression) {
 				setEntityExpression(client.pony, expression, 800);
