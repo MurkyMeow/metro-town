@@ -96,6 +96,7 @@ CLASSES[MessageType.WhisperTo] = 'chat-line-whisper';
 CLASSES[MessageType.WhisperAnnouncement] = 'chat-line-whisper-announcement';
 CLASSES[MessageType.WhisperToAnnouncement] = 'chat-line-whisper-announcement';
 
+
 export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickHandler): ChatLogLineDOM {
 	const line: ChatLogLineDOM = {} as any;
 
@@ -163,6 +164,7 @@ function setNameColors(line: ChatLogLineDOM | undefined, colors?: string[] | nul
 }
 
 function updateChatLogName(line: ChatLogLineDOM, { name, index }: ChatLogMessage) {
+
 	if (name) {
 		line.name.style.display = 'inline';
 		replaceNodes(line.nameContent, name);
@@ -450,7 +452,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 
 		return index;
 	}
-
 	filterChat() {
 		this.clearTimeOutAutoClear();
 		this.clearTimeOutAutoUnfocus();
@@ -493,7 +494,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 		this.showHideChatLogLines(value, toLowerCase);
 	}
-
 	showHideChatLogLines(content: string | RegExp, caseSensitive: boolean) {
 		const lines = this.linesElement.getElementsByTagName('div');
 
@@ -514,14 +514,12 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			}
 		}
 	}
-
 	unhideAllLines() {
 		const lines = this.linesElement.getElementsByTagName('div');
 		for (let i = 0; i < lines.length; i++) {
 			lines[i].hidden = false;
 		}
 	}
-
 	private getRGB(hex: string) {
 		const bigint = parseInt(hex, 16);
 		const r = (bigint >> 16) & 255;
@@ -529,7 +527,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		const b = bigint & 255;
 		return [r, g, b];
 	}
-
 	private RGBToHSL(rgb: number[]) {
 		let r = rgb[0] / 255;
 		let g = rgb[1] / 255;
@@ -559,17 +556,25 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		s = Math.floor(s * 100);
 		l = Math.floor(l * 100);
 
-		if (l < 45) l = 45;
-		//if (s > 60) s = 60;
+		if (l < 40) {
+			if (l > 20 && l < 40) {
+				l += 20;
+				if (s > 11) s -= 11;
+			} else {
+				l = 40;
+				if (s > 11) s = 0;
+			}
+		}
+
 		return `hsl(${h}, ${s}%, ${l}%)`;
 	}
-
 	fixColor(color: string) {
-		if (color === 'ff') color = '000000';
-		if (color === '0') color = 'ffffff';
-		return color;
+		while (color.length <= 7) {
+			color = `0${color}`;
+		}
+		color = color.replace(/0/g, '1');
+		return color.substr(0, 6);
 	}
-
 	private getCharaterColors(id: number | undefined) {
 		if (!id) return null;
 		const entity = findEntityById(this.game.map, id) as Pony;
@@ -578,12 +583,12 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		let body = entity.palettePonyInfo.body;
 		let mane = entity.palettePonyInfo.mane;
 		if (body && body.palette && body.palette.colors[1]) {
-			let bodyColor = this.fixColor(body.palette.colors[1].toString(16).substr(0, 6));
+			let bodyColor = this.fixColor(body.palette.colors[1].toString(16));
 			const RGB = this.getRGB(bodyColor);
 			colors.push(this.RGBToHSL(RGB));
 		}
 		if (mane && mane.palette && mane.palette.colors[1]) {
-			let maneColor = this.fixColor(mane.palette.colors[1].toString(16).substr(0, 6));
+			let maneColor = this.fixColor(mane.palette.colors[1].toString(16));
 			const RGB = this.getRGB(maneColor);
 			colors.push(this.RGBToHSL(RGB));
 		} else if (colors && colors[0]) {
@@ -597,18 +602,15 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		this.autoClear = null;
 		this.filterColor = this.inactiveBg;
 	}
-
 	clearTimeOutAutoUnfocus() {
 		if (this.autoUnfocus) clearTimeout(this.autoUnfocus);
 		this.autoUnfocus = null;
 	}
-
 	unFocus() {
 		this.clearTimeOutAutoUnfocus();
 		if (this.filterTab.nativeElement)
 			this.filterTab.nativeElement.blur();
 	}
-
 	addMessage(message: ChatMessage) {
 		if (message.name && message.message) {
 			const entry = this.createEntry(message);
