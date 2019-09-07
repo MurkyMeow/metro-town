@@ -136,6 +136,7 @@ export const MONTH_NAMES_EN = [
 
 export const OFFLINE_PONY = 'DAKVlZUvLy82QIxomgCfgAYAGIAoQGEBwAEERFEUEA==';
 export const SUPPORTER_PONY = 'CAfz9PUFLUnapSD/1wD5aFT////+hHM2QIJkJ8AQLkkADAA6jXrsBT1Iw+wBMJOqoW1C2oW1AAI=';
+export const DISCORD_PONY = 'EAlyidplAf/U7f/r9//09vf///9//9QsLzOXp+E2QQJiBLQBPwAMADqNANFZmyFFGhKgorM8ICAEIBAgJGZyzAzMzMzAwMzMzAAAwA==';
 
 // patreon reward tier IDs
 export const rewardLevel1 = '2255086';
