@@ -57,6 +57,36 @@ export const args = argv as AppArgs;
 export const { version, description }: AppPackage = require('../../../package.json');
 export const config: AppConfig = require('../../../config.json');
 
+if (!DEVELOPMENT && !TESTS &&
+	(!config.secret || !config.token
+	|| config.secret.length < 16
+	|| config.token.length < 16
+	|| config.secret === config.token
+	|| config.secret === 'gfhfdshtrdhgedryhe4t3y5uwjthr'
+	|| config.token === 'sdlfgihsdor8ghor8dgdrgdegrdg'
+	|| config.secret === '<some_random_string_here>'
+	|| config.token === '<some_random_string_here>')) {
+	console.error(
+`
+================================================================================
+                           WARNING! WARNING! WARNING!
+
+Your config parameters token and secret appear to be insecure!
+This is **VERY** insecure, as these values serve as authentication tokens for
+internal APIs and session cookies. You **must** change these values in order to
+prevent potential exploits.
+
+To generate new values for these parameters, you can use the following command:
+    node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+
+Exiting here, as the security of your application cannot be guaranteed...
+================================================================================
+`
+	);
+
+	process.exit(1);
+}
+
 const loginServer: ServerConfig = { id: 'login', filter: false, port: config.port } as any;
 const adminServer: ServerConfig = { id: 'admin', filter: false, port: config.adminPort || config.port } as any;
 

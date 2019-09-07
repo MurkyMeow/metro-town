@@ -181,6 +181,16 @@ Add `config.json` file in root directory with following content. You can use `co
 }
 ```
 
+### NOTE!
+
+You **MUST** provide **unique**, **random** values for the `secret` and `token` fields of your config. It is **extremely dangerous** to leave these as default, as these values serve as authentication tokens for internal APIs and session cookies.
+
+To generate new values for these parameters, you can use the following command:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+```
+
 ## Running
 
 ### Your first build
