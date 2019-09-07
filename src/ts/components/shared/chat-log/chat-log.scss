@@ -162,6 +162,9 @@ $resizer-offset: $resizer-size / 2;
 .chat-log-filter {
     border: none;
     width: 100px;
+    &::placeholder {
+        color: #ccc;
+    }
 }
 
 @media only screen and (max-width: 360px) {
