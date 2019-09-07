@@ -1,5 +1,6 @@
 {
 	"title": "Your Town",
+	"discordLink": "<LINK_TO_DISCORD_INVITE>",
 	"twitterLink": "<LINK_TO_TWITTER>",
 	"contactEmail": "your_contact_email@example.com",
 	"port": 8090,
