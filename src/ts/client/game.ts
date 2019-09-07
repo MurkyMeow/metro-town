@@ -11,7 +11,7 @@ import {
 	clamp, lengthOfXY, setFlag, hasFlag, boundsIntersect, point, toInt, lerpColor, distanceXY
 } from '../common/utils';
 import {
-	OFFLINE_PONY, MAX_SCALE, SUPPORTER_PONY, HOUR, MIN_SCALE, CAMERA_WIDTH_MIN, CAMERA_WIDTH_MAX,
+	OFFLINE_PONY, MAX_SCALE, SUPPORTER_PONY, DISCORD_PONY, HOUR, MIN_SCALE, CAMERA_WIDTH_MIN, CAMERA_WIDTH_MAX,
 	CAMERA_HEIGHT_MIN, CAMERA_HEIGHT_MAX, SECOND, TILE_CHANGE_RANGE, MINUTE, PONY_TYPE,
 	REGION_SIZE, tileWidth, tileHeight
 } from '../common/constants';
@@ -206,6 +206,7 @@ export class PonyTownGame implements Game {
 	tileSets?: TileSets;
 	offlinePony = createPony(0, 0, OFFLINE_PONY, mockPaletteManager.addArray(defaultPalette), mockPaletteManager);
 	supporterPony = createPony(0, 0, SUPPORTER_PONY, mockPaletteManager.addArray(defaultPalette), mockPaletteManager);
+	discordPony = createPony(0, 0, DISCORD_PONY, mockPaletteManager.addArray(defaultPalette), mockPaletteManager);
 	scale: number;
 	failedFBO = false;
 	rightOverride?: boolean;
@@ -718,6 +719,7 @@ export class PonyTownGame implements Game {
 
 			this.offlinePony = createPony(0, 0, OFFLINE_PONY, palettes.defaultPalette, this.paletteManager);
 			this.supporterPony = createPony(0, 0, SUPPORTER_PONY, palettes.defaultPalette, this.paletteManager);
+			this.discordPony = createPony(0, 0, DISCORD_PONY, palettes.defaultPalette, this.paletteManager);
 			initializeToys(this.paletteManager);
 		} catch (e) {
 			this.errorReporter.captureEvent({ name: 'failed game.initWebGL', error: e.message, stack: e.stack });

@@ -140,6 +140,7 @@ Add `config.json` file in root directory with following content. You can use `co
 ```javascript
 {
   "title": "Pony Town",
+  "discordLink": "https://discordapp.com/invite/<invite_code>", // optional
   "twitterLink": "https://twitter.com/<twitter_name>", // optional
   "contactEmail": "<your_contact_email>",
   "port": 8090,

@@ -25,6 +25,8 @@ import { SpriteBox } from './sprite-box/sprite-box';
 import { SpriteSelection } from './sprite-selection/sprite-selection';
 import { SupportButton } from './support-button/support-button';
 import { SupporterPony } from './supporter-pony/supporter-pony';
+import { DiscordButton } from './discord-button/discord-button';
+import { DiscordPony } from './discord-pony/discord-pony';
 import { SetSelection, SetOutlineHidden } from './set-selection/set-selection';
 import { CheckBox } from './check-box/check-box';
 import { PortraitBox } from './portrait-box/portrait-box';
@@ -91,6 +93,8 @@ const declarations = [
 	SpriteSelection,
 	SupportButton,
 	SupporterPony,
+	DiscordButton,
+	DiscordPony,
 	SetSelection,
 	SetOutlineHidden,
 	CheckBox,

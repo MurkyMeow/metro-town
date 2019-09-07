@@ -14,6 +14,7 @@ page-loader(*ngIf="!playing")
 		h2.sr-only Character selection
 		.mx-auto(style="max-width: 400px;")
 			support-button.mb-3
+			discord-button.mb-3
 			install-button.mb-3
 			character-select(
 				[(error)]="error" [newButton]="true" [removeButton]="true" (change)="updateMuzzles()"
