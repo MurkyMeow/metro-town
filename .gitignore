@@ -1,9 +1,19 @@
+.idea/
 node_modules/
+
 /src/scripts/
 /build/
 /build-copy/
 /logs/
 /settings/
-.idea/
+
+/tools/
+
+/src/ts/generated/*
+!/src/ts/generated/gamepad-template.ts
+
+/assets/images/pony.png
+/assets/images/pony2.png
+/assets/images/pony2a.png
 
 /config.json

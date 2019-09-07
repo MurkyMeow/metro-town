@@ -36,7 +36,7 @@
 		"no-trailing-whitespace": true,
 		"linebreak-style": [
 			true,
-			"CRLF"
+			"LF"
 		],
 		"max-line-length": [
 			true,

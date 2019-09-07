@@ -183,17 +183,26 @@ Add `config.json` file in root directory with following content. You can use `co
 
 ## Running
 
-Production environment
+### Your first build
+
+pixel.horse has modified the Pony Town archive such that compiled game assets are no longer included. To compile the game assets for the first time, you can either use a development build with the `--sprites` flag (see [Running in development](#running-in-development)), or use the following commands to build and start a production instance with compiled sprites:
+
+```bash
+npm run build-sprites
+npm start
+```
+
+### Production environment
 
 ```bash
 npm run build
 npm start
 ```
 
-Adding/removing roles
+### Adding/removing roles
 
 ```bash
-node cli.js --addrole <account_id> <role>   # roles: superadmin, admin, mod, dev 
+node cli.js --addrole <account_id> <role>   # roles: superadmin, admin, mod, dev
 node cli.js --removerole <account_id> <role>
 ```
 
@@ -206,7 +215,7 @@ node cli.js --addrole <your_account_id> superadmin
 Admin panel is accessible at `<base_url>/admin/` (requires admin or superadmin role to access)
 Tools are accessible at `<base_url>/tools/` (only available in dev mode or when started with --tools flag)
 
-Starting as multiple processes
+### Starting as multiple processes
 
 ```bash
 node pony-town.js --login                    # login server
@@ -223,14 +232,14 @@ It is recommended to run processes with larger memory pool for large user bases 
 node --max_old_space_size=8192 pony-town.js --game main
 ```
 
-Beta environment (with dev tools and in-development features)
+### Beta environment (with dev tools and in-development features)
 
 ```bash
 npm run build-beta
 node pony-town.js --login --admin --game --tools --beta
 ```
 
-Running in development
+### Running in development
 
 ```bash
 npm run ts-watch    # terminal 1

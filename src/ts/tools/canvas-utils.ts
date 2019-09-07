@@ -1,4 +1,7 @@
+/// <reference path="../../typings/my.d.ts" />
+
 import * as fs from 'fs';
+import * as path from 'path';
 import { createCanvas, Image } from 'canvas';
 import { ExtCanvas, Point } from './types';
 
@@ -167,6 +170,12 @@ export function isCanvasEmpty(canvas: ExtCanvas | undefined): boolean {
 }
 
 export function saveCanvas(filePath: string, canvas: HTMLCanvasElement) {
+	try {
+		fs.mkdirSync(path.dirname(filePath), { recursive: true });
+	} catch (e) {
+		if (e.code !== 'EEXIST') throw e;
+	}
+
 	fs.writeFileSync(filePath, canvas.toBuffer());
 }
 

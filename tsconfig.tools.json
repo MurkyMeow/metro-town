@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "src/ts/tools/create-sprites.ts"
+  ]
+}
