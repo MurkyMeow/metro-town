@@ -151,6 +151,7 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 					this.lastMessages.shift();
 				}
 			}
+
 			this.close();
 		}
 	}

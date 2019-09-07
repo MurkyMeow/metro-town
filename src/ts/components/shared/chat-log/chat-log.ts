@@ -96,14 +96,13 @@ CLASSES[MessageType.WhisperTo] = 'chat-line-whisper';
 CLASSES[MessageType.WhisperAnnouncement] = 'chat-line-whisper-announcement';
 CLASSES[MessageType.WhisperToAnnouncement] = 'chat-line-whisper-announcement';
 
-
 export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickHandler): ChatLogLineDOM {
 	const line: ChatLogLineDOM = {} as any;
 
 	line.root = element('div', 'chat-line', [
 		element('span', 'chat-line-lead'),
 		line.time = element('span', 'chat-line-name', [
-			textNode(`[`),
+			textNode('['),
 			line.timeContent = element(
 				'span', 'chat-line-time-content', [textNode('')], undefined),
 			line.index = element('span', 'chat-line-time-index', [line.indexText = textNode('')]),
@@ -111,7 +110,6 @@ export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickH
 		]),
 		line.label = element(
 			'span', 'chat-line-label mr-1', [line.labelText = textNode('')], undefined, { click: () => clickLabel(line.entry) }),
-
 		line.prefixText = textNode(''),
 		line.name = element('span', 'chat-line-name', [
 			textNode(`[`),
@@ -164,7 +162,6 @@ function setNameColors(line: ChatLogLineDOM | undefined, colors?: string[] | nul
 }
 
 function updateChatLogName(line: ChatLogLineDOM, { name, index }: ChatLogMessage) {
-
 	if (name) {
 		line.name.style.display = 'inline';
 		replaceNodes(line.nameContent, name);
@@ -204,6 +201,7 @@ function findUserIndex(users: IndexEntryUser[], id: number, crc: number | undefi
 			return i;
 		}
 	}
+
 	return -1;
 }
 
@@ -596,7 +594,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 		return colors;
 	}
-
 	clearTimeOutAutoClear() {
 		if (this.autoClear) clearTimeout(this.autoClear);
 		this.autoClear = null;
@@ -621,7 +618,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			const tab = this.activeTab;
 			let colors: string[] | null = null;
 			colors = this.getCharaterColors(message.id);
-
 
 			this.addEntryToList(this.local, GENERAL_CHAT_LIMIT, open && tab === 'local', entry);
 			setNameColors(entry.dom, colors);
@@ -662,9 +658,9 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.messageCounter++;
 		}
 	}
-
 	private addEntryToList(list: ChatLogMessage[], limit: number, isOpen: boolean, entry: ChatLogMessage) {
 		let removedDom: ChatLogLineDOM | undefined;
+
 		while (list.length >= limit) {
 			const removed = list.shift();
 
@@ -677,6 +673,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				removed.dom = undefined;
 			}
 		}
+
 		list.push(entry);
 
 		if (isOpen) {
@@ -685,13 +682,11 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.linesElement.appendChild(entry.dom.root);
 		}
 	}
-
 	toggle() {
 		this.settings.chatlogClosed = !this.settings.chatlogClosed;
 		this.settingsService.saveBrowserSettings();
 		this.updateOpen();
 	}
-
 	switchTab(tab: Tab) {
 		if (this.activeTab !== tab) {
 			this.settings.chatlogTab = tab;
@@ -701,13 +696,11 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.updateTabs();
 		}
 	}
-
 	private updateTabs() {
 		this.setActiveTab(this.localTab.nativeElement, this.activeTab === 'local');
 		this.setActiveTab(this.partyTab.nativeElement, this.activeTab === 'party');
 		this.setActiveTab(this.whisperTab.nativeElement, this.activeTab === 'whisper');
 	}
-
 	private setActiveTab(tab: HTMLElement, active: boolean) {
 		if (active) {
 			tab.classList.add('active');
@@ -719,21 +712,17 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				tab.style.backgroundColor = this.inactiveBg;
 		}
 	}
-
 	scrollToEnd() {
 		// requestAnimationFrame(this.scrollHandler);
 		this.scrollToEndAtFrame = true;
 	}
-
 	scrollHandler = () => {
 		this.scrollingToEnd = true;
 		this.scroll.nativeElement.scrollTop = 99999;
 	}
-
 	clickNameHandler = (message: ChatLogMessage) => {
 		this.zone.run(() => this.nameClick.emit(message));
 	}
-
 	clickLabel = (message: ChatLogMessage) => {
 		this.zone.run(() => {
 			if (message.label) {
@@ -741,11 +730,9 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			}
 		});
 	}
-
 	private clearList() {
 		removeAllNodes(this.linesElement);
 	}
-
 	private regenerateList() {
 		this.clearList();
 
@@ -761,7 +748,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			lines.appendChild(entry.dom.root);
 		});
 	}
-
 	drag({ x, y, type, event }: AgDragEvent, resizeY: boolean, resizeX: boolean) {
 		event.preventDefault();
 
@@ -791,7 +777,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.scrollToEnd();
 		}
 	}
-
 	private setUnread(value: number) {
 		if (this.unread !== value) {
 			this.unread = value;
@@ -807,13 +792,11 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			}
 		}
 	}
-
 	private findEntityFromMessages = (id: number): FakeEntity | undefined => {
 		return findEntityFromMessages(id, this.whisper) ||
 			findEntityFromMessages(id, this.party) ||
 			findEntityFromMessages(id, this.local);
 	}
-
 	private findEntityFromMessagesByName = (name: string): FakeEntity | undefined => {
 		return findEntityFromMessagesByName(name, this.game.playerId, this.whisper) ||
 			findEntityFromMessagesByName(name, this.game.playerId, this.party) ||
