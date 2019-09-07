@@ -8,6 +8,7 @@ node_modules/
 /settings/
 
 /tools/
+/store/
 
 /src/ts/generated/*
 !/src/ts/generated/gamepad-template.ts
