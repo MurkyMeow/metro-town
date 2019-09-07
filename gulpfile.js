@@ -325,7 +325,7 @@ const empty = cb => cb();
 const tsTools = npmScript('ts-tools');
 const spritesTask = argv.sprites ? gulp.series(tsTools, sprites) : empty;
 
-const build = gulp.series(clean, setProd, common, spritesTask, ts, webpackProd, sw, size);
+const build = gulp.series(clean, setProd, spritesTask, common, ts, webpackProd, sw, size);
 const admin = gulp.series(clearnAdmin, setProd, sassAdmin, ts, webpackAdmin);
 const dev = gulp.series(clean, spritesTask, common, gulp.parallel(serverDev, watch, watchTools));
 
