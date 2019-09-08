@@ -157,6 +157,12 @@ export interface HSVA {
 	a: number;
 }
 
+export interface HSL {
+	h: number;
+	s: number;
+	l: number;
+}
+
 export interface RGB {
 	r: number;
 	g: number;
@@ -492,4 +498,38 @@ export function h2rgb(h: number): RGB {
 		g: Math.round(g * 255),
 		b: Math.round(b * 255)
 	};
+}
+
+export function rgb2hsl(rgb: RGB): HSL {
+	const r = rgb.r / 255;
+	const g = rgb.g / 255;
+	const b = rgb.b / 255;
+	let max = Math.max(r, g, b);
+	let min = Math.min(r, g, b);
+	let delta = max - min;
+	let h = 0;
+	let s;
+	let l;
+
+	if (max === min) h = 0;
+	else if (r === max) h = (g - b) / delta;
+	else if (g === max) h = 2 + (b - r) / delta;
+	else if (b === max) h = 4 + (r - g) / delta;
+
+	h = Math.min(h * 60, 360);
+	if (h < 0) h += 360;
+	l = (min + max) / 2;
+
+	if (max === min) s = 0;
+	else if (l <= 0.5) s = delta / (max + min);
+	else s = delta / (2 - max - min);
+	h = Math.floor(h);
+	s = Math.floor(s * 100);
+	l = Math.floor(l * 100);
+
+	return { h, s, l };
+}
+
+export function hsl2CSS(hsl: HSL) {
+	return `hsl(${hsl.h},${hsl.s}%,${hsl.l}%)`;
 }

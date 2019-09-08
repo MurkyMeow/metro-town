@@ -26,6 +26,10 @@ export class SettingsModal implements OnInit, OnDestroy {
 	readonly graphicsIcon = faImage;
 	readonly exportIcon = faDownload;
 	readonly importIcon = faUpload;
+	off = false;
+	twelve = false;
+	twentyFour = false;
+	timestampText: 'Disabled' | '24 Hour mode' | '12 Hour mode' = 'Disabled';
 	@Output() close = new EventEmitter();
 	account: AccountSettings = {};
 	browser: BrowserSettings = {};
@@ -59,6 +63,7 @@ export class SettingsModal implements OnInit, OnDestroy {
 		this.browser = this.settingsService.browser;
 		this.setupDefaults();
 		this.subscription = this.game.onLeft.subscribe(() => this.cancel());
+		this.updateTimestampRadios();
 	}
 	ngOnDestroy() {
 		this.finishChatlogRange();
@@ -100,6 +105,37 @@ export class SettingsModal implements OnInit, OnDestroy {
 		this.settingsService.saveBrowserSettings(this.browser);
 		this.close.emit();
 	}
+	switchTimestamp(state?: string) {
+		if (!state) this.browser.timestamp = undefined;
+		else if (state === '12') this.browser.timestamp = '12';
+		else if (state === '24') this.browser.timestamp = '24';
+		this.updateTimestampRadios();
+	}
+	turnOffTimestampRadioButtons() {
+		this.off = false;
+		this.twelve = false;
+		this.twentyFour = false;
+	}
+
+	updateTimestampRadios() {
+		this.turnOffTimestampRadioButtons();
+		switch (this.browser.timestamp) {
+			case '12':
+				this.twelve = true;
+				this.timestampText = '12 Hour mode';
+				break;
+			case '24':
+				this.twentyFour = true;
+				this.timestampText = '24 Hour mode';
+				break;
+			default:
+				this.off = true;
+				this.timestampText = 'Disabled';
+				break;
+		}
+	}
+
+
 	updateChatlogRange(range: number | undefined) {
 		document.body.classList.add('translucent-modals');
 		updateRangeIndicator(range, this.game);
