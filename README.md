@@ -282,3 +282,17 @@ gulp dev --coverage # run with tests and code coverage
 
 - `src/ts/server/start.ts:35` - adding custom map to the world
 - `src/ts/server/map/customMap.ts` - commented introduction to customizing maps
+
+## Have git ignore changes to `sprites.ts`, eventhough it's already in the index
+
+```bash
+git update-index --assume-unchanged src/ts/generated/sprites.ts
+```
+
+`serve.ts`:
+
+```bash
+git update-index --assume-unchanged src/ts/server/server.ts
+```
+
+Read more about it [here](https://stackoverflow.com/questions/1139762/ignore-files-that-have-already-been-committed-to-a-git-repository).
