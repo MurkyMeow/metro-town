@@ -1,4 +1,5 @@
 @import '../../../../styles/partials/variables';
+
 .chat-box {
 	max-width: 500px;
 	height: 37px;
@@ -51,27 +52,27 @@
 	.chat-party > &, .chat-party-think > & {
 		color: $chat-party;
 	}
-	
+
 	.chat-say > &, .chat-think > & {
 		color: $chat-color;
 	}
-	
+
 	.chat-sup > & {
 		color: $supporter-1;
 	}
-	
+
 	.chat-sup1 > & {
 		color: $supporter-1;
 	}
-	
+
 	.chat-sup2 > & {
 		color: $supporter-2;
 	}
-	
+
 	.chat-sup3 > & {
 		color: $supporter-3;
 	}
-	
+
 	.chat-whisper > & {
 		color: $chat-whisper;
 	}

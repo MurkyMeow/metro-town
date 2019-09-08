@@ -112,7 +112,7 @@ export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickH
 			'span', 'chat-line-label mr-1', [line.labelText = textNode('')], undefined, { click: () => clickLabel(line.entry) }),
 		line.prefixText = textNode(''),
 		line.name = element('span', 'chat-line-name', [
-			textNode(`[`),
+			textNode('['),
 			line.nameContent = element(
 				'span', 'chat-line-name-content', [textNode('')], undefined, { click: () => clickName(line.entry) }),
 			line.index = element('span', 'chat-line-name-index', [line.indexText = textNode('')], { title: 'duplicate name' }),
