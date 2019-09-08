@@ -31,7 +31,7 @@ export const CREDITS: Credit[] = [
 	},
 	{
 		name: 'Cloud Hop',
-		title: 'Programmer / Moderator',
+		title: 'Programmer',
 		avatarIndex: 1,
 		links: ['https://twitter.com/blackhole0173', 'https://github.com/blackhole12']
 	},
@@ -42,22 +42,40 @@ export const CREDITS: Credit[] = [
 		links: ['https://twitter.com/CyberPon3']
 	},
 	{
-		name: 'NotMyWing',
-		title: 'Programmer / Moderator',
+		name: 'Keupoz',
+		title: 'Programmer',
 		avatarIndex: 3,
-		links: ['https://twitter.com/NotMyWing', 'https://github.com/Neeve01']
+		links: ['https://github.com/Keupoz']
 	},
 	{
-		name: 'Stubenhocker',
-		title: 'Programmer',
+		name: 'NotMyWing',
+		title: 'Programmer / Moderator',
 		avatarIndex: 4,
-		links: ['https://github.com/Stubenhocker1399']
+		links: ['https://twitter.com/NotMyWing', 'https://github.com/Neeve01']
 	},
 	{
 		name: 'Luney',
 		title: 'Programmer',
 		avatarIndex: 5,
 		links: ['https://twitter.com/luneythesnep', 'https://github.com/LunarMist']
+	},
+	{
+		name: 'Stubenhocker',
+		title: 'Programmer',
+		avatarIndex: 6,
+		links: ['https://github.com/Stubenhocker1399']
+	},
+	{
+		name: 'Terncode',
+		title: 'Programmer',
+		avatarIndex: 7,
+		links: ['https://twitter.com/terncode', 'https://github.com/Terncode']
+	},
+	{
+		name: 'ZizzyDizzyMC',
+		title: 'Server Host',
+		avatarIndex: 8,
+		links: ['https://twitter.com/ZizzyDizzyMC']
 	}
 ];
 
