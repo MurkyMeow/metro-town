@@ -1,0 +1,30 @@
+name: Push Checks
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: install gulp
+        run: bash .github/ci-install-gulp.sh
+      - run: npm ci
+      - name: write config.json
+        run: cp .github/ci-config.json config.json
+      - run: npm run lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: install gulp
+        run: bash .github/ci-install-gulp.sh
+      - run: npm ci
+      - name: write config.json
+        run: cp .github/ci-config.json config.json
+      - run: npm run build

@@ -1,0 +1,32 @@
+{
+	"title": "pixel.horse CI",
+	"contactEmail": "noreply@pony.dev",
+	"port": 8090,
+	"adminPort": 8091,
+	"host": "http://localhost:8090/",
+	"local": "localhost:8090",
+	"adminLocal": "localhost:8091",
+	"secret": "pixel",
+	"token": "horse",
+	"db": "mongodb://pixel:horse@mongo:27017/pixelhorse",
+	"oauth": {
+		"google": {
+			"clientID": "snake",
+			"clientSecret": "oil"
+		}
+	},
+	"assetsPath": "assets-source",
+	"servers": [
+		{
+			"id": "ci",
+			"port": 8090,
+			"path": "/s00/ws",
+			"local": "localhost:8090",
+			"name": "CI test server",
+			"desc": "GitHub Actions checking in",
+			"flags": {
+				"test": false
+			}
+		}
+	]
+}
