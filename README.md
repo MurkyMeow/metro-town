@@ -289,10 +289,4 @@ gulp dev --coverage # run with tests and code coverage
 git update-index --assume-unchanged src/ts/generated/sprites.ts
 ```
 
-`serve.ts`:
-
-```bash
-git update-index --assume-unchanged src/ts/server/server.ts
-```
-
 Read more about it [here](https://stackoverflow.com/questions/1139762/ignore-files-that-have-already-been-committed-to-a-git-repository).
