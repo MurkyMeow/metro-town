@@ -73,14 +73,13 @@
 						| Only allow whispers from friends
 					.form-group
 				.form-group
-					label#chatlog-opacity-label Message timestamp
+					label#chatlog-opacity-label Timestamp
 					div
-						.btn-group.ml-2(btnCheckbox)
-								button.btn.btn-outline-secondary.d-none.d-sm-block([class.active]='off' (click)='switchTimestamp()') Off
-								button.btn.btn-outline-secondary.d-none.d-sm-block([class.active]='twelve' (click)='switchTimestamp("12")') 12
-								button.btn.btn-outline-secondary.d-none.d-sm-block([class.active]='twentyFour' (click)='switchTimestamp("24")') 24
-						span.ml-2 {{timestampText}}
-						//small.form-text.text-muted.mt-0 Shows message time
+						.btn-group.mb-2(btnCheckbox)
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='off' (click)='switchTimestamp()') None
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='twelve' (click)='switchTimestamp("12")') 12-hour format
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='twentyFour' (click)='switchTimestamp("24")') 24-hour format
+						small.form-text.text-muted.mt-0 Displays a timestamp in front of chatlog messages
 
 				.form-group
 					label#chatlog-opacity-label Chatlog background opacity

@@ -29,7 +29,6 @@ export class SettingsModal implements OnInit, OnDestroy {
 	off = false;
 	twelve = false;
 	twentyFour = false;
-	timestampText: 'Disabled' | '24 Hour mode' | '12 Hour mode' = 'Disabled';
 	@Output() close = new EventEmitter();
 	account: AccountSettings = {};
 	browser: BrowserSettings = {};
@@ -121,15 +120,12 @@ export class SettingsModal implements OnInit, OnDestroy {
 		switch (this.browser.timestamp) {
 			case '12':
 				this.twelve = true;
-				this.timestampText = '12 Hour mode';
 				break;
 			case '24':
 				this.twentyFour = true;
-				this.timestampText = '24 Hour mode';
 				break;
 			default:
 				this.off = true;
-				this.timestampText = 'Disabled';
 				break;
 		}
 	}
