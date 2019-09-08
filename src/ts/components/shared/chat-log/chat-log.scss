@@ -160,11 +160,35 @@ $resizer-offset: $resizer-size / 2;
 }
 
 .chat-log-filter {
+	padding-bottom: 5px;
 	border: none;
 	width: 100px;
-	&::placeholder {
-		color: #ccc;
-	}
+}
+
+.chat-log-filter::-webkit-input-placeholder {
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter:-moz-placeholder {
+	/* Firefox 18- */
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter::-moz-placeholder {
+	/* Firefox 19+ */
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter:-ms-input-placeholder {
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
 }
 
 @media only screen and (max-width: 360px) {

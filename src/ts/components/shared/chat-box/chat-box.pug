@@ -12,7 +12,7 @@
 						span.emote-sample.mr-2
 							emote-box([emote]="e.names[0]")
 
-		emote-box.game-button.chat-emoji-button([emote]="btnEmoji" (click)="openBox()" (mouseenter)="onMouseEnter($event)")
+		emote-box.game-button.chat-emoji-button([emote]="btnEmoji" (click)="toggleEmojiBox()" (mouseenter)="onMouseEnter($event)")
 		button.game-button.chat-send-button((click)="send($event)" title="Send message" aria-label="Send message")
 			fa-icon([icon]="sendIcon")
 

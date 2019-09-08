@@ -13,6 +13,7 @@ import { AutocompleteState, autocompleteMesssage, replaceEmojis, emojis } from '
 import { replaceNodes } from '../../../client/htmlUtils';
 import { invalidEnumReturn } from '../../../common/utils';
 import { findMatchingEntityNames, findEntityOrMockByAnyMeans, findBestEntityByName } from '../../../client/handlers';
+import * as _ from 'lodash';
 
 const chatTypeNames: string[] = [];
 const chatTypeClasses: string[] = [];
@@ -45,7 +46,7 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	readonly maxSayLength = SAY_MAX_LENGTH;
 	readonly commentIcon = faComment;
 	readonly sendIcon = faAngleDoubleRight;
-	readonly emotes = emojis.map(e => e);
+	readonly emotes = emojis;
 	emojiBoxState = 'none';
 	@ViewChild('inputElement', { static: true }) inputElement!: ElementRef;
 	@ViewChild('typeBox', { static: true }) typeBox!: ElementRef;
@@ -96,13 +97,13 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 		this.subscriptions.forEach(s => s.unsubscribe());
 	}
 	addEmoji(emoji: string) {
-		this.emojiBoxState = 'none';
+		this.toggleEmojiBox();
 		if (!this.message) this.message = emoji;
 		else if (this.input.maxLength > this.message.length) {
 			this.message += emoji;
 		}
 	}
-	openBox() {
+	toggleEmojiBox() {
 		if (this.emojiBoxState === 'none')
 			this.emojiBoxState = 'inline-block';
 		else this.emojiBoxState = 'none';
@@ -291,8 +292,8 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	onMouseEnter(event: MouseEvent) {
 		if (!event.target) return;
-		const value = emojis[Math.floor(Math.random() * emojis.length)];
-		this.btnEmoji = value.names[0];
+		const emoji = _.sample(emojis) || emojis[0];
+		this.btnEmoji = emoji.names[0];
 	}
 	toggleChatType() {
 		const chatTypes = getChatTypes(this.game);
