@@ -196,11 +196,16 @@ node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
 
 ### Your first build
 
-pixel.horse has modified the Pony Town archive such that compiled game assets are no longer included. To compile the game assets for the first time, you can either use a development build with the `--sprites` flag (see [Running in development](#running-in-development)), or use the following commands to build and start a production instance with compiled sprites:
+pixel.horse has modified the Pony Town archive such that compiled game assets are no longer included. To compile the game assets for the first time, you must use the following command, which will generate the necessary spritesheets and corresponding data.
+
+```bash
+gulp sprites
+```
+
+If you would like to run a full production build after building spritesheets, you can use:
 
 ```bash
 npm run build-sprites
-npm start
 ```
 
 ### Production environment

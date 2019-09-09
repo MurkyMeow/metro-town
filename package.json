@@ -27,7 +27,7 @@
     "webpack-verbose": "npm run webpack-prod -- --verbose",
     "wds": "webpack-dev-server --config webpack.dev.js --progress --color --debug --port 8091",
     "build": "gulp build",
-    "build-sprites": "npm run build -- --sprites",
+    "build-sprites": "gulp sprites && npm run build",
     "build-beta": "npm run build -- --beta --tools",
     "build-fast": "npm run build -- --parallel",
     "build-maps": "npm run build -- --maps",

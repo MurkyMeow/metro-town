@@ -321,11 +321,18 @@ const setProd = cb => {
 	cb();
 };
 
-const empty = cb => cb();
-const tsTools = npmScript('ts-tools');
-const spritesTask = argv.sprites ? gulp.series(tsTools, sprites) : empty;
+const warnAboutTscBeingDumb = cb => {
+	console.log("You're probably about to see some warnings from tsc about not being able to find certain files.");
+	console.log("Don't worry about these. It's a known issue regarding circular build dependencies. The build should continue despite these errors.");
+	cb();
+};
 
-const build = gulp.series(clean, setProd, spritesTask, common, ts, webpackProd, sw, size);
+const empty = cb => cb();
+const tsTools = gulp.series(warnAboutTscBeingDumb, npmScript('ts-tools'));
+const spritesTask = argv.sprites ? sprites : empty;
+const buildSprites = gulp.series(tsTools, sprites);
+
+const build = gulp.series(clean, setProd, common, ts, webpackProd, sw, size);
 const admin = gulp.series(clearnAdmin, setProd, sassAdmin, ts, webpackAdmin);
 const dev = gulp.series(clean, spritesTask, common, gulp.parallel(serverDev, watch, watchTools));
 
@@ -334,6 +341,7 @@ module.exports = {
 	admin,
 	build,
 	dev,
+	sprites: buildSprites,
 	default: dev,
 	test: watchTests,
 };
