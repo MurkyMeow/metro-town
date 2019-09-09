@@ -141,6 +141,8 @@ export class FriendsService {
 		pending.add(target.accountId);
 		this.pending.set(client.accountId, pending);
 		client.reporter.systemLog(`Friend request [${target.accountId}]`);
+
+		saySystem(client, `Friend request sent to ${getEntityName(target.pony, client)}`);
 	}
 	private acceptInvitation(client: IClient, friend: IClient, notificationId: number) {
 		client.reporter.systemLog(`Friend request accepted by [${friend.accountId}]`);
