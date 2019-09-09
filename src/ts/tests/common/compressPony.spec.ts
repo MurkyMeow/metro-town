@@ -86,9 +86,9 @@ describe('compressPony', () => {
 
 		tests.forEach(test => it(`works for set: ${JSON.stringify(test)}`, () => {
 			const [set, colorBits, customOutlines] = test;
-			const buffer = bitWriter(write => writeSet(write, colorBits, customOutlines, set));
+			const buffer = bitWriter(write => writeSet(write, 5, colorBits, customOutlines, set));
 			// console.log(map(buffer, x => x).map(x => x.toString(2).padStart(8, '0')).join(' '));
-			const result = readSet(bitReader(buffer), colorBits, customOutlines);
+			const result = readSet(bitReader(buffer), 5, colorBits, customOutlines);
 			expect(result).eql(set);
 		}));
 	});
