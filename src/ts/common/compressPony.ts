@@ -14,7 +14,20 @@ import {
 } from '../client/ponyUtils';
 import { CM_SIZE } from './constants';
 
-export const VERSION = 4;
+export const VERSION = 5; // old manes version is 3
+
+const VERSION_BITS = 6; // max 63
+const COLORS_LENGTH_BITS = 10; // max 1024
+const BOOLEAN_FIELDS_LENGTH_BITS = 4; // max 15
+const NUMBER_FIELDS_LENGTH_BITS = 4; // max 15
+const COLOR_FIELDS_LENGTH_BITS = 4; // max 15
+const SET_FIELDS_LENGTH_BITS = 6; // max 63
+const CM_LENGTH_BITS = 5; // max 31
+const NUMBERS_BITS = 6; // max 63
+
+const SET_TYPE_BITS = 6; // max 63
+const SET_PATTERN_BITS = 4; // max 15
+const SET_COLORS_BITS = 3; // max 7
 
 interface FieldDefinition<T> {
 	name: keyof PonyInfo;
@@ -180,15 +193,6 @@ const omittableFields: FieldDefinition<any>[] = [
 	...numberFields,
 	...colorFields,
 ].filter(f => !!f.omit);
-
-const VERSION_BITS = 6; // max 63
-const COLORS_LENGTH_BITS = 10; // max 1024
-const BOOLEAN_FIELDS_LENGTH_BITS = 4; // max 15
-const NUMBER_FIELDS_LENGTH_BITS = 4; // max 15
-const COLOR_FIELDS_LENGTH_BITS = 4; // max 15
-const SET_FIELDS_LENGTH_BITS = 6; // max 63
-const CM_LENGTH_BITS = 5; // max 31
-const NUMBERS_BITS = 6; // max 63
 
 /* istanbul ignore next */
 if (DEVELOPMENT) {
@@ -475,17 +479,15 @@ export function postdecompressPony<T>(data: Precompressed, parseColor: (color: n
 
 // set
 
-const TYPE_BITS = 5; // max 31
-const PATTERN_BITS = 4; // max 15
-const COLORS_BITS = 3; // max 7
-
-export function writeSet(write: WriteBits, colorBits: number, customOutlines: boolean, set: PrecompressedSet | undefined) {
+export function writeSet(
+	write: WriteBits, typeBits: number, colorBits: number, customOutlines: boolean, set: PrecompressedSet | undefined
+) {
 	write(set ? 1 : 0, 1);
 
 	if (set) {
-		write(set.type, TYPE_BITS);
-		write(set.pattern, PATTERN_BITS);
-		write(set.colors - 1, COLORS_BITS);
+		write(set.type, typeBits);
+		write(set.pattern, SET_PATTERN_BITS);
+		write(set.colors - 1, SET_COLORS_BITS);
 		write(set.fillLocks, set.colors);
 		set.fills.forEach(c => write(c, colorBits));
 
@@ -496,13 +498,15 @@ export function writeSet(write: WriteBits, colorBits: number, customOutlines: bo
 	}
 }
 
-export function readSet(read: ReadBits, colorBits: number, customOutlines: boolean): PrecompressedSet | undefined {
+export function readSet(
+	read: ReadBits, typeBits: number, colorBits: number, customOutlines: boolean
+): PrecompressedSet | undefined {
 	const has = read(1);
 
 	if (has) {
-		const type = read(TYPE_BITS);
-		const pattern = read(PATTERN_BITS);
-		const colors = read(COLORS_BITS) + 1;
+		const type = read(typeBits);
+		const pattern = read(SET_PATTERN_BITS);
+		const colors = read(SET_COLORS_BITS) + 1;
 		const fillLocks = read(colors);
 		const fills = readTimes(read, colors - countBits(fillLocks), colorBits);
 		const outlineLocks = customOutlines ? read(colors) : 0;
@@ -536,12 +540,14 @@ function readFields<T>(read: ReadBits, lengthBits: number, readField: (read: Rea
 export function writePony(write: WriteBits, data: Precompressed) {
 	const colorBits = Math.max(numberToBitCount(data.colors.length), 1);
 	const customOutlines = !!data.booleanFields[0];
+	const typeBits = data.version < 5 ? 5 : SET_TYPE_BITS;
 	write(data.version, VERSION_BITS);
 	writeFields(write, COLORS_LENGTH_BITS, data.colors, x => write(x >> 8, 24));
 	writeFields(write, BOOLEAN_FIELDS_LENGTH_BITS, data.booleanFields, x => write(x ? 1 : 0, 1));
 	writeFields(write, NUMBER_FIELDS_LENGTH_BITS, data.numberFields, x => write(x, NUMBERS_BITS));
 	writeFields(write, COLOR_FIELDS_LENGTH_BITS, data.colorFields, x => write(x, colorBits));
-	writeFields(write, SET_FIELDS_LENGTH_BITS, data.setFields, x => writeSet(write, colorBits, customOutlines, x));
+	writeFields(write, data.version < 4 ? 5 : SET_FIELDS_LENGTH_BITS, data.setFields,
+		x => writeSet(write, typeBits, colorBits, customOutlines, x));
 	writeFields(write, CM_LENGTH_BITS, data.cm, x => write(x, colorBits));
 }
 
@@ -557,6 +563,7 @@ export function readPony(read: ReadBits): Precompressed {
 		throw new Error('Invalid version');
 	}
 
+	const typeBits = version < 5 ? 5 : SET_TYPE_BITS;
 	const colors = readFields(read, COLORS_LENGTH_BITS, readColorValue);
 	const colorBits = Math.max(numberToBitCount(colors.length), 1);
 	const readColor = readBits(colorBits);
@@ -564,7 +571,8 @@ export function readPony(read: ReadBits): Precompressed {
 	const customOutlines = !!booleanFields[0];
 	const numberFields = readFields(read, NUMBER_FIELDS_LENGTH_BITS, readNumber);
 	const colorFields = readFields(read, COLOR_FIELDS_LENGTH_BITS, readColor);
-	const setFields = readFields(read, version < 4 ? 5 : SET_FIELDS_LENGTH_BITS, read => readSet(read, colorBits, customOutlines));
+	const setFields = readFields(read, version < 4 ? 5 : SET_FIELDS_LENGTH_BITS,
+		read => readSet(read, typeBits, colorBits, customOutlines));
 	const cm = readFields(read, CM_LENGTH_BITS, readColor);
 	return { version, colors, booleanFields, numberFields, colorFields, setFields, cm };
 }
