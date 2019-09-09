@@ -559,7 +559,7 @@ const readNumber = readBits(NUMBERS_BITS);
 export function readPony(read: ReadBits): Precompressed {
 	const version = read(VERSION_BITS);
 
-	if (version > 5) {
+	if (version > VERSION) {
 		throw new Error('Invalid version');
 	}
 
