@@ -290,9 +290,9 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 			this.open();
 		}
 	}
-	onMouseEnter(event: MouseEvent) {
+	onMouseEnterEmojiButton(event: MouseEvent) {
 		if (!event.target) return;
-		const emoji = _.sample(emojis) || emojis[0];
+		const emoji = _.sample(emojis)!;
 		this.btnEmoji = emoji.names[0];
 	}
 	toggleChatType() {
