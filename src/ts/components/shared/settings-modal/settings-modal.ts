@@ -26,7 +26,6 @@ export class SettingsModal implements OnInit, OnDestroy {
 	readonly graphicsIcon = faImage;
 	readonly exportIcon = faDownload;
 	readonly importIcon = faUpload;
-
 	@Output() close = new EventEmitter();
 	account: AccountSettings = {};
 	browser: BrowserSettings = {};
