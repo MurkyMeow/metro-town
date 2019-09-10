@@ -98,15 +98,18 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	addEmoji(emoji: string) {
 		this.toggleEmojiBox();
-		if (!this.message) this.message = emoji;
-		else if (this.input.maxLength > this.message.length) {
+		if (!this.message) {
+			this.message = emoji;
+		} else if (this.input.maxLength > this.message.length) {
 			this.message += emoji;
 		}
 	}
 	toggleEmojiBox() {
-		if (this.emojiBoxState === 'none')
+		if (this.emojiBoxState === 'none') {
 			this.emojiBoxState = 'inline-block';
-		else this.emojiBoxState = 'none';
+		} else {
+			this.emojiBoxState = 'none';
+		}
 	}
 	send(_event: Event | undefined) {
 		let chatType = this.chatType;

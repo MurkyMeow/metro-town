@@ -455,8 +455,9 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.unFocus();
 			this.filterChatLogLines('', false);
 			return;
+		} else {
+			this.filterColor = this.bg;
 		}
-		else this.filterColor = this.bg;
 
 		this.autoClear = setTimeout(() => {
 			this.filterTab.nativeElement.value = '';
@@ -470,8 +471,9 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 
 		let toLowerCase = false;
 
-		if (value.startsWith('#')) value = value.slice(1);
-		else if (value.startsWith('/')) {
+		if (value.startsWith('#')) {
+			value = value.slice(1);
+		} else if (value.startsWith('/')) {
 			value = value.slice(1);
 			try {
 				const regExp = new RegExp(value);
@@ -482,8 +484,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				this.filterTab.nativeElement.style.color = '#ff6666';
 			}
 			return;
-		}
-		else {
+		} else {
 			value = value.toLowerCase();
 			toLowerCase = true;
 		}
@@ -499,10 +500,11 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				textContent = textContent.slice(10);
 
 				if (typeof content === 'string') {
-					if (caseSensitive)
+					if (caseSensitive) {
 						lines[i].hidden = !textContent.toLowerCase().includes(content);
-					else
+					} else {
 						lines[i].hidden = !textContent.includes(content);
+					}
 				} else {
 					lines[i].hidden = !textContent.match(content);
 				}
