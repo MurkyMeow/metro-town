@@ -81,6 +81,12 @@ export const CREDITS: Credit[] = [
 
 export const CONTRIBUTORS: Contributors[] = [
 	{
+		group: 'Musicians',
+		contributors: [
+			{ name: 'Wandering Artist', links: ['https://wanderingartist.bandcamp.com/', 'https://www.youtube.com/user/WanderingArtistMusic'] }
+		]
+	},
+	{
 		group: 'Artists & Animators',
 		contributors: [
 			{ name: 'Shino', links: ['https://www.deviantart.com/shinodage'] },
