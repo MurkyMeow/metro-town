@@ -76,9 +76,9 @@
 					label#chatlog-opacity-label Timestamp
 					div
 						.btn-group.mb-2(btnCheckbox)
-								button.btn.btn-outline-secondary.d-sm-block([class.active]='off' (click)='switchTimestamp()') None
-								button.btn.btn-outline-secondary.d-sm-block([class.active]='twelve' (click)='switchTimestamp("12")') 12-hour format
-								button.btn.btn-outline-secondary.d-sm-block([class.active]='twentyFour' (click)='switchTimestamp("24")') 24-hour format
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='!browser.timestamp' (click)='switchTimestamp()') None
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='browser.timestamp === "12"' (click)='switchTimestamp("12")') 12-hour format
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='browser.timestamp === "24"' (click)='switchTimestamp("24")') 24-hour format
 						small.form-text.text-muted.mt-0 Displays a timestamp in front of chatlog messages
 
 				.form-group

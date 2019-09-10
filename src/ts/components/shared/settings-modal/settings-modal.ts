@@ -26,9 +26,7 @@ export class SettingsModal implements OnInit, OnDestroy {
 	readonly graphicsIcon = faImage;
 	readonly exportIcon = faDownload;
 	readonly importIcon = faUpload;
-	off = false;
-	twelve = false;
-	twentyFour = false;
+
 	@Output() close = new EventEmitter();
 	account: AccountSettings = {};
 	browser: BrowserSettings = {};
@@ -62,7 +60,6 @@ export class SettingsModal implements OnInit, OnDestroy {
 		this.browser = this.settingsService.browser;
 		this.setupDefaults();
 		this.subscription = this.game.onLeft.subscribe(() => this.cancel());
-		this.updateTimestampRadios();
 	}
 	ngOnDestroy() {
 		this.finishChatlogRange();
@@ -108,26 +105,6 @@ export class SettingsModal implements OnInit, OnDestroy {
 		if (!state) this.browser.timestamp = undefined;
 		else if (state === '12') this.browser.timestamp = '12';
 		else if (state === '24') this.browser.timestamp = '24';
-		this.updateTimestampRadios();
-	}
-	turnOffTimestampRadioButtons() {
-		this.off = false;
-		this.twelve = false;
-		this.twentyFour = false;
-	}
-	updateTimestampRadios() {
-		this.turnOffTimestampRadioButtons();
-		switch (this.browser.timestamp) {
-			case '12':
-				this.twelve = true;
-				break;
-			case '24':
-				this.twentyFour = true;
-				break;
-			default:
-				this.off = true;
-				break;
-		}
 	}
 	updateChatlogRange(range: number | undefined) {
 		document.body.classList.add('translucent-modals');
