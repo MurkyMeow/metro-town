@@ -472,6 +472,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 
 		let toLowerCase = false;
 
+		this.filterInput.nativeElement.style.color = '';
 		if (value.startsWith('#')) {
 			value = value.slice(1);
 		} else if (value.startsWith('/')) {
@@ -479,7 +480,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			try {
 				const regExp = new RegExp(value);
 				this.filterChatLogLines(regExp, toLowerCase);
-				this.filterInput.nativeElement.style.color = '';
 			} catch (err) {// If the user inputs invalid regExp we just notify him by changing text color to red
 				if (DEVELOPMENT) console.error(err);
 				this.filterInput.nativeElement.style.color = '#ff6666';
