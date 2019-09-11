@@ -13,7 +13,7 @@ import { AutocompleteState, autocompleteMesssage, replaceEmojis, emojis } from '
 import { replaceNodes } from '../../../client/htmlUtils';
 import { invalidEnumReturn } from '../../../common/utils';
 import { findMatchingEntityNames, findEntityOrMockByAnyMeans, findBestEntityByName } from '../../../client/handlers';
-import * as _ from 'lodash';
+import { sample } from 'lodash';
 
 const chatTypeNames: string[] = [];
 const chatTypeClasses: string[] = [];
@@ -295,7 +295,7 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	onMouseEnterEmojiButton(event: MouseEvent) {
 		if (!event.target) return;
-		const emoji = _.sample(emojis)!;
+		const emoji = sample(emojis)!;
 		this.btnEmoji = emoji.names[0];
 	}
 	toggleChatType() {
