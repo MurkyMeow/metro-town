@@ -159,10 +159,18 @@ $resizer-offset: $resizer-size / 2;
 	color: rgba(255, 255, 255, 0.2);
 }
 
+.search-icon {
+	padding-right: 5px;
+}
+
 .chat-log-filter {
 	padding-bottom: 5px;
 	border: none;
 	width: 100px;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	outline: none;
+    color: white;
 }
 
 .chat-log-filter::-webkit-input-placeholder {

@@ -9,7 +9,7 @@ import { SettingsService } from '../../services/settingsService';
 import { AgDragEvent } from '../directives/agDrag';
 import { element, textNode, removeAllNodes, replaceNodes } from '../../../client/htmlUtils';
 import { DEFAULT_CHATLOG_OPACITY, PONY_TYPE, SECOND } from '../../../common/constants';
-import { faCaretUp, faArrowDown } from '../../../client/icons';
+import { faCaretUp, faArrowDown, faSearch } from '../../../client/icons';
 import { sampleMessages } from '../../../common/debugData';
 import { findEntityById } from '../../../common/worldMap';
 import { colorToRGBA, rgb2hsl, HSL, hsl2CSS } from '../../../common/color';
@@ -209,13 +209,14 @@ function findUserIndex(users: IndexEntryUser[], id: number, crc: number | undefi
 export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	readonly toBottomIcon = faArrowDown;
 	readonly resizeIcon = faCaretUp;
+	readonly searchIcon = faSearch;
 	@ViewChild('chatLog', { static: true }) chatLog!: ElementRef;
 	@ViewChild('scroll', { static: true }) scroll!: ElementRef;
 	@ViewChild('lines', { static: true }) lines!: ElementRef;
 	@ViewChild('localTab', { static: true }) localTab!: ElementRef;
 	@ViewChild('partyTab', { static: true }) partyTab!: ElementRef;
 	@ViewChild('whisperTab', { static: true }) whisperTab!: ElementRef;
-	@ViewChild('filterTab', { static: true }) filterTab!: ElementRef;
+	@ViewChild('filterInput', { static: true }) filterInput!: ElementRef;
 	@ViewChild('toggleButton', { static: true }) toggleButton!: ElementRef;
 	@ViewChild('count', { static: true }) countElement!: ElementRef;
 	@ViewChild('content', { static: true }) contentElement!: ElementRef;
@@ -449,7 +450,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	filterChat() {
 		this.clearTimeOutAutoClear();
 		this.clearTimeOutAutoUnfocus();
-		let value = this.filterTab.nativeElement.value;
+		let value = this.filterInput.nativeElement.value;
 		if (!value) {
 			this.clearTimeOutAutoClear();
 			this.unFocus();
@@ -460,7 +461,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 
 		this.autoClear = setTimeout(() => {
-			this.filterTab.nativeElement.value = '';
+			this.filterInput.nativeElement.value = '';
 			this.filterChat();
 			this.unFocus();
 		}, SECOND * 30);
@@ -478,10 +479,10 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			try {
 				const regExp = new RegExp(value);
 				this.filterChatLogLines(regExp, toLowerCase);
-				this.filterTab.nativeElement.style.color = '';
+				this.filterInput.nativeElement.style.color = '';
 			} catch (err) {// If the user inputs invalid regExp we just notify him by changing text color to red
 				if (DEVELOPMENT) console.error(err);
-				this.filterTab.nativeElement.style.color = '#ff6666';
+				this.filterInput.nativeElement.style.color = '#ff6666';
 			}
 			return;
 		} else {
@@ -566,10 +567,15 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		if (this.autoUnfocus) clearTimeout(this.autoUnfocus);
 		this.autoUnfocus = undefined;
 	}
+	focus() {
+		this.clearTimeOutAutoUnfocus();
+		if (this.filterInput.nativeElement)
+			this.filterInput.nativeElement.focus();
+	}
 	unFocus() {
 		this.clearTimeOutAutoUnfocus();
-		if (this.filterTab.nativeElement)
-			this.filterTab.nativeElement.blur();
+		if (this.filterInput.nativeElement)
+			this.filterInput.nativeElement.blur();
 	}
 	addMessage(message: ChatMessage) {
 		if (message.name && message.message) {
