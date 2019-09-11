@@ -160,17 +160,27 @@ $resizer-offset: $resizer-size / 2;
 }
 
 .search-icon {
-	padding-right: 5px;
+	position: relative;
+	float: left;
+	width: 0;
+	bottom: -1px;
+	left: 0;
+    z-index: 2;
+}
+
+.chat-log-filter-tab {
+	width: 100px;
 }
 
 .chat-log-filter {
 	padding-bottom: 5px;
 	border: none;
-	width: 100px;
 	background-color: rgba(0, 0, 0, 0);
 	border: none;
 	outline: none;
-    color: white;
+	color: white;
+	padding-left: 20px;
+	width: 100%;
 }
 
 .chat-log-filter::-webkit-input-placeholder {
@@ -200,11 +210,12 @@ $resizer-offset: $resizer-size / 2;
 }
 
 @media only screen and (max-width: 360px) {
-	.chat-log-filter {
+	.chat-log-filter-tab  {
 		position: absolute;
 		left: 0;
 		bottom: 35px;
 		width: 100%;
+		width: calc(100% - 10px);
 		border-radius: 2px;
 	}
 }
