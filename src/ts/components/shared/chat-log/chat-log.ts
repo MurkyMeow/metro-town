@@ -530,12 +530,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 		return hsl;
 	}
-	fixColor(color: string) {
-		while (color.length <= 7) {
-			color = `0${color}`;
-		}
-		return color.substr(0, 6);
-	}
 	private getCharacterColors(id: number | undefined) {
 		if (!id) return;
 		const entity = findEntityById(this.game.map, id) as Pony;
