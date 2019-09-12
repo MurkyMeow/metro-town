@@ -100,6 +100,11 @@ export class SettingsModal implements OnInit, OnDestroy {
 		this.settingsService.saveBrowserSettings(this.browser);
 		this.close.emit();
 	}
+	switchTimestamp(state?: string) {
+		if (!state) this.browser.timestamp = undefined;
+		else if (state === '12') this.browser.timestamp = '12';
+		else if (state === '24') this.browser.timestamp = '24';
+	}
 	updateChatlogRange(range: number | undefined) {
 		document.body.classList.add('translucent-modals');
 		updateRangeIndicator(range, this.game);

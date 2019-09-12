@@ -5,6 +5,14 @@
 			aria-label="Chat message")
 		.chat-box-type(#typeBox (click)="toggleChatType()")
 			| #[span(#typePrefix)][#[span.chat-box-type-name(#typeName)]]:
+		.emotes.emoji-box([style.display]="emojiBoxState")
+				ul
+					li(*ngFor="let e of emotes" (click)="addEmoji(e.symbol)"
+					)
+						span.emote-sample.mr-2
+							emote-box([emote]="e.names[0]")
+
+		emote-box.game-button.chat-emoji-button([emote]="btnEmoji" (click)="toggleEmojiBox()" (mouseenter)="onMouseEnterEmojiButton($event)")
 		button.game-button.chat-send-button((click)="send($event)" title="Send message" aria-label="Send message")
 			fa-icon([icon]="sendIcon")
 

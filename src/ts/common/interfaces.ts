@@ -683,6 +683,7 @@ export interface BrowserSettings {
 	scale?: number;
 	walkByDefault?: boolean;
 	brightNight?: boolean;
+	timestamp?: '24' | '12';
 }
 
 export interface EntityTypeName {

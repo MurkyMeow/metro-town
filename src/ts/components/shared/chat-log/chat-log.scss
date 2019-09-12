@@ -56,7 +56,7 @@ $resizer-offset: $resizer-size / 2;
 }
 
 .whisper-icon {
-	position: absolute;	
+	position: absolute;
 	top: 0;
 	left: 0;
 	font-size: 14px;
@@ -84,6 +84,7 @@ $resizer-offset: $resizer-size / 2;
 	left: 30px;
 	display: flex;
 	user-select: none;
+	text-shadow: 0px 0px 4px #000000;
 }
 
 .chat-log-tab {
@@ -156,4 +157,65 @@ $resizer-offset: $resizer-size / 2;
 	right: 1px;
 	transform: rotate(45deg);
 	color: rgba(255, 255, 255, 0.2);
+}
+
+.search-icon {
+	position: relative;
+	float: left;
+	width: 0;
+	bottom: -1px;
+	left: 0;
+    z-index: 2;
+}
+
+.chat-log-filter-tab {
+	width: 100px;
+}
+
+.chat-log-filter {
+	padding-bottom: 5px;
+	border: none;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	outline: none;
+	color: white;
+	padding-left: 20px;
+	width: 100%;
+}
+
+.chat-log-filter::-webkit-input-placeholder {
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter:-moz-placeholder {
+	/* Firefox 18- */
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter::-moz-placeholder {
+	/* Firefox 19+ */
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+.chat-log-filter:-ms-input-placeholder {
+	opacity: 1;
+	color: white;
+	text-shadow: 0px 0px 4px #000000;
+}
+
+@media only screen and (max-width: 360px) {
+	.chat-log-filter-tab  {
+		position: absolute;
+		left: 0;
+		bottom: 35px;
+		width: 100%;
+		width: calc(100% - 10px);
+		border-radius: 2px;
+	}
 }

@@ -71,6 +71,16 @@
 						[(checked)]="account.ignoreNonFriendWhispers"
 						help="Don't show any whispers from players who are not on your friends list")
 						| Only allow whispers from friends
+					.form-group
+				.form-group
+					label#chatlog-opacity-label Timestamp
+					div
+						.btn-group.mb-2(btnCheckbox)
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='!browser.timestamp' (click)='switchTimestamp()') None
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='browser.timestamp === "12"' (click)='switchTimestamp("12")') 12-hour format
+								button.btn.btn-outline-secondary.d-sm-block([class.active]='browser.timestamp === "24"' (click)='switchTimestamp("24")') 24-hour format
+						small.form-text.text-muted.mt-0 Displays a timestamp in front of chatlog messages
+
 				.form-group
 					label#chatlog-opacity-label Chatlog background opacity
 					div

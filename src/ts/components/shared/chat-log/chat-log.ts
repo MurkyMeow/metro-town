@@ -8,9 +8,12 @@ import { MessageType, isPartyMessage, ChatMessage, Pony, FakeEntity, isWhisper, 
 import { SettingsService } from '../../services/settingsService';
 import { AgDragEvent } from '../directives/agDrag';
 import { element, textNode, removeAllNodes, replaceNodes } from '../../../client/htmlUtils';
-import { DEFAULT_CHATLOG_OPACITY, PONY_TYPE } from '../../../common/constants';
-import { faCaretUp, faArrowDown } from '../../../client/icons';
+import { DEFAULT_CHATLOG_OPACITY, PONY_TYPE, SECOND } from '../../../common/constants';
+import { faCaretUp, faArrowDown, faSearch } from '../../../client/icons';
 import { sampleMessages } from '../../../common/debugData';
+import { findEntityById } from '../../../common/worldMap';
+import { colorToRGBA, rgb2hsl, HSL, hsl2CSS } from '../../../common/color';
+import * as moment from 'moment';
 
 interface IndexEntryUser {
 	id: number;
@@ -26,6 +29,8 @@ interface ChatLogLineDOM {
 	entry: ChatLogMessage;
 	root: HTMLElement;
 	label: HTMLElement;
+	time: HTMLElement;
+	timeContent: HTMLElement;
 	labelText: Text;
 	name: HTMLElement;
 	nameContent: HTMLElement;
@@ -98,6 +103,11 @@ export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickH
 
 	line.root = element('div', 'chat-line', [
 		element('span', 'chat-line-lead'),
+		line.time = element('span', 'chat-line-name', [
+			line.timeContent = element(
+				'span', 'chat-line-time-content', [textNode('')], undefined),
+			line.index = element('span', 'chat-line-time-index', [line.indexText = textNode('')]),
+		]),
 		line.label = element(
 			'span', 'chat-line-label mr-1', [line.labelText = textNode('')], undefined, { click: () => clickLabel(line.entry) }),
 		line.prefixText = textNode(''),
@@ -115,7 +125,7 @@ export function createChatLogLineDOM(clickLabel: ClickHandler, clickName: ClickH
 	return line;
 }
 
-export function updateChatLogLine(line: ChatLogLineDOM, entry: ChatLogMessage) {
+export function updateChatLogLine(line: ChatLogLineDOM, entry: ChatLogMessage, hourMode?: '12' | '24') {
 	const { classes, label, message, prefix, suffix } = entry;
 	const hasSpace = message.indexOf(' ') !== -1;
 
@@ -125,10 +135,26 @@ export function updateChatLogLine(line: ChatLogLineDOM, entry: ChatLogMessage) {
 	line.labelText.nodeValue = label ? `[${label}]` : '';
 
 	updateChatLogName(line, entry);
+	updateTime(line, hourMode);
 
 	line.prefixText.nodeValue = prefix || '';
 	line.suffixText.nodeValue = suffix ? ` ${suffix}: ` : ': ';
 	replaceNodes(line.message, message);
+}
+
+function updateTime(line: ChatLogLineDOM, hourMode?: '12' | '24') {
+	line.time.style.display = 'inline';
+	if (!hourMode) return;
+	if (hourMode === '24')
+		replaceNodes(line.timeContent, `[${moment().format('HH:mm:ss')}] `);
+	if (hourMode === '12')
+		replaceNodes(line.timeContent, `[${moment().format('LTS')}] `);
+}
+
+function setNameColors(line: ChatLogLineDOM | undefined, colors?: string[]) {
+	if (!colors || !line) return;
+	if (colors[1]) line.name.style.color = colors[1];
+	if (colors[0]) line.nameContent.style.color = colors[0];
 }
 
 function updateChatLogName(line: ChatLogLineDOM, { name, index }: ChatLogMessage) {
@@ -183,12 +209,14 @@ function findUserIndex(users: IndexEntryUser[], id: number, crc: number | undefi
 export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	readonly toBottomIcon = faArrowDown;
 	readonly resizeIcon = faCaretUp;
+	readonly searchIcon = faSearch;
 	@ViewChild('chatLog', { static: true }) chatLog!: ElementRef;
 	@ViewChild('scroll', { static: true }) scroll!: ElementRef;
 	@ViewChild('lines', { static: true }) lines!: ElementRef;
 	@ViewChild('localTab', { static: true }) localTab!: ElementRef;
 	@ViewChild('partyTab', { static: true }) partyTab!: ElementRef;
 	@ViewChild('whisperTab', { static: true }) whisperTab!: ElementRef;
+	@ViewChild('filterInput', { static: true }) filterInput!: ElementRef;
 	@ViewChild('toggleButton', { static: true }) toggleButton!: ElementRef;
 	@ViewChild('count', { static: true }) countElement!: ElementRef;
 	@ViewChild('content', { static: true }) contentElement!: ElementRef;
@@ -199,6 +227,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	local: ChatLogMessage[] = [];
 	party: ChatLogMessage[] = [];
 	whisper: ChatLogMessage[] = [];
+	filterColor = this.inactiveBg;
 	unread = 0;
 	private subscriptions: Subscription[] = [];
 	private startX = 0;
@@ -210,6 +239,8 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	private indexes = new Map<string, IndexEntry>();
 	private messageCounter = 0;
 	private lastOpacity = 0;
+	private autoClear?: NodeJS.Timeout;
+	private autoUnfocus?: NodeJS.Timeout;
 	constructor(
 		private game: PonyTownGame,
 		private settingsService: SettingsService,
@@ -277,6 +308,8 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 	}
 	ngAfterViewInit() {
+		const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+		canvas.addEventListener('click', () => this.unFocus());
 		this.game.findEntityFromChatLog = this.findEntityFromMessages;
 		this.game.findEntityFromChatLogByName = this.findEntityFromMessagesByName;
 
@@ -414,6 +447,130 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 
 		return index;
 	}
+	filterChat() {
+		this.clearTimeOutAutoClear();
+		this.clearTimeOutAutoUnfocus();
+		let value = this.filterInput.nativeElement.value;
+		if (!value) {
+			this.clearTimeOutAutoClear();
+			this.unFocus();
+			this.filterChatLogLines('', false);
+			return;
+		} else {
+			this.filterColor = this.bg;
+		}
+
+		this.autoClear = setTimeout(() => {
+			this.filterInput.nativeElement.value = '';
+			this.filterChat();
+			this.unFocus();
+		}, SECOND * 30);
+
+		this.autoUnfocus = setTimeout(() => {
+			this.unFocus();
+		}, SECOND * 3);
+
+		let toLowerCase = false;
+
+		this.filterInput.nativeElement.style.color = '';
+		if (value.startsWith('#')) {
+			value = value.slice(1);
+		} else if (value.startsWith('/')) {
+			value = value.slice(1);
+			try {
+				const regExp = new RegExp(value);
+				this.filterChatLogLines(regExp, toLowerCase);
+			} catch (err) {// If the user inputs invalid regExp we just notify him by changing text color to red
+				if (DEVELOPMENT) console.error(err);
+				this.filterInput.nativeElement.style.color = '#ff6666';
+			}
+			return;
+		} else {
+			value = value.toLowerCase();
+			toLowerCase = true;
+		}
+		this.filterChatLogLines(value, toLowerCase);
+	}
+	filterChatLogLines(content: string | RegExp, caseSensitive: boolean) {
+		const lines = this.linesElement.getElementsByTagName('div');
+
+		for (let i = 0; i < lines.length; i++) {
+			let textContent = lines[i].textContent;
+
+			if (textContent) {
+				textContent = textContent.slice(10);
+
+				if (typeof content === 'string') {
+					if (caseSensitive) {
+						lines[i].hidden = !textContent.toLowerCase().includes(content);
+					} else {
+						lines[i].hidden = !textContent.includes(content);
+					}
+				} else {
+					lines[i].hidden = !textContent.match(content);
+				}
+			}
+		}
+	}
+	unhideAllLines() {
+		const lines = this.linesElement.getElementsByTagName('div');
+		for (let i = 0; i < lines.length; i++) {
+			lines[i].hidden = false;
+		}
+	}
+	brightenDarkColors(hsl: HSL) {
+		if (hsl.l < 40) {
+			if (hsl.l > 20 && hsl.l < 40) {
+				hsl.l += 20;
+				if (hsl.s > 11) hsl.s -= 11;
+			} else {
+				hsl.l = 40;
+				if (hsl.s > 11) hsl.s = 0;
+			}
+		}
+		return hsl;
+	}
+	private getCharacterColors(id: number | undefined) {
+		if (!id) return;
+		const entity = findEntityById(this.game.map, id) as Pony;
+		if (!entity || !entity.palettePonyInfo) return;
+		let colors = [];
+		let { body, mane } = entity.palettePonyInfo;
+		if (body && body.palette && body.palette.colors[1]) {
+			const rgb = colorToRGBA(body.palette.colors[1]);
+			const hsl = rgb2hsl(rgb);
+			this.brightenDarkColors(hsl);
+			colors.push(hsl2CSS(hsl));
+		}
+		if (mane && mane.palette && mane.palette.colors[1]) {
+			const rgb = colorToRGBA(mane.palette.colors[1]);
+			const hsl = rgb2hsl(rgb);
+			this.brightenDarkColors(hsl);
+			colors.push(hsl2CSS(hsl));
+		} else if (colors && colors[0]) {
+			colors.push((colors[0]));
+		}
+		return colors;
+	}
+	clearTimeOutAutoClear() {
+		if (this.autoClear) clearTimeout(this.autoClear);
+		this.autoClear = undefined;
+		this.filterColor = this.inactiveBg;
+	}
+	clearTimeOutAutoUnfocus() {
+		if (this.autoUnfocus) clearTimeout(this.autoUnfocus);
+		this.autoUnfocus = undefined;
+	}
+	focus() {
+		this.clearTimeOutAutoUnfocus();
+		if (this.filterInput.nativeElement)
+			this.filterInput.nativeElement.focus();
+	}
+	unFocus() {
+		this.clearTimeOutAutoUnfocus();
+		if (this.filterInput.nativeElement)
+			this.filterInput.nativeElement.blur();
+	}
 	addMessage(message: ChatMessage) {
 		if (message.name && message.message) {
 			const entry = this.createEntry(message);
@@ -422,14 +579,17 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			const open = this.open;
 			const scrolledToEnd = open ? this.scrolledToEnd : false;
 			const tab = this.activeTab;
+			const colors = this.getCharacterColors(message.id);
 
 			this.addEntryToList(this.local, GENERAL_CHAT_LIMIT, open && tab === 'local', entry);
+			setNameColors(entry.dom, colors);
 
 			if (party || whisper) {
 				const partyEntry = { ...entry };
 				partyEntry.dom = undefined;
 				partyEntry.label = whisper ? partyEntry.label : undefined;
 				this.addEntryToList(this.party, PARTY_CHAT_LIMIT, open && tab === 'party', partyEntry);
+				setNameColors(partyEntry.dom, colors);
 			}
 
 			if (whisper) {
@@ -437,6 +597,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				whisperEntry.dom = undefined;
 				whisperEntry.label = undefined;
 				this.addEntryToList(this.whisper, WHISPER_CHAT_LIMIT, open && tab === 'whisper', whisperEntry);
+				setNameColors(whisperEntry.dom, colors);
 			}
 
 			if (message.type === MessageType.Whisper && !this.open) {
@@ -447,6 +608,15 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				this.scrollToEnd();
 			}
 
+			if (tab !== 'whisper' && isWhisper(message.type)) {
+				this.whisperTab.nativeElement.classList.add('unread');
+				this.whisperTab.nativeElement.style.backgroundColor = `rgba(225, 161, 223, ${this.opacity / 100})`;
+			}
+			if (tab !== 'party' && party) {
+				this.partyTab.nativeElement.classList.add('unread');
+				this.partyTab.nativeElement.style.backgroundColor = `rgba(184, 227, 255, ${this.opacity / 100})`;
+			}
+			this.filterChat();
 			this.messageCounter++;
 		}
 	}
@@ -470,7 +640,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 
 		if (isOpen) {
 			entry.dom = removedDom || createChatLogLineDOM(this.clickLabel, this.clickNameHandler);
-			updateChatLogLine(entry.dom, entry);
+			updateChatLogLine(entry.dom, entry, this.settings.timestamp);
 			this.linesElement.appendChild(entry.dom.root);
 		}
 	}
@@ -486,6 +656,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 			this.regenerateList();
 			this.scrollToEnd();
 			this.updateTabs();
+			this.filterChat();
 		}
 	}
 	private updateTabs() {
@@ -496,10 +667,12 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 	private setActiveTab(tab: HTMLElement, active: boolean) {
 		if (active) {
 			tab.classList.add('active');
+			tab.classList.remove('unread');
 			tab.style.backgroundColor = this.bg;
 		} else {
 			tab.classList.remove('active');
-			tab.style.backgroundColor = this.inactiveBg;
+			if (!tab.classList.contains('unread'))
+				tab.style.backgroundColor = this.inactiveBg;
 		}
 	}
 	scrollToEnd() {
@@ -531,7 +704,8 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		this.messages.forEach(entry => {
 			if (!entry.dom) {
 				entry.dom = createChatLogLineDOM(this.clickLabel, this.clickNameHandler);
-				updateChatLogLine(entry.dom, entry);
+				setNameColors(entry.dom, this.getCharacterColors(entry.entityId));
+				updateChatLogLine(entry.dom, entry, this.settings.timestamp);
 			}
 
 			lines.appendChild(entry.dom.root);
@@ -548,7 +722,8 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 
 		if (resizeX) {
-			this.settings.chatlogWidth = clamp(x - this.startX, 200, 2000);
+			const filterBoxWidth = 80;
+			this.settings.chatlogWidth = clamp(x - this.startX, 200 + filterBoxWidth, 2000);
 		}
 
 		if (resizeY) {

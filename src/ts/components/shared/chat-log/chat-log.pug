@@ -13,6 +13,9 @@
 				| Party
 			a.link-plain.chat-log-tab(#whisperTab tabindex (click)="switchTab('whisper')")
 				| Whisper
+			a.link-plain.chat-log-tab.chat-log-filter-tab([style.background-color]="filterColor" (click)="focus()")
+				fa-icon.search-icon([icon]="searchIcon")
+				input.chat-log-filter(#filterInput type="text" (keyup.enter)="(unFocus())" (keyup.esc)="(unFocus())" [placeholder]="'Filter'" (keyup)="filterChat()")
 		.chat-log-scroll-outer()
 			.chat-log-scroll-inner(#scroll)
 				.chat-log-scroll-inner-inner(#lines)
