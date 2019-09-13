@@ -121,7 +121,9 @@ export function getProfileUrl(profile: OAuthProfile): string | undefined {
 
 export function getProfileEmails(profile: OAuthProfile): string[] {
 	if (profile.provider === 'discord') {
-		return [profile.email as string];
+		// TODO: diagnose why we aren't receiving the email from Discord
+		// for now, we just won't attempt to record an email if we don't receive one
+		return profile.email ? [profile.email] : [];
 	} else if (profile.emails && profile.emails.length) {
 		return profile.emails.map(e => e.value);
 	} else if (profile._json && profile._json.attributes && profile._json.attributes.email) { // patreon
