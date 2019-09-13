@@ -121,6 +121,8 @@ export function getProfileUrl(profile: OAuthProfile): string | undefined {
 
 export function getProfileEmails(profile: OAuthProfile): string[] {
 	if (profile.provider === 'discord') {
+		// TODO: diagnose why we aren't receiving the email from Discord
+		// for now, we just won't attempt to record an email if we don't receive one
 		return profile.email ? [profile.email] : [];
 	} else if (profile.emails && profile.emails.length) {
 		return profile.emails.map(e => e.value);
