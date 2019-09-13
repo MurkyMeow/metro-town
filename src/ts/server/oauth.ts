@@ -121,7 +121,7 @@ export function getProfileUrl(profile: OAuthProfile): string | undefined {
 
 export function getProfileEmails(profile: OAuthProfile): string[] {
 	if (profile.provider === 'discord') {
-		return [profile.email as string];
+		return profile.email ? [profile.email] : [];
 	} else if (profile.emails && profile.emails.length) {
 		return profile.emails.map(e => e.value);
 	} else if (profile._json && profile._json.attributes && profile._json.attributes.email) { // patreon
