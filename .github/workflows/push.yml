@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '10.x'
       - name: install gulp
         run: bash .github/ci-install-gulp.sh
       - run: npm ci
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '10.x'
       - name: install gulp
         run: bash .github/ci-install-gulp.sh
       - run: npm ci
