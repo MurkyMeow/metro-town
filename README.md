@@ -218,7 +218,7 @@ npm run build
 npm start
 ```
 
-**This will not update spritesheets**; for that, you must use `npm run build-sprites` ad discussed previously, or run a [development build](#running-in-development) with the `--sprites` flag.
+**This will not update spritesheets**; for that, you must use `npm run build-sprites` as discussed previously, or run a [development build](#running-in-development) with the `--sprites` flag.
 
 ### Adding/removing roles
 
