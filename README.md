@@ -196,24 +196,29 @@ node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
 
 ### Your first build
 
-pixel.horse has modified the Pony Town archive such that compiled game assets are no longer included. To compile the game assets for the first time, you must use the following command, which will generate the necessary spritesheets and corresponding data.
+pixel.horse has modified the Pony Town archive such that compiled game assets are no longer included. To compile the game assets for the first time, you must use the following command, which will generate the necessary spritesheets and corresponding data, and run a full production build of the site:
+
+```bash
+npm run build-sprites
+npm start
+```
+
+**If you want to build sprites __only__** (useful if you want to develop the project before deployment), you can use:
 
 ```bash
 gulp sprites
 ```
 
-If you would like to run a full production build after building spritesheets, you can use:
-
-```bash
-npm run build-sprites
-```
-
 ### Production environment
+
+After your initial build (see above), you can use the following commands to generate a fresh production build of the site.
 
 ```bash
 npm run build
 npm start
 ```
+
+**This will not update spritesheets**; for that, you must use `npm run build-sprites` ad discussed previously, or run a [development build](#running-in-development) with the `--sprites` flag.
 
 ### Adding/removing roles
 
@@ -289,7 +294,9 @@ gulp dev --coverage # run with tests and code coverage
 - `src/ts/server/start.ts:35` - adding custom map to the world
 - `src/ts/server/map/customMap.ts` - commented introduction to customizing maps
 
-## Have git ignore changes to `sprites.ts`, eventhough it's already in the index
+## Repo quirks and notes
+
+### `sprites.ts`
 
 Due to an issue with the build system, an old copy of `src/ts/generated/sprites.ts` is shipped with this repository. In order to prevent Git from seeing changes to this file from local builds and warning you about them when changing branches or pulling new changes, you can use the following command:
 
