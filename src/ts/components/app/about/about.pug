@@ -34,23 +34,6 @@ h1(focusTitle) About
 
 			hr
 
-		div(*ngIf="patreonLink")
-			h2 Support {{title}}
-
-			p.
-				If you'd like to help keep {{title}} running, and support future development of the project,
-				please consider #[a([href]="patreonLink" target="_blank" rel="noopener noreferrer") supporting us on Patreon].
-
-			support-button.d-block.mx-auto.my-4(style="max-width: 400px;")
-
-			p.
-				Patreon supporter rewards include the following:
-			ul
-				li(*ngFor="let r of rewards")
-					| {{r}}
-			p.
-				Note that in order to receive any patreon rewards you need to connect your Patreon to your {{title}} account.
-
 		h2 Technology
 
 		p.

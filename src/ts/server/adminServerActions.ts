@@ -32,13 +32,11 @@ import {
 import { accountStatus, accountAround, getServer, getLoginServer, RemovedDocument, accountHidden } from './internal';
 import { create } from './reporter';
 import { system } from './logger';
-import { updatePatreonData, updatePastSupporters } from './polling';
 import { AdminService } from './services/adminService';
 import { getOriginStats, clearOrigins, removeAllOrigins, removeOrigins, addOrigin, clearOriginsForAccounts } from './api/origins';
 import { getDuplicateEntries, getAllDuplicatesQuickInfo, getAllDuplicatesWithInfo } from './api/duplicates';
 import { splitAccounts } from './api/merge';
 import { removeAuth, assignAuth } from './api/admin-auths';
-import { getLastPatreonData } from './patreon';
 import { removeFriend, addFriend } from './accountUtils';
 
 @Socket({
@@ -541,34 +539,6 @@ export class AdminServerActions implements IAdminServerActions, SocketServer {
 	@Method({ promise: true })
 	async getDuplicateEntries(force: boolean) {
 		return await getDuplicateEntries(this.adminService.accounts.items, force);
-	}
-	// patreon
-	@Method({ promise: true })
-	async updatePatreon() {
-		await updatePatreonData(this.server, this.settings);
-	}
-	@Method({ promise: true })
-	async resetSupporter(accountId: string) {
-		await Account.updateOne(
-			{ _id: accountId },
-			{ $unset: { supporter: 1, patreon: 1, supporterDeclinedSince: 1 } }).exec();
-	}
-	@Method({ promise: true })
-	async getLastPatreonData() {
-		const data = await getLastPatreonData();
-
-		// if (data) {
-		// 	data.pledges.forEach(pledge => {
-		// 		const auth = this.adminService.auths.items.find(a => a.openId === pledge.user);
-		// 		pledge.account = auth && auth.account;
-		// 	});
-		// }
-
-		return data;
-	}
-	@Method({ promise: true })
-	async updatePastSupporters() {
-		await updatePastSupporters();
 	}
 	// other
 	@Method({ promise: true })

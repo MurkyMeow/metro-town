@@ -23,7 +23,6 @@ import { EmoteBox } from './emote-box/emote-box';
 import { SliderBar } from './slider-bar/slider-bar';
 import { SpriteBox } from './sprite-box/sprite-box';
 import { SpriteSelection } from './sprite-selection/sprite-selection';
-import { SupportButton } from './support-button/support-button';
 import { SupporterPony } from './supporter-pony/supporter-pony';
 import { DiscordButton } from './discord-button/discord-button';
 import { DiscordPony } from './discord-pony/discord-pony';
@@ -91,7 +90,6 @@ const declarations = [
 	SliderBar,
 	SpriteBox,
 	SpriteSelection,
-	SupportButton,
 	SupporterPony,
 	DiscordButton,
 	DiscordPony,

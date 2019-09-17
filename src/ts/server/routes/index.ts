@@ -99,7 +99,6 @@ export function createIndex(assetsPath: string, adminAssetsPath: string) {
 			host: config.host,
 			title: config.title,
 			twitterLink: config.twitterLink,
-			supporterLink: config.supporterLink,
 			discordLink: config.discordLink,
 			email: config.contactEmail,
 			logo: `${config.host}${getRevImageURL('logo-120.png')}`,

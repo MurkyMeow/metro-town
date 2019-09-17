@@ -24,7 +24,6 @@ export const local = attr('data-local') === 'true';
 export const token = attr('data-token');
 export const version = attr('data-version');
 export const isPublic = attr('data-public') === 'true';
-export const supporterLink = attr('data-supporter-link');
 export const discordLink = attr('data-discord-link');
 export const twitterLink = attr('data-twitter-link');
 export const contactEmail = attr('data-email');

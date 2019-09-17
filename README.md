@@ -2,6 +2,11 @@
 
 A fork of Pony Town, a game of ponies building a town.
 
+## Patreon Warning
+
+Code relating to Patreon syncing has been removed from the public pixel.horse codebase.
+You **MUST** contact the Pony Town Team before opening a Patreon based off the Pony Town Custom Server source code. Not doing so is a violation of the [CC-BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license on to the art and music assets supplied with the game. Please submit a request for approval to **ponytownhelp@gmail.com**.
+
 ## Prerequisites
 
 * [Node.js](https://nodejs.org/download/release/v9.11.2/) (version 9)

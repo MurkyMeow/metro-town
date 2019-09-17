@@ -42,8 +42,6 @@
 				.text-nowrap
 					a.text-muted.mr-2(*ngIf="twitterLink" [href]="twitterLink" target="_blank" title="Twitter")
 						fa-icon([icon]="twitterIcon" [fixedWidth]="true")
-					a.text-muted.mr-2(*ngIf="patreonLink" [href]="patreonLink" target="_blank" title="Patreon")
-						fa-icon([icon]="patreonIcon" [fixedWidth]="true")
 					a.text-muted.mr-2(*ngIf="contactEmail" href="mailto:{{contactEmail}}" target="_blank" title="Email")
 						fa-icon([icon]="emailIcon" [fixedWidth]="true")
 			div

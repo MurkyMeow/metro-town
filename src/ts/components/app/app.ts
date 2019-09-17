@@ -6,7 +6,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subscription } from 'rxjs';
 import { GameService } from '../services/gameService';
 import { Model, Friend } from '../services/model';
-import { version, host, contactEmail, supporterLink, twitterLink, discordLink, copyrightName } from '../../client/data';
+import { version, host, contactEmail, twitterLink, discordLink, copyrightName } from '../../client/data';
 import { PonyTownGame } from '../../client/game';
 import { faTwitter, faPatreon, faEnvelope, faCog, faHome, faGamepad, faInfoCircle, faHorseHead, faDiscord } from '../../client/icons';
 import { InstallService } from '../services/installService';
@@ -54,7 +54,6 @@ export class App implements OnInit, OnDestroy {
 	readonly aboutIcon = faInfoCircle;
 	readonly charactersIcon = faHorseHead;
 	readonly contactEmail = contactEmail;
-	readonly patreonLink = supporterLink;
 	readonly discordLink = discordLink;
 	readonly twitterLink = twitterLink;
 	readonly copyright = copyrightName;
