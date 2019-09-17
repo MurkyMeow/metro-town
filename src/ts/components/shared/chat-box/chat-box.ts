@@ -244,7 +244,14 @@ export class ChatBox implements AfterViewInit, OnDestroy {
 	}
 	private say(message: string, chatType: ChatType, entityId: number): boolean {
 		this.game.lastChatMessageType = chatType;
-		return !!this.game.send(server => server.say(entityId, message, chatType));
+		if (message.toLowerCase().startsWith('/shrug')) {
+			var rawMessage = message.substring(6);
+			return !!this.game.send(server =>
+				server.say(entityId, ((rawMessage !== '') ? rawMessage + ' ' : '') + `¯\\_(ツ)_/¯`,
+				chatType));
+		} else {
+			return !!this.game.send(server => server.say(entityId, message, chatType));
+		}
 	}
 	private changeChatType(e: KeyboardEvent, chatType: ChatType) {
 		this.chatType = chatType;
