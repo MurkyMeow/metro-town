@@ -11,6 +11,7 @@ import { element, textNode, removeAllNodes, replaceNodes } from '../../../client
 import { DEFAULT_CHATLOG_OPACITY, PONY_TYPE } from '../../../common/constants';
 import { faCaretUp, faArrowDown } from '../../../client/icons';
 import { sampleMessages } from '../../../common/debugData';
+import { isMobile } from '../../../client/data';
 
 interface IndexEntryUser {
 	id: number;
@@ -354,7 +355,10 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		return (tab === 'local' || tab === 'party' || tab === 'whisper') ? tab : 'local';
 	}
 	get open() {
-		return !this.settings.chatlogClosed;
+		if (this.settings.chatlogClosed === undefined) {
+			return !isMobile; // closed by default on mobile
+		}
+		return this.settings.chatlogClosed === false;
 	}
 	get width() {
 		return this.settings.chatlogWidth || 500;
@@ -475,7 +479,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 	}
 	toggle() {
-		this.settings.chatlogClosed = !this.settings.chatlogClosed;
+		this.settings.chatlogClosed = this.open;
 		this.settingsService.saveBrowserSettings();
 		this.updateOpen();
 	}

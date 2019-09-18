@@ -85,17 +85,6 @@ ng-template(#alertModal)
 	//-span.badge.badge-admin.badge-primary([title]="account.birthdate | date:'yyyy-MM-dd'")
 		| {{age}}
 
-	span.badge.badge-admin.badge-supporter(
-		*ngIf="isPatreonOrSupporter"
-		[ngClass]="supporterClass"
-		[class.declined]="account.supporterDeclinedSince && supporterLevel"
-		[tooltip]="supporterTooltip")
-		fa-icon([icon]="supporterIcon" [fixedWidth]="true")
-		| {{supporterLevelString}}
-
-	span.badge.badge-admin.badge-supporter.badge-success(*ngIf="account.totalPledged" title="lifetime support")
-		| ${{account.totalPledged}}
-
 	span.badge.badge-admin.badge-danger(*ngIf="account.ignoresCount" title="ignored by")
 		| {{account.ignoresCount}}
 

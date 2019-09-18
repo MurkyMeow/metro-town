@@ -18,6 +18,7 @@ module.exports = merge(common, {
 	devtool: 'cheap-eval-source-map',
 	devServer: {
 		host: '0.0.0.0',
+		port: 8090,
 		hot: true,
 		historyApiFallback: true,
 		publicPath: '/assets/scripts/',

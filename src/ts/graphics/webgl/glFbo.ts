@@ -293,9 +293,11 @@ function throwFBOError(gl: WebGL, status: number, message = '') {
 }
 
 function initTexture(gl: WebGL, width: number, height: number, type: number, format: number, attachment: number) {
-	const texture = createEmptyTexture(gl, width, height, format, type);
-	gl.bindTexture(gl.TEXTURE_2D, texture.handle);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture.handle, 0);
+	const texture = createEmptyTexture(gl, true, width, height, format, type);
+	if (texture) {
+		gl.bindTexture(gl.TEXTURE_2D, texture.handle);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture.handle, 0);
+	}
 	return texture;
 }
 

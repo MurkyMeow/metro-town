@@ -23,6 +23,7 @@ export function drawCanvas(
 }
 
 export class ContextSpriteBatch extends BaseStateBatch implements PaletteSpriteBatch, SpriteBatch {
+	depth = 1;
 	pixelSize = 1;
 	disableShading = false;
 	ignoreColor = 0;
@@ -136,6 +137,8 @@ export class ContextSpriteBatch extends BaseStateBatch implements PaletteSpriteB
 		return undefined;
 	}
 	releaseBatch() {
+	}
+	flush() {
 	}
 }
 

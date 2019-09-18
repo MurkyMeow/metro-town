@@ -24,23 +24,23 @@ const accountDuplicates = new Map<string, DuplicatesInfo>();
 const predefinedAlerts = [
 	{
 		name: 'erp:flagged',
-		message: `Your account has been flagged for inappropriate bahavior on PG rated server. `
-			+ `Continuing that behavior may result in permanent ban.`
+		message: `Your account has been flagged for inappropriate behavior on a PG rated server. `
+			+ `Continuing that behavior may result in a permanent ban.`
 	},
 	{
 		name: 'erp:timeout',
-		message: `Your account has been timed out for inappropriate language and bahavior on PG rated server. `
-			+ `Continuing that behavior may result in permanent ban.`
+		message: `Your account has been timed out for inappropriate language and behavior on a PG rated server. `
+			+ `Continuing that behavior may result in a permanent ban.`
 	},
 	{
 		name: 'dups',
 		message: `Your account has been flagged for making multiple accounts. `
-			+ `Continuing that behavior may result in permanent ban.`
+			+ `Continuing that behavior may result in a permanent ban.`
 	},
 	{
 		name: 'under',
-		message: `Your account has been reported for being underage, please do NOT play on 18+ server. `
-			+ `Continuing that may result in permanent ban.`
+		message: `Your account has been reported for being underage, please do NOT play on an 18+ server. `
+			+ `Continuing that may result in a permanent ban.`
 	},
 ];
 

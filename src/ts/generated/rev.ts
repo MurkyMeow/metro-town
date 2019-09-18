@@ -1,5 +1,5 @@
 export const REV: { [key: string]: string; } = {
-		'images/avatars.jpg': '0f8cf8266f',
+		'images/avatars.jpg': 'db381b64ec',
 		'images/logo-120.png': 'b051cf1915',
 		'images/logo-64.png': '64a63307c9',
 		'images/logo-gray.png': '7d4473f069',
@@ -7,8 +7,8 @@ export const REV: { [key: string]: string; } = {
 		'images/logo-small.png': '770b141d9d',
 		'images/logo.png': 'fedfb401e4',
 		'images/pony.png': '541b24abea',
-		'images/pony2.png': 'f370ad056d',
-		'images/pony2a.png': 'a6292b4e18',
+		'images/pony2.png': 'd949ad66f9',
+		'images/pony2a.png': 'efa4df6ddb',
 		'music/ambient.mp3': 'd37b620d70',
 		'music/ambient.webm': '4dbe61d738',
 		'music/bossanova.mp3': 'd43e480500',

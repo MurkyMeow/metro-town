@@ -15,6 +15,7 @@ export interface Contributors {
 	contributors: Contributor[];
 }
 
+// The Team
 export const CREDITS: Credit[] = [
 	// example:
 	// {
@@ -27,28 +28,31 @@ export const CREDITS: Credit[] = [
 
 export const CONTRIBUTORS: Contributors[] = [
 	{
-		group: 'Artists & Animators',
+		group: 'Music Composers',
+		contributors: [
+			{ name: 'Wandering Artist', links: ['https://wanderingartist.bandcamp.com/', 'https://www.youtube.com/user/WanderingArtistMusic'] },
+		],
+	},
+	{
+		group: 'Programmers',
+		contributors: [
+			{ name: 'CyberPon3', links: ['https://twitter.com/CyberPon3'] },
+			{ name: 'Industrialice' },
+		],
+	},
+	{
+		group: 'Artists',
 		contributors: [
 			{ name: 'Shino', links: ['https://www.deviantart.com/shinodage'] },
 			{ name: 'ChiraChan', links: ['https://www.deviantart.com/chiramii-chan', 'https://chirachan-art.tumblr.com/'] },
 			{ name: 'Goodly', links: ['https://www.deviantart.com/goodlyay'] },
 			{ name: 'TioRafaJP', links: ['https://www.deviantart.com/tiorafajp', 'https://www.youtube.com/user/RafaelJP2'] },
 			{ name: 'ShareMyShipment', links: ['https://www.deviantart.com/sharemyshipment'] },
-			{ name: 'Velenor', links: ['https://www.deviantart.com/velenor'] },
+			{ name: 'Velenor' },
+			{ name: 'Meno', links: ['https://twitter.com/menojar', 'https://www.deviantart.com/menojar'] },
 			{ name: 'OtakuAP', links: ['https://www.deviantart.com/otakuap'] },
-		],
-	},
-	{
-		group: 'Programmers & Artists',
-		contributors: [
-			{ name: 'CyberPon3', links: ['https://www.deviantart.com/cyberpon3'] },
-		],
-	},
-	{
-		group: 'Artists',
-		contributors: [
 			{ name: 'Disastral' },
-			{ name: 'Meno', links: ['https://www.deviantart.com/menojar'] },
+			{ name: 'CyberPon3', links: ['https://twitter.com/CyberPon3'] },
 			{ name: 'Paulpeoples', links: ['https://www.deviantart.com/paulpeopless'] },
 			{ name: 'Velvet-Frost', links: ['https://www.deviantart.com/velvet-frost'] },
 			{ name: 'Jet7Wave', links: ['https://www.deviantart.com/jetwave'] },
@@ -65,7 +69,7 @@ export const CONTRIBUTORS: Contributors[] = [
 			{ name: 'Towmacow Waffles', links: ['https://www.deviantart.com/towmacowwaffles'] },
 			{ name: 'OrchidPony', links: ['https://www.deviantart.com/orchidpony'] },
 			{ name: 'Cherry Cerise', links: ['https://www.deviantart.com/cherryceriseart'] },
-			{ name: 'Radio' },
+			{ name: 'RADIOstations', links: ['https://twitter.com/stagbeeble'] },
 			{ name: 'Ultimate Fluff' },
 			{ name: 'SC', links: ['https://0somecunt0.tumblr.com/tagged/sfw'] },
 			{ name: 'SailorDolpin', links: ['https://vk.com/id324582699'] },

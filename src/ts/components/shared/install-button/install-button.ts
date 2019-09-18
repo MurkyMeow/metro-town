@@ -13,7 +13,7 @@ export class InstallButton {
 	constructor(private installService: InstallService) {
 	}
 	get canInstall() {
-		return this.installService.canInstall;
+		return false;
 	}
 	get isMobile() {
 		return isMobile;

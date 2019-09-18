@@ -1,19 +1,20 @@
 // VERTEX
 
-attribute vec2 position;
+attribute vec3 position;
 attribute vec2 texcoords;
 attribute vec4 vertexColor;
 
 uniform mat4 transform;
 uniform vec4 lighting;
+uniform vec2 textureSize;
 
 varying vec2 textureCoord;
 varying vec4 vColor;
 
 void main() {
-	textureCoord = texcoords;
+	textureCoord = texcoords / textureSize;
 	vColor = vertexColor * lighting;
-	gl_Position = transform * vec4(position, 0, 1);
+	gl_Position = transform * vec4(position, 1);
 }
 
 // FRAGMENT
@@ -21,11 +22,14 @@ void main() {
 precision mediump float;
 
 uniform sampler2D sampler1;
-uniform float textureSize;
 
 varying vec2 textureCoord;
 varying vec4 vColor;
 
 void main() {
-	gl_FragColor = texture2D(sampler1, textureCoord / textureSize) * vColor;
+	gl_FragColor = texture2D(sampler1, textureCoord);
+
+	#ifdef USE_COLOR
+		gl_FragColor *= vColor;
+	#endif
 }

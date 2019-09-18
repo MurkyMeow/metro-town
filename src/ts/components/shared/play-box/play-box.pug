@@ -18,7 +18,7 @@
 
 .form-group(*ngIf="isAndroidBrowser")
 	.alert.alert-warning(role="alert")
-		| Your browser is outdated and is not able to correctly run Pony Town.
+		| Your browser is outdated and is not able to correctly run Pony Town Custom Server.
 		| Please install different browser to be able to play the game.
 
 .form-group(*ngIf="model.missingBirthdate && !birthdateSet && requestBirthdate")
@@ -86,8 +86,8 @@
 .form-group(*ngIf="isBrowserOutdated")
 	.alert.alert-warning(role="alert")
 		button.close.float-right((click)="dismissOutdatedBrowser()" aria-label="Close" style="font-size: 20px;") &times;
-		| Your browser is outdated and is known to have issues running Pony Town.
-		| Make sure you have latest version installed.
+		| Your browser is outdated and is known to have issues running Pony Town Custom Server.
+		| Make sure you have the latest version installed.
 
 .form-group(*ngIf="invalidVersion && !offline")
 	.alert.alert-danger(role="alert")

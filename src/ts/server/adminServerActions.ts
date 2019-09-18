@@ -38,7 +38,6 @@ import { getOriginStats, clearOrigins, removeAllOrigins, removeOrigins, addOrigi
 import { getDuplicateEntries, getAllDuplicatesQuickInfo, getAllDuplicatesWithInfo } from './api/duplicates';
 import { splitAccounts } from './api/merge';
 import { removeAuth, assignAuth } from './api/admin-auths';
-import { getLastPatreonData } from './patreon';
 import { removeFriend, addFriend } from './accountUtils';
 
 @Socket({
@@ -555,16 +554,7 @@ export class AdminServerActions implements IAdminServerActions, SocketServer {
 	}
 	@Method({ promise: true })
 	async getLastPatreonData() {
-		const data = await getLastPatreonData();
-
-		// if (data) {
-		// 	data.pledges.forEach(pledge => {
-		// 		const auth = this.adminService.auths.items.find(a => a.openId === pledge.user);
-		// 		pledge.account = auth && auth.account;
-		// 	});
-		// }
-
-		return data;
+		return undefined;
 	}
 	@Method({ promise: true })
 	async updatePastSupporters() {

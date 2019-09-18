@@ -4,7 +4,8 @@ import { createTexture, disposeTexture } from './webgl/texture2d';
 export function createTexturesForSpriteSheets(gl: WebGLRenderingContext, sheets: SpriteSheet[], texture = createTexture) {
 	sheets.forEach(sheet => {
 		if (sheet.data) {
-			sheet.texture = texture(gl, sheet.data);
+			let format = sheet.isSingleChannel ? gl.LUMINANCE : gl.RGBA;
+			sheet.texture = texture(gl, sheet.data, format);
 		}
 	});
 }

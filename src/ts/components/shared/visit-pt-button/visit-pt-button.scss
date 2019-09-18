@@ -12,30 +12,36 @@
 	}
 }
 
-.patreon-logo {
+.btn-pt {
+	padding: 1.0rem;
+	font-weight: 500;
+	//height: 60px;
+}
+
+.pt-logo {
 	position: absolute;
 	left: 8px;
-	top: 5px;
-	width: 30px;
-	height: 30px;
+	top: 6px;
+	width: 37px;
+	height: 47px;
 	
 	@media (max-width: 320px) {
 		display: none;
 	}
 }
 
-.supporter-pony {
+.visit-pt-pony {
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	height: 70px;
+	height: 80px;
 	width: 100px;
 	overflow: hidden;
 	border-radius: $border-radius-lg - 2px;
 	
-	> supporter-pony {
+	> visit-pt-pony {
 		position: absolute;
-		bottom: -95px;
+		bottom: -80px;
 		left: -20px;
 	}
 	

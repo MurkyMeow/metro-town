@@ -158,7 +158,7 @@ export class PaletteManager implements IPaletteManager {
 	private initializeTexture(gl: WebGLRenderingContext, size: number) {
 		try {
 			if (!this.paletteTexture) {
-				this.paletteTexture = createEmptyTexture(gl, size, size, gl.RGBA, gl.UNSIGNED_BYTE);
+				this.paletteTexture = createEmptyTexture(gl, true, size, size, gl.RGBA, gl.UNSIGNED_BYTE);
 			} else if (this.paletteTexture.width !== size) {
 				resizeTexture(gl, this.paletteTexture, size, size);
 			}

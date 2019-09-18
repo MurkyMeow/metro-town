@@ -34,14 +34,6 @@
 		"no-duplicate-variable": true,
 		"no-eval": true,
 		"no-trailing-whitespace": true,
-		"linebreak-style": [
-			true,
-			"CRLF"
-		],
-		"max-line-length": [
-			true,
-			130
-		],
 		"one-line": [
 			true,
 			"check-open-brace",
