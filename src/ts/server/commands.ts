@@ -275,6 +275,7 @@ export function createCommands(world: World): Command[] {
 		action(['yawn'], Action.Yawn),
 		action(['laugh', 'lol', 'haha', 'хаха', 'jaja'], Action.Laugh),
 		action(['sneeze', 'achoo'], Action.Sneeze),
+		action(['excite', 'tada'], Action.Excite),
 		action(['magic'], Action.Magic),
 
 		// house

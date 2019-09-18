@@ -25,7 +25,7 @@ import { decodeUpdate, readOneUpdate } from '../common/encoders/updateDecoder';
 import { updateEntityVelocity } from '../common/entityUtils';
 import { decodePonyInfo } from '../common/compressPony';
 import { mockPaletteManager } from '../common/ponyInfo';
-import { yawn, laugh, sneeze } from './ponyAnimations';
+import { yawn, laugh, sneeze, excite } from './ponyAnimations';
 import {
 	findEntityById, getRegionGlobal, setTile, removeEntity, addEntity, removeEntityDirectly, setRegion,
 	addEntityToMapRegion, switchEntityRegion, getRegionUnsafe, addOrRemoveFromEntityList,
@@ -413,6 +413,11 @@ export function handleAction(game: PonyTownGame, id: number, action: Action) {
 			case Action.Sneeze:
 				if (!hasHeadAnimation(pony)) {
 					setHeadAnimation(pony, sneeze);
+				}
+				break;
+			case Action.Excite:
+				if (!hasHeadAnimation(pony)) {
+					setHeadAnimation(pony, excite);
 				}
 				break;
 			default:

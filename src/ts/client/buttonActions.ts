@@ -11,7 +11,7 @@ import { PonyTownGame } from './game';
 import { boopAction, upAction, downAction, turnHeadAction } from './playerActions';
 import { ACTIONS_LIMIT, COMMAND_ACTION_TIME_DELAY } from '../common/constants';
 import { cloneDeep, hasFlag } from '../common/utils';
-import { boop, defaultHeadFrame, stand, sneeze, yawn, lie, sit, fly, laugh } from './ponyAnimations';
+import { boop, defaultHeadFrame, stand, sneeze, yawn, lie, sit, fly, laugh, excite } from './ponyAnimations';
 import { createDefaultPony, syncLockedPonyInfo, toPalette, mockPaletteManager } from '../common/ponyInfo';
 import {
 	ACTION_EXPRESSION_EYE_COLOR, ACTION_EXPRESSION_BG, ACTION_ACTION_COAT_COLOR, WHITE, HEARTS_COLOR,
@@ -113,6 +113,7 @@ const actionActions = [
 	actionButtonAction('yawn', 'Yawn', Action.Yawn),
 	actionButtonAction('love', 'Love', Action.Love),
 	actionButtonAction('laugh', 'Laugh', Action.Laugh),
+	actionButtonAction('excite', 'Excite', Action.Excite),
 	actionButtonAction('blush', 'Blush', Action.Blush),
 	actionButtonAction('drop', 'Drop item', Action.Drop),
 	actionButtonAction('drop-toy', 'Drop toy', Action.DropToy),
@@ -469,6 +470,11 @@ export function drawAction(canvas: HTMLCanvasElement, action: ButtonAction | und
 							}
 							case 'sneeze': {
 								const state = { ...createState(), headAnimation: sneeze, headAnimationFrame: 3 };
+								drawPony(batch, actionPony, state, 17, 40, defaultDrawPonyOptions());
+								break;
+							}
+							case 'excite': {
+								const state = { ...createState(), headAnimation: excite, headAnimationFrame: 3 };
 								drawPony(batch, actionPony, state, 17, 40, defaultDrawPonyOptions());
 								break;
 							}

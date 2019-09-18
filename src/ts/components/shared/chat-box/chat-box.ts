@@ -34,7 +34,7 @@ setupChatType(ChatType.Think, 'think');
 setupChatType(ChatType.PartyThink, 'party think');
 
 function isActionCommand(message: string) {
-	return /^\/(yawn|sneeze|achoo|laugh|lol|haha|хаха|jaja)/i.test(message);
+	return /^\/(yawn|sneeze|excite|tada|achoo|laugh|lol|haha|хаха|jaja)/i.test(message);
 }
 
 @Component({
