@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { AccountSettings, BrowserSettings } from '../../../common/interfaces';
+import { AccountSettings, BrowserSettings, GraphicsQuality } from '../../../common/interfaces';
 import { SettingsService } from '../../services/settingsService';
 import {
 	DEFAULT_CHATLOG_OPACITY, MAX_CHATLOG_RANGE, MIN_CHATLOG_RANGE, isChatlogRangeUnlimited, MAX_FILTER_WORDS_LENGTH
@@ -9,7 +9,7 @@ import { StorageService } from '../../services/storageService';
 import { cloneDeep } from '../../../common/utils';
 import { PonyTownGame } from '../../../client/game';
 import { updateRangeIndicator, readFileAsText } from '../../../client/clientUtils';
-import { faSlidersH, faCommentSlash, faGamepad, faImage, faDownload, faUpload } from '../../../client/icons';
+import { faSlidersH, faCommentSlash, faGamepad, faImage, faDownload, faUpload, faComment } from '../../../client/icons';
 
 @Component({
 	selector: 'settings-modal',
@@ -19,8 +19,10 @@ import { faSlidersH, faCommentSlash, faGamepad, faImage, faDownload, faUpload } 
 export class SettingsModal implements OnInit, OnDestroy {
 	readonly maxChatlogRange = MAX_CHATLOG_RANGE;
 	readonly minChatlogRange = MIN_CHATLOG_RANGE;
+	readonly maxGraphicsQuality: number;
+	readonly maxGraphicsQualityValue: GraphicsQuality;
 	readonly gameIcon = faSlidersH;
-	readonly chatIcon = faCommentSlash;
+	readonly chatIcon = faComment;
 	readonly filtersIcon = faCommentSlash;
 	readonly controlsIcon = faGamepad;
 	readonly graphicsIcon = faImage;
@@ -38,6 +40,24 @@ export class SettingsModal implements OnInit, OnDestroy {
 		private storage: StorageService,
 		private game: PonyTownGame,
 	) {
+		if (game.webgl) {
+			if (game.webgl.failedFBO) {
+				this.maxGraphicsQuality = 0;
+				this.maxGraphicsQualityValue = GraphicsQuality.Low;
+			}
+			else if (game.webgl.failedDepthBuffer) {
+				this.maxGraphicsQuality = 1;
+				this.maxGraphicsQualityValue = GraphicsQuality.Medium;
+			}
+			else {
+				this.maxGraphicsQuality = 2;
+				this.maxGraphicsQualityValue = GraphicsQuality.High;
+			}
+		}
+		else {
+			this.maxGraphicsQuality = 2;
+			this.maxGraphicsQualityValue = GraphicsQuality.High;
+		}
 	}
 	get pane() {
 		return this.storage.getItem('settings-modal-pane') || 'game';
@@ -45,12 +65,24 @@ export class SettingsModal implements OnInit, OnDestroy {
 	set pane(value: string) {
 		this.storage.setItem('settings-modal-pane', value);
 	}
-	get lockLowGraphicsMode() {
-		return this.game.failedFBO;
-	}
 	get chatlogRangeText() {
 		const range = this.account.chatlogRange;
 		return isChatlogRangeUnlimited(range) ? 'entire screen' : `${range} tiles`;
+	}
+	get graphicsQualityText() {
+		if (!this.game.webgl || (this.browser.graphicsQuality === undefined)) {
+			return 'Undefined';
+		}
+
+		if (this.game.webgl.failedFBO || (this.browser.graphicsQuality === GraphicsQuality.Low)) {
+			return 'Low';
+		}
+		else if (this.game.webgl.failedDepthBuffer || (this.browser.graphicsQuality === GraphicsQuality.Medium)) {
+			return 'Medium';
+		}
+		else {
+			return 'High';
+		}
 	}
 	ngOnInit() {
 		this.accountBackup = cloneDeep(this.settingsService.account);
@@ -124,6 +156,10 @@ export class SettingsModal implements OnInit, OnDestroy {
 
 		if (this.account.filterWords === undefined) {
 			this.account.filterWords = '';
+		}
+
+		if (this.browser.graphicsQuality === undefined) {
+			this.browser.graphicsQuality = this.maxGraphicsQualityValue;
 		}
 	}
 	export() {

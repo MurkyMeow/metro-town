@@ -214,13 +214,14 @@ export function initializeToys(paletteManager: PaletteManager) {
 	}
 }
 
-const zeroPoint = point(0, 0);
+// const zeroPoint = point(0, 0);
 const wakes = [
 	{ ox: 21, oy: 60, behind: sprites.pony_wake_4, front: sprites.pony_wake_3 },
 	{ ox: 24, oy: 60, behind: sprites.pony_wake_6, front: sprites.pony_wake_5 },
 	{ ox: 18, oy: 51, behind: sprites.pony_wake_2, front: sprites.pony_wake_1 },
 ];
 
+// swimming effects of different size; add value per tail
 const wakeIndices = [0, 2, 1, 0, 2, 2, 2, 0, 2, 2, 2, 1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1];
 
 function getWakeIndex(info: Info) {
@@ -292,9 +293,10 @@ export function drawPony(batch: Batch, info: Info, state: State, ponyX: number, 
 	let hatOffset = at(HEAD_ACCESSORY_OFFSETS, info.mane ? info.mane.type : 0)!;
 	const noMane = !info.mane || hasNoMane(info.mane.type);
 
-	if (info.headAccessory !== undefined && info.headAccessory.type === 20) {
-		hatOffset = zeroPoint;
-	}
+	// temp front layer hat test
+	// if (info.headAccessory !== undefined && info.headAccessory.type === 20) {
+	//	hatOffset = zeroPoint;
+	//}
 
 	if (draw(options, NoDraw.Behind)) {
 		// far wing
@@ -639,13 +641,14 @@ export function drawHead(
 		drawSet(batch, sprites.facialHair, info.facialHair, x, y, WHITE);
 	}
 
-	const skipTopAndFrontMane = info.headAccessory !== undefined && info.headAccessory.type === 20;
+	// temp front layer hat test
+	// const skipTopAndFrontMane = info.headAccessory !== undefined && info.headAccessory.type === 20;
 
 	if (draw(options, NoDraw.FrontMane)) {
 		drawSet(batch, sprites.backFrontManes, info.backMane, x, y + maneOffsetY, WHITE);
 	}
 
-	if (draw(options, NoDraw.TopMane) && !skipTopAndFrontMane) {
+	if (draw(options, NoDraw.TopMane) /* && !skipTopAndFrontMane*/ ) {
 		drawSet(batch, sprites.topManes, info.mane, x, y, WHITE);
 	}
 
@@ -682,7 +685,7 @@ export function drawHead(
 		drawSet(batch, sprites.earAccessories, info.earAccessory, x + earAccessoryOffset.x, y + earAccessoryOffset.y, WHITE);
 	}
 
-	if (draw(options, NoDraw.FrontMane) && !skipTopAndFrontMane) {
+	if (draw(options, NoDraw.FrontMane) /* && !skipTopAndFrontMane */) {
 		drawSet(batch, sprites.frontManes, info.mane, x, y + maneOffsetY, WHITE);
 	}
 

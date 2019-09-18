@@ -78,41 +78,6 @@ h1(focusTitle) Account settings
 
 	.col-md-6
 		div(style="margin-bottom: 100px;")
-			.clearfix(*ngIf="showSupporter")
-				.form-group
-					h3
-						fa-icon.mr-2([icon]="starIcon" [ngClass]="supporterClass")
-						| Thank you for your support
-
-				supporter-pony.float-right(#pony (mouseenter)="pony.excite()" (mouseleave)="pony.reset()")
-
-				.form-group
-					p Your reward tier: #[b {{supporterTitle}}]
-					p Your rewards include:
-					ul
-						li(*ngFor="let r of supporterRewards")
-							| {{r}}
-
-				p(*ngIf="supporter > 0")
-					| Use <code>/ss hello</code> command to use supporter chat color.
-
-				p(*ngIf="supporter > 1")
-					| Use <code>/s1 hello</code> and <code>/s2 hello</code> commands to use lower tier supporter chat colors.
-
-			.clearfix(*ngIf="showSupporterInfo")
-				.form-group
-					h3 Supporter info
-
-				supporter-pony.float-right(#pony (mouseenter)="pony.excite()" (mouseleave)="pony.reset()")
-
-				.form-group.text-muted
-					p.
-						You've successfully connected your Patreon account to pixel.horse.
-						If you support pixel.horse on Patreon your supporter info will show up here.
-					p.
-						It should take no longer than 10 minutes to register your Patreon pledges.
-
-		div(style="margin-bottom: 100px;")
 			.form-group
 				.float-right
 					span.text-muted Page: {{page + 1}}

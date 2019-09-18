@@ -1,41 +1,42 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { defaultExpression } from '../../../client/ponyUtils';
 import { defaultPonyState } from '../../../client/ponyHelpers';
-import { SUPPORTER_PONY } from '../../../common/constants';
-import { Expression, Muzzle, HeadAnimation, Iris } from '../../../common/interfaces';
-import { excite } from '../../../client/ponyAnimations';
+import { Expression, Muzzle, HeadAnimation, BodyAnimation, Eye } from '../../../common/interfaces';
+import { excite_meno, happy_tongue_meno, stand, boop, happy_tongue_meno_2 } from '../../../client/ponyAnimations';
 import { FrameService, FrameLoop } from '../../services/frameService';
 import { CharacterPreview } from '../character-preview/character-preview';
 import { decompressPonyString } from '../../../common/compressPony';
 
 const BLEP: Expression = {
 	...defaultExpression,
+	left: Eye.Neutral2,
+	right: Eye.Neutral2,
 	muzzle: Muzzle.Blep,
 };
 
 const EXCITED: Expression = {
 	...defaultExpression,
+	left: Eye.Neutral2,
+	right: Eye.Neutral2,
 	muzzle: Muzzle.SmileOpen,
 };
 
-const DERP: Expression = {
-	...defaultExpression,
-	muzzle: Muzzle.SmileOpen,
-	leftIris: Iris.Up,
-};
+const MENO = 'DBWIzP8imd08//D19fVazSjcwf1GhLNEiMxENSovLy/NsIdJQDnGqYBiSztWQTM6LychEnE/KRX///9WPeE1HbSpBUEIIASwgEIAAAAAbIAgCFMY34AHAAjwgCMRQCVLY38IDhAAwmFBz4fAIxjKM6SjGlaxjWtYgjGI';
 
 @Component({
-	selector: 'supporter-pony',
-	templateUrl: 'supporter-pony.pug',
+	selector: 'visit-pt-pony',
+	templateUrl: 'visit-pt-pony.pug',
 })
-export class SupporterPony implements OnInit, OnDestroy {
+export class VisitPTPony implements OnInit, OnDestroy {
 	@ViewChild('characterPreview', { static: true }) characterPreview!: CharacterPreview;
 	@Input() scale = 3;
-	pony = decompressPonyString(SUPPORTER_PONY);
+	pony = decompressPonyString(MENO);
 	state = defaultPonyState();
 	private expression?: Expression;
 	private headAnimation?: HeadAnimation;
 	private headTime = 0;
+	private bodyAnimation?: BodyAnimation;
+	private bodyTime = 0;
 	private loop: FrameLoop;
 	constructor(frameService: FrameService) {
 		this.loop = frameService.create(delta => this.tick(delta));
@@ -46,16 +47,29 @@ export class SupporterPony implements OnInit, OnDestroy {
 	ngOnDestroy() {
 		this.loop.destroy();
 	}
-	excite() {
+	select() {
 		this.headTime = 0;
-		this.headAnimation = excite;
-		this.expression = Math.random() < 0.2 ? DERP : EXCITED;
+		this.bodyTime = 0;
+		this.expression = EXCITED;
+		this.bodyAnimation = Math.random() < 0.25 ? boop : stand;
+
+		const headRandom = Math.random();
+		if (headRandom < 0.5) {
+			this.headAnimation = excite_meno;
+		}
+		else if (headRandom < 0.8) {
+			this.headAnimation = happy_tongue_meno;
+		}
+		else {
+			this.headAnimation = happy_tongue_meno_2;
+		}
 	}
 	reset() {
 		this.expression = undefined;
 	}
 	private tick(delta: number) {
 		this.headTime += delta;
+		this.bodyTime += delta;
 
 		if (this.headAnimation) {
 			const frame = Math.floor(this.headTime * this.headAnimation.fps);
@@ -80,6 +94,19 @@ export class SupporterPony implements OnInit, OnDestroy {
 				if (Math.random() < 0.005) {
 					this.expression = BLEP;
 				}
+			}
+		}
+
+		if (this.bodyAnimation) {
+			const frame = Math.floor(this.bodyTime * this.bodyAnimation.fps * 0.75);
+
+			if (frame >= this.bodyAnimation.frames.length && !this.bodyAnimation.loop) {
+				this.bodyAnimation = undefined;
+				this.state.animation = stand;
+				this.state.animationFrame = 0;
+			} else {
+				this.state.animation = this.bodyAnimation;
+				this.state.animationFrame = frame % this.bodyAnimation.frames.length;
 			}
 		}
 

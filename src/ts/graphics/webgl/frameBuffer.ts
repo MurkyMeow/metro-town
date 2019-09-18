@@ -1,28 +1,50 @@
-import { Texture2D, createEmptyTexture, resizeTexture } from './texture2d';
+import { Texture2D, createEmptyTexture } from './texture2d';
 
 export interface FrameBuffer {
 	handle: WebGLFramebuffer;
-	texture: Texture2D;
+	colorTexture: Texture2D;
+	depthStencilRenderbuffer: WebGLRenderbuffer | null;
 	width: number;
 	height: number;
+	owningDepthStencil: boolean;
 }
 
-export function createFrameBuffer(gl: WebGLRenderingContext, width: number, height: number): FrameBuffer {
+export function createFrameBuffer(
+	gl: WebGLRenderingContext, target: FrameBuffer, width: number, height: number, useLinearMagnify: boolean,
+	createDepthStencil: boolean, depthStencilRenderbuffer: WebGLRenderbuffer | null
+) {
 	const handle = gl.createFramebuffer();
-
 	if (!handle) {
 		throw new Error('Failed to create frame buffer');
 	}
 
-	const texture = createEmptyTexture(gl, width, height, gl.RGB);
-	return { handle, texture, width, height };
+	const resources = createFrameBufferResources(gl, width, height, createDepthStencil, useLinearMagnify);
+	target.handle = handle;
+	target.colorTexture = resources.colorTexture;
+	target.depthStencilRenderbuffer = resources.depthStencilRenderbuffer;
+	target.width = width;
+	target.height = height;
+	target.owningDepthStencil = createDepthStencil;
+
+	if (!createDepthStencil) {
+		target.depthStencilRenderbuffer = depthStencilRenderbuffer;
+	}
+
+	gl.bindFramebuffer(gl.FRAMEBUFFER, handle);
+	bindFrameBufferAttachments(gl, target);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-export function disposeFrameBuffer(gl: WebGLRenderingContext | undefined, buffer: FrameBuffer | undefined) {
+export function disposeFrameBuffer(gl?: WebGLRenderingContext, buffer?: FrameBuffer) {
 	try {
 		if (gl && buffer) {
 			gl.deleteFramebuffer(buffer.handle);
-			gl.deleteTexture(buffer.texture.handle);
+			if (buffer.colorTexture) {
+				gl.deleteTexture(buffer.colorTexture.handle);
+			}
+			if (buffer.depthStencilRenderbuffer && buffer.owningDepthStencil) {
+				gl.deleteRenderbuffer(buffer.depthStencilRenderbuffer);
+			}
 		}
 	} catch (e) {
 		DEVELOPMENT && console.error(e);
@@ -31,18 +53,52 @@ export function disposeFrameBuffer(gl: WebGLRenderingContext | undefined, buffer
 	return undefined;
 }
 
-export function resizeFrameBuffer(gl: WebGLRenderingContext, frameBuffer: FrameBuffer, width: number, height: number) {
-	resizeTexture(gl, frameBuffer.texture, width, height);
-	frameBuffer.width = width;
-	frameBuffer.height = height;
-}
-
-export function bindFrameBuffer(gl: WebGLRenderingContext, { handle, texture }: FrameBuffer) {
+export function bindFrameBuffer(gl: WebGLRenderingContext, { handle }: FrameBuffer) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, handle);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture.handle, 0);
 }
 
 export function unbindFrameBuffer(gl: WebGLRenderingContext) {
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, null, 0);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+function bindFrameBufferAttachments(gl: WebGLRenderingContext, { colorTexture, depthStencilRenderbuffer }: FrameBuffer) {
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, colorTexture.handle, 0);
+	if (depthStencilRenderbuffer) {
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthStencilRenderbuffer);
+	}
+
+	gl.depthMask(true);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.depthMask(false);
+
+	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+		throw new Error('Failed to set framebuffer attachments');
+	}
+}
+
+function createFrameBufferResources(
+	gl: WebGLRenderingContext, width: number, height: number, createDepthBuffer: boolean, useLinearMagnify: boolean
+) {
+	const colorTexture = createEmptyTexture(gl, false, width, height, gl.RGB);
+	if (!colorTexture) {
+		throw new Error('Failed to create frame buffer\'s color texture');
+	}
+	if (useLinearMagnify) {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	}
+
+	let depthStencilRenderbuffer: WebGLRenderbuffer | null = null;
+	if (createDepthBuffer) {
+		depthStencilRenderbuffer = gl.createRenderbuffer();
+		if (depthStencilRenderbuffer) {
+			gl.bindRenderbuffer(gl.RENDERBUFFER, depthStencilRenderbuffer);
+			gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+			gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+		}
+		else {
+			console.warn('depth/stencil is not available');
+		}
+	}
+
+	return { colorTexture, depthStencilRenderbuffer };
 }

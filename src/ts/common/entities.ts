@@ -22,7 +22,7 @@ import { mockPaletteManager } from './ponyInfo';
 const entities: EntityDescriptor[] = [];
 
 export function createBaseEntity(type: number, id: number, x: number, y: number): Entity {
-	return { id, type, x, y, z: 0, vx: 0, vy: 0, order: 0, state: 0, playerState: 0, flags: 0, timestamp: 0 };
+	return { id, type, x, y, z: 0, vx: 0, vy: 0, depth: 0, order: 0, state: 0, playerState: 0, flags: 0, timestamp: 0 };
 }
 
 function createEntity(
@@ -154,12 +154,14 @@ function mixOrder(order: number): MixinEntity {
 
 const collectableInteractive = mixInteract(-8, -12, 16, 16, 1.5);
 
+// entity with centered sprite and larger clickable area
 function collectable(name: string, sprite: PaletteRenderable, paletteIndex = 0, ...other: MixinEntity[]) {
 	return doodad(name, sprite, Math.floor(sprite.color!.w / 2), sprite.color!.h - 1, paletteIndex,
 		collectableInteractive,
 		...other);
 }
 
+// for ground details. puts origin point on the top of sprite, so you always go on top of it. collectables are able to spawn overlapping decals
 function decal(name: string, sprite: PaletteRenderable, palette = 0, ...other: MixinEntity[]) {
 	return registerMix(name,
 		mixDraw(sprite, Math.floor((sprite.color!.w + sprite.color!.ox) / 2), sprite.color!.oy, palette),
@@ -174,6 +176,7 @@ function decalOffset(name: string, sprite: PaletteRenderable, dx: number, dy: nu
 		...other);
 }
 
+// for decorative objects
 function doodad(
 	name: string, sprite: PaletteRenderable, ox: number, oy: number, palatte = 0, ...other: (MixinEntity | undefined)[]
 ) {
@@ -806,11 +809,6 @@ export const rock2B = doodad(n('rock-2b'), sprites.rock_2, 11, 11, 1,
 export const rock3B = doodad(n('rock-3b'), sprites.rock_3, 10, 11, 1,
 	mixColliderRounded(-10, -4, 18, 5, 2, false),
 	rockMinimap);
-
-// other
-
-export const well = doodad(n('well'), sprites.well, 30, 67, 0,
-	mixColliderRect(-26, -20, 54, 30));
 
 // water rocks
 
@@ -1552,7 +1550,7 @@ const cloudSprite = sprites.cloud.shadow;
 
 export const cloud = registerMix(n('cloud'),
 	mixDrawShadow(sprites.cloud, Math.floor(cloudSprite.w / 2), cloudSprite.h, CLOUD_SHADOW_COLOR),
-	mixFlags(EntityFlags.Decal | EntityFlags.Movable));
+	mixFlags(EntityFlags.StaticY | EntityFlags.Decal | EntityFlags.Movable));
 
 // vegetation
 

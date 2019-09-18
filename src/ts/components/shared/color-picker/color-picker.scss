@@ -35,7 +35,6 @@ $color-picker-box-offset: 5px;
 	border: solid 1px $border-color;
 	border-radius: 2px;
 	pointer-events: none;
-	z-index: 10;
 
 	.disabled > & {
 		opacity: 0.8;

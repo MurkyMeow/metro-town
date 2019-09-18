@@ -11,9 +11,11 @@ export const WEEK = DAY * 7;
 export const MONTH = DAY * 30;
 export const YEAR = DAY * 365;
 
-export const BATCH_SIZE_MAX = 10000;
+export const BATCH_VERTEX_CAPACITY_MAX = 16384;
 
 export const MAX_VELOCITY = 16; // do not change
+
+export const NEW_ACCOUNT_PONY_NAME = 'Pony';
 
 export const PONY_TYPE = 1;
 export const PONY_SPEED_TROT = 4; // tiles per sec
@@ -36,6 +38,8 @@ export const MAP_DISCARD_TIMEOUT = 15 * MINUTE;
 export const MAP_SWITCH_DELAY = 1 * SECOND;
 export const MAP_SWITCHES_PER_UPDATE = 1;
 export const JOINS_PER_UPDATE = 1;
+
+export const LIGHT_VOLUME_SCALE = 0.81;
 
 export const DEFAULT_CHATLOG_OPACITY = 35;
 export const MAX_CHATLOG_RANGE = 13;
@@ -184,7 +188,7 @@ export const PAST_SUPPORTER_REWARDS = [
 export const GENERAL_RULES = [
 	`Be kind to others`,
 	`Don't spam`,
-	`Don't use multiple accounts`,
+	`Don't create multiple accounts`,
 	`Don't modify the game with hacks or scripts`,
 	`Don't encourage behaviour violating the rules`,
 	`Violation of the rules may result in temporary or permanent ban`,

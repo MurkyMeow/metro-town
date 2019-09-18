@@ -1,85 +1,98 @@
-export interface Shader {
+export interface ShaderProgramData {
 	program: WebGLProgram;
-	vertexShader: WebGLShader;
-	fragmentShader: WebGLShader;
 	uniforms: { [key: string]: WebGLUniformLocation; };
 }
 
-export function createShader(gl: WebGLRenderingContext, source: string | { vertex: string; fragment: string; }): Shader {
-	if (typeof source === 'string') {
-		const index = source.indexOf('// FRAGMENT');
+export class Shader {
+	private programs: { [key: string]: ShaderProgramData; } = {};
+	private vertexCode: string;
+	private fragmentCode: string;
 
-		if (index === -1) {
-			throw new Error(`Missing fragment shader separator`);
+	constructor(source: string | { vertex: string; fragment: string; }) {
+		if (typeof source === 'string') {
+			const index = source.indexOf('// FRAGMENT');
+
+			if (index === -1) {
+				throw new Error(`Missing fragment shader separator`);
+			}
+
+			source = {
+				vertex: source.substring(0, index),
+				fragment: source.substring(index),
+			};
 		}
 
-		source = {
-			vertex: source.substring(0, index),
-			fragment: source.substring(index),
-		};
+		this.vertexCode = source.vertex;
+		this.fragmentCode = source.fragment;
 	}
 
-	const vertexShader = createWebGLShader(gl, gl.VERTEX_SHADER, source.vertex);
-	const fragmentShader = createWebGLShader(gl, gl.FRAGMENT_SHADER, source.fragment);
-	const program = gl.createProgram();
+	compile(gl: WebGLRenderingContext, defines: string[]) {
+		defines.sort();
+		let definesString = defines.reduce((prev, cur) => prev + cur, '');
 
-	if (!program) {
-		throw new Error('Failed to create shader program');
-	}
-
-	gl.attachShader(program, vertexShader);
-	gl.attachShader(program, fragmentShader);
-
-	const attribs = source.vertex.match(/^attribute [a-zA-Z0-9_]+ ([a-zA-Z0-9_]+)/mg)!;
-
-	for (var i = 0; i < attribs.length; ++i) {
-		const [, name] = /attribute [a-zA-Z0-9_]+ ([a-zA-Z0-9_]+)/.exec(attribs[i])!;
-		gl.bindAttribLocation(program, i, name);
-	}
-
-	gl.linkProgram(program);
-
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		throw new Error('Failed to link shader program');
-	}
-
-	gl.useProgram(program);
-
-	const uniforms: any = {};
-	const samplers: string[] = [];
-
-	for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
-		const info = gl.getActiveUniform(program, i)!;
-		uniforms[info.name] = gl.getUniformLocation(program, info.name);
-
-		if (!uniforms[info.name]) {
-			throw new Error(`Failed to get uniform location (${info.name})`);
+		let data = this.programs[definesString];
+		if (!data) {
+			data = Shader.compileShader(gl, this.vertexCode, this.fragmentCode, defines);
+			this.programs[definesString] = data;
 		}
 
-		if (info.type === gl.SAMPLER_2D) {
-			samplers.push(info.name);
-		}
+		return data;
 	}
 
-	samplers.sort().forEach((name, i) => gl.uniform1i(uniforms[name], i));
 
-	gl.useProgram(null);
+	private static compileShader(gl: WebGLRenderingContext, vertexCode: string, fragmentCode: string, defines: string[]) {
+		let shaderDefines = defines.reduce((prev, cur) => prev + '#define ' + cur + '\n', '');
 
-	return { program, vertexShader, fragmentShader, uniforms };
-}
+		const vertexShader = createWebGLShader(gl, gl.VERTEX_SHADER, shaderDefines + vertexCode);
+		const fragmentShader = createWebGLShader(gl, gl.FRAGMENT_SHADER, shaderDefines + fragmentCode);
+		const program = gl.createProgram();
 
-export function disposeShader(gl: WebGLRenderingContext | undefined, shader: Shader | undefined) {
-	try {
-		if (gl && shader) {
-			gl.deleteProgram(shader.program);
-			gl.deleteShader(shader.vertexShader);
-			gl.deleteShader(shader.fragmentShader);
+		if (!program) {
+			throw new Error('Failed to create shader program');
 		}
-	} catch (e) {
-		DEVELOPMENT && console.error(e);
-	}
 
-	return undefined;
+		gl.attachShader(program, vertexShader);
+		gl.attachShader(program, fragmentShader);
+
+		const attribs = vertexCode.match(/^attribute [a-zA-Z0-9_]+ ([a-zA-Z0-9_]+)/mg)!;
+
+		for (var i = 0; i < attribs.length; ++i) {
+			const [, name] = /attribute [a-zA-Z0-9_]+ ([a-zA-Z0-9_]+)/.exec(attribs[i])!;
+			gl.bindAttribLocation(program, i, name);
+		}
+
+		gl.linkProgram(program);
+		gl.deleteShader(vertexShader);
+		gl.deleteShader(fragmentShader);
+
+		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+			throw new Error('Failed to link shader program');
+		}
+
+		gl.useProgram(program);
+
+		const uniforms: any = {};
+		const samplers: string[] = [];
+
+		for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
+			const info = gl.getActiveUniform(program, i)!;
+			uniforms[info.name] = gl.getUniformLocation(program, info.name);
+
+			if (!uniforms[info.name]) {
+				throw new Error(`Failed to get uniform location (${info.name})`);
+			}
+
+			if (info.type === gl.SAMPLER_2D) {
+				samplers.push(info.name);
+			}
+		}
+
+		samplers.sort().forEach((name, i) => gl.uniform1i(uniforms[name], i));
+
+		gl.useProgram(null);
+
+		return {program, uniforms};
+	}
 }
 
 function createWebGLShader(gl: WebGLRenderingContext, type: number, source: string) {
@@ -97,4 +110,14 @@ function createWebGLShader(gl: WebGLRenderingContext, type: number, source: stri
 	}
 
 	return shader;
+}
+
+export function disposeShaderProgramData(gl: WebGLRenderingContext, data: ShaderProgramData) {
+	try {
+		if (gl) {
+			gl.deleteProgram(data.program);
+		}
+	} catch (e) {
+		DEVELOPMENT && console.error(e);
+	}
 }

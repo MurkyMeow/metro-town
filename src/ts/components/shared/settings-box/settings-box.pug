@@ -12,32 +12,33 @@ ng-template(#actionsModal)
 		button.game-button.dropdown-toggle.no-arrow(dropdownToggle (click)="false" title="Settings")
 			fa-icon([icon]="cogIcon" [fixedWidth]="true")
 		.dropdown-menu.dropdown-menu-right.settings-box-menu(*dropdownMenu)
-			.dropdown-header.d-flex.justify-content-between
+			.dropdown-header.d-flex.justify-content-between.mb-1
 				span {{server}}
 				span.clock-display {{time}}
-			.dropdown-item.d-flex
+			.dropdown-item.d-flex.mb-1
 				fa-icon.mr-2([icon]="searchIcon" [fixedWidth]="true")
 				.flex-grow-1 Scale (x{{scale}})
 				button.btn.btn-xs.btn-outline-secondary((click)="zoomOut()" aria-label="Zoom out")
 					fa-icon([icon]="minusIcon" [fixedWidth]="true")
 				button.btn.btn-xs.btn-outline-secondary.ml-2((click)="zoomIn()" aria-label="Zoom in")
 					fa-icon([icon]="plusIcon" [fixedWidth]="true")
-			.dropdown-item.dropdown-item-static
+			.dropdown-item.dropdown-item-static.mb-1
 				a((click)="toggleVolume()" title="Toggle sound")
 					fa-icon([icon]="volumeIcon" [fixedWidth]="true")
+					//.flex-grow-1 Volume
 				slider-bar([(value)]="volume" [step]="1" (started)="volumeStarted()")
 				.text-muted.text-right(*ngIf="track" style="margin-top: -5px;")
 					small
 						| playing: #[b {{track}}]
 						a.text-muted.ml-1((click)="nextTrack()" title="Next track")
 							fa-icon([icon]="forwardIcon" [fixedWidth]="true")
-			a.dropdown-item((click)="unhideAllHiddenPlayers()")
+			a.dropdown-item((click)="unhideAllHiddenPlayers()").mb-1
 				fa-icon.mr-2([icon]="emptyIcon" [fixedWidth]="true")
 				| Unhide players (temporary)
-			a.dropdown-item((click)="openSettings()")
+			a.dropdown-item((click)="openSettings()").mb-1
 				fa-icon.mr-2([icon]="emptyIcon" [fixedWidth]="true")
 				| Settings
-			a.dropdown-item((click)="openActions()")
+			a.dropdown-item((click)="openActions()").mb-1
 				fa-icon.mr-2([icon]="emptyIcon" [fixedWidth]="true")
 				| Actions
 			//-a.dropdown-item((click)="openInvites()" *ngIf="hasInvites")

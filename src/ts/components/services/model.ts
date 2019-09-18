@@ -22,7 +22,7 @@ import { ErrorReporter } from './errorReporter';
 import { randomString } from '../../common/stringUtils';
 import { StorageService } from './storageService';
 import { decompressPonyString, compressPonyString, decodePonyInfo } from '../../common/compressPony';
-import { SECOND, PLAYER_DESC_MAX_LENGTH } from '../../common/constants';
+import { SECOND, PLAYER_DESC_MAX_LENGTH, NEW_ACCOUNT_PONY_NAME } from '../../common/constants';
 import { canUseTag } from '../../common/tags';
 
 export interface Friend extends FriendData {
@@ -191,7 +191,11 @@ export class Model {
 				this.ponies = account.ponies ? account.ponies.sort(comparePonies) : [];
 				this.friends = undefined;
 
-				this.selectPony(getDefaultPony(this.ponies));
+				let defaultPony = getDefaultPony(this.ponies);
+				if (this.ponies.length === 0) {
+					defaultPony.name = NEW_ACCOUNT_PONY_NAME;
+				}
+				this.selectPony(defaultPony);
 				this.storage.setItem('vid', account.id);
 				this.loading = false;
 				this.accountAlert = account.alert;
