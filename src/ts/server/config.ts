@@ -58,15 +58,20 @@ export const args = argv as AppArgs;
 export const { version, description }: AppPackage = require('../../../package.json');
 export const config: AppConfig = require('../../../config.json');
 
+const INSECURE_RANDOM_VALUES = [
+	'gfhfdshtrdhgedryhe4t3y5uwjthr',
+	'sdlfgihsdor8ghor8dgdrgdegrdg',
+	'<some_random_string_here>',
+	'<some_other_random_string_here>',
+];
+
 if (!DEVELOPMENT && !TESTS &&
 	(!config.secret || !config.token
 	|| config.secret.length < 16
 	|| config.token.length < 16
 	|| config.secret === config.token
-	|| config.secret === 'gfhfdshtrdhgedryhe4t3y5uwjthr'
-	|| config.token === 'sdlfgihsdor8ghor8dgdrgdegrdg'
-	|| config.secret === '<some_random_string_here>'
-	|| config.token === '<some_random_string_here>')) {
+	|| INSECURE_RANDOM_VALUES.includes(config.secret)
+	|| INSECURE_RANDOM_VALUES.includes(config.token))) {
 	console.error(
 `
 ================================================================================
