@@ -1,3 +1,6 @@
+ng-template(#actionsModal)
+	actions-modal((close)="closeActions()" [focusTrap]="true" (keydown)="$event.stopPropagation()")
+
 .action-bar(
 	[class.has-scroller]="hasScroller" [class.is-mobile]="mobile" [class.is-blurred]="blurred"
 	#scroller (mousewheel)="scroll($event)" (wheel)="scroll($event)" (scroll)="true")
@@ -14,6 +17,8 @@
 		[draggablePad]="10"
 		(draggableDrag)="drag(i)"
 		(draggableDrop)="drop($event, i)")
+	button.action-settings.game-button((click)="openActions()" style="touch-action: inherit;")
+		fa-icon.action-icon([icon]="cogIcon" [fixedWidth]="true")
 	.action-button-padding
 .scroller-label
 	| scroll using this bar

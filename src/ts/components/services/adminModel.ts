@@ -502,18 +502,6 @@ export class AdminModel {
 			.then(() => this.updateState())
 			.catch(this.handleError);
 	}
-	resetSupporter(accountId: string) {
-		return this.server.resetSupporter(accountId)
-			.catch(this.handleError);
-	}
-	getLastPatreonData() {
-		return this.server.getLastPatreonData()
-			.catch(this.handleError);
-	}
-	updatePastSupporters() {
-		return this.server.updatePastSupporters()
-			.catch(this.handleError);
-	}
 	// other
 	getTimings(server: string) {
 		return this.server.getTimings(server)

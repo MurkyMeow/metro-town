@@ -14,6 +14,7 @@ import { sampleMessages } from '../../../common/debugData';
 import { findEntityById } from '../../../common/worldMap';
 import { colorToRGBA, rgb2hsl, HSL, hsl2CSS } from '../../../common/color';
 import * as moment from 'moment';
+import { isMobile } from '../../../client/data';
 
 interface IndexEntryUser {
 	id: number;
@@ -387,7 +388,10 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		return (tab === 'local' || tab === 'party' || tab === 'whisper') ? tab : 'local';
 	}
 	get open() {
-		return !this.settings.chatlogClosed;
+		if (this.settings.chatlogClosed === undefined) {
+			return !isMobile; // closed by default on mobile
+		}
+		return this.settings.chatlogClosed === false;
 	}
 	get width() {
 		return this.settings.chatlogWidth || 500;
@@ -645,7 +649,7 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		}
 	}
 	toggle() {
-		this.settings.chatlogClosed = !this.settings.chatlogClosed;
+		this.settings.chatlogClosed = this.open;
 		this.settingsService.saveBrowserSettings();
 		this.updateOpen();
 	}

@@ -1,14 +1,12 @@
 .idea/
 node_modules/
 
-/src/scripts/
 /build/
 /build-copy/
 /logs/
 /settings/
 
-/tools/
-/store/
+/.vs
 
 /src/ts/generated/*
 !/src/ts/generated/gamepad-template.ts

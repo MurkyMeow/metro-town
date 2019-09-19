@@ -196,6 +196,7 @@ export function createCommands(world: World): Command[] {
 		command(['t', 'think'], '/t - thinking balloon', '', shouldNotBeCalled),
 		command(['w', 'whisper'], '/w <name> - whisper to player', '', shouldNotBeCalled),
 		command(['r', 'reply'], '/r - reply to whisper', '', shouldNotBeCalled),
+		command(['shrug'], '/shrug - ¯\\_(ツ)_/¯', '', shouldNotBeCalled),
 		command(['e'], '/e - set permanent expression', '', ({ }, { pony }, message) => {
 			pony.exprPermanent = parseExpression(message, true);
 			setEntityExpression(pony, undefined, 0);
@@ -274,6 +275,7 @@ export function createCommands(world: World): Command[] {
 		action(['yawn'], Action.Yawn),
 		action(['laugh', 'lol', 'haha', 'хаха', 'jaja'], Action.Laugh),
 		action(['sneeze', 'achoo'], Action.Sneeze),
+		action(['excite', 'tada'], Action.Excite),
 		action(['magic'], Action.Magic),
 
 		// house
@@ -370,10 +372,6 @@ export function createCommands(world: World): Command[] {
 			const query = { account: client.account._id, name: { $regex: regex } };
 			await swapCharacter(client, world, query);
 		}),
-		command(['s1'], '', 'sup1', shouldNotBeCalled),
-		command(['s2'], '', 'sup2', shouldNotBeCalled),
-		command(['s3'], '', 'sup3', shouldNotBeCalled),
-		command(['ss'], '/ss - supporter text', 'sup1', shouldNotBeCalled),
 
 		// mod
 		adminModChat(['m'], '/m - mod text', 'mod', MessageType.Mod),
@@ -608,7 +606,7 @@ chatTypes.set('w', ChatType.Whisper);
 chatTypes.set('whisper', ChatType.Whisper);
 
 export function parseCommand(text: string, type: ChatType): { command?: string; args: string; type: ChatType; } {
-	if (!isCommand(text)) {
+	if (!isCommand(text) || text.toLowerCase().startsWith('/shrug')) {
 		return { args: text, type };
 	}
 

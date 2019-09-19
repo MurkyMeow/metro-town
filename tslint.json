@@ -38,10 +38,6 @@
 			true,
 			"LF"
 		],
-		"max-line-length": [
-			true,
-			130
-		],
 		"one-line": [
 			true,
 			"check-open-brace",

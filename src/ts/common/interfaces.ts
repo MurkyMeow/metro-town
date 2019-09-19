@@ -93,6 +93,7 @@ export type Batch = Float32Array;
 
 export interface SpriteBatchBase {
 	globalAlpha: number;
+	depth: number;
 	crop(x: number, y: number, w: number, h: number): void;
 	clearCrop(): void;
 	save(): void;
@@ -105,11 +106,11 @@ export interface SpriteBatchBase {
 	startBatch(): void;
 	finishBatch(): Batch | undefined;
 	releaseBatch(batch: Batch): void;
+	flush(): void;
 }
 
 export interface SpriteBatchCommons extends SpriteBatchBase {
 	palette: boolean;
-	depth?: number;
 	drawRect(color: number, x: number, y: number, w: number, h: number): void;
 }
 
@@ -360,6 +361,7 @@ export interface SpriteSheet {
 	texture: Texture2D | undefined;
 	sprites: (Sprite | undefined)[];
 	palette: boolean;
+	isSingleChannel: boolean;
 }
 
 export interface SpriteBorder {
@@ -541,6 +543,7 @@ export interface Entity extends EntityPart {
 	z: number;
 	vx: number;
 	vy: number;
+	depth: number;
 	// frame: number; // last update frame
 	timestamp: number;
 
@@ -668,8 +671,15 @@ export interface AccountSettings {
 	hidden?: boolean;
 }
 
+export const enum GraphicsQuality {
+	Low,
+	Medium,
+	High
+}
+
 export interface BrowserSettings {
 	lowGraphicsMode?: boolean;
+	graphicsQuality?: GraphicsQuality;
 	chatlogClosed?: boolean;
 	chatlogTab?: string;
 	chatlogWidth?: number;
@@ -1093,6 +1103,7 @@ export const enum Action {
 	SwitchToolRev,
 	SwitchToPlaceTool,
 	SwitchToTileTool,
+	Excite,
 }
 
 export const enum InfoFlags {
@@ -1103,7 +1114,7 @@ export const enum InfoFlags {
 }
 
 export function isExpressionAction(action: Action) {
-	return action === Action.Yawn || action === Action.Laugh || action === Action.Sneeze;
+	return action === Action.Yawn || action === Action.Laugh || action === Action.Sneeze || action === Action.Excite;
 }
 
 export interface EditorPlaceAction {
@@ -1640,6 +1651,7 @@ export interface DrawOptions {
 	tileGrid: boolean;
 	engine: Engine;
 	season: Season;
+	useDepthBuffer: boolean;
 	error: (message: string) => void;
 }
 
@@ -1656,6 +1668,7 @@ export const defaultDrawOptions: DrawOptions = {
 	tileGrid: false,
 	engine: Engine.Default,
 	season: Season.Summer,
+	useDepthBuffer: true,
 	error: () => { },
 };
 

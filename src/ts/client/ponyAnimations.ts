@@ -522,6 +522,12 @@ export const excite = createHeadAnimation('excite', 8, false, [
 	...repeat(10, [0, 0, 1, 1, 5]),
 ]);
 
+export const excite_meno = createHeadAnimation('excite_meno', 8, false, [
+	...repeat(2, [0, 0, 2, 2, 0]),
+	[0, 1, 6, 6, 0],
+	...repeat(10, [0, 0, 1, 1, 5])
+]);
+
 export const surpriseSad = createHeadAnimation('surpriseSad', 8, false, [
 	[0, 1, 15, 15, 8],
 	...repeat(8, [0, 0, 15, 15, 8]),
@@ -532,6 +538,24 @@ export const sneeze = createHeadAnimation('sneeze', 12, false, [
 	...repeat(2, [1, -1, 18, 18, 16]),
 	...repeat(8, [-1, 1, 23, 23, 13]),
 	...repeat(4, [0, 0, 18, 18, 7]),
+]);
+
+export const happy_tongue = createHeadAnimation('happy_tongue', 12, false, [
+	...repeat(3, [0, 0, 1, 1, 0]),
+	[0, 1, 6, 6, 0],
+	...repeat(8, [0, 0, 14, 14, 4]),
+]);
+
+export const happy_tongue_meno = createHeadAnimation('happy_tongue_meno', 12, false, [
+	...repeat(3, [0, 0, 2, 2, 0]),
+	[0, 1, 6, 6, 0],
+	...repeat(8, [0, 0, 12, 12, 4]),
+]);
+
+export const happy_tongue_meno_2 = createHeadAnimation('happy_tongue_meno_2', 12, false, [
+	...repeat(3, [0, 0, 2, 2, 0]),
+	[0, 1, 6, 6, 0],
+	...repeat(8, [0, 0, 11, 11, 4]),
 ]);
 
 export const headAnimations = [

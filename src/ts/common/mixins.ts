@@ -9,7 +9,7 @@ import { at, att, hasFlag, invalidEnum } from './utils';
 import { WHITE, BLACK, RED } from './colors';
 import { toScreenX, toWorldX, toWorldY, toScreenYWithZ } from './positionUtils';
 import { rect, addRects, addRect } from './rect';
-import { SECOND } from './constants';
+import { SECOND, LIGHT_VOLUME_SCALE } from './constants';
 import { mockPaletteManager } from './ponyInfo';
 import { releasePalette } from '../graphics/paletteManager';
 
@@ -679,16 +679,16 @@ export function mixLight(color: number, dx: number, dy: number, w: number, h: nu
 			base.lightScale = 1;
 			base.lightTarget = 1;
 			base.lightScaleAdjust = 1;
-			base.lightBounds = rect(-(dx + w / 2), -(dy + h / 2), w, h);
+			const adjustedScale = base.lightScale * base.lightScaleAdjust * LIGHT_VOLUME_SCALE;
+			base.lightBounds = rect(-(dx + w / 2), -(dy + h / 2), w * adjustedScale, h * adjustedScale);
 			base.drawLight = function (batch: SpriteBatch) {
 				if (!this.lightOn)
 					return;
 
 				const x = toScreenX(this.x);
 				const y = toScreenYWithZ(this.y, this.z);
-				const s = this.lightScale! * this.lightScaleAdjust!;
-				const width = w * s;
-				const height = h * s;
+				const width = w * adjustedScale;
+				const height = h * adjustedScale;
 				const color = this.lightColor!;
 
 				batch.drawImage(color, -1, -1, 2, 2, x - (dx + width / 2), y - (dy + height / 2), width, height);

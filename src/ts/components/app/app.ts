@@ -6,10 +6,9 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subscription } from 'rxjs';
 import { GameService } from '../services/gameService';
 import { Model, Friend } from '../services/model';
-import { version, host, contactEmail, supporterLink, twitterLink, discordLink, copyrightName } from '../../client/data';
+import { version, host, contactEmail, twitterLink, discordLink, copyrightName } from '../../client/data';
 import { PonyTownGame } from '../../client/game';
-import { faTwitter, faPatreon, faEnvelope, faCog, faHome, faGamepad, faInfoCircle, faHorseHead, faDiscord } from '../../client/icons';
-import { InstallService } from '../services/installService';
+import { faTwitter, faPatreon, faDiscord, faEnvelope, faCog, faHome, faInfoCircle, faHorseHead, faQuestionCircle } from '../../client/icons';
 import { OAuthProvider, Entity, FakeEntity, Pony } from '../../common/interfaces';
 import { registerServiceWorker, isBrowserOutdated, checkIframeKey } from '../../client/clientUtils';
 import { ErrorReporter } from '../services/errorReporter';
@@ -50,11 +49,10 @@ export class App implements OnInit, OnDestroy {
 	readonly discordIcon = faDiscord;
 	readonly cogIcon = faCog;
 	readonly homeIcon = faHome;
-	readonly helpIcon = faGamepad;
+	readonly helpIcon = faQuestionCircle;
 	readonly aboutIcon = faInfoCircle;
 	readonly charactersIcon = faHorseHead;
 	readonly contactEmail = contactEmail;
-	readonly patreonLink = supporterLink;
 	readonly discordLink = discordLink;
 	readonly twitterLink = twitterLink;
 	readonly copyright = copyrightName;
@@ -69,12 +67,11 @@ export class App implements OnInit, OnDestroy {
 		private game: PonyTownGame,
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
-		private installService: InstallService,
 		private errorReporter: ErrorReporter,
 	) {
 	}
 	get canInstall() {
-		return this.installService.canInstall;
+		return false;
 	}
 	get loading() {
 		return this.model.loading;

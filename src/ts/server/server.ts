@@ -39,9 +39,9 @@ import { start } from './start';
 import { createServerActionsFactory } from './serverActionsManager';
 import { init, createRemovedDocument } from './internal';
 import {
-	pollServers, pollDiskSpace, pollCertificateExpirationDate, pollPatreon, startBansCleanup, pollMemoryUsage,
+	pollServers, pollDiskSpace, pollCertificateExpirationDate, startBansCleanup, pollMemoryUsage,
 	startMergesCleanup, startStrayAuthsCleanup, startClearOldIgnores, startCollectingUsersVisitedCount,
-	startSupporterInvitesCleanup, startPotentialDuplicatesCleanup, startAccountAlertsCleanup, startUpdatePastSupporters,
+	startSupporterInvitesCleanup, startPotentialDuplicatesCleanup, startAccountAlertsCleanup,
 	startClearTo10Origns, startClearVeryOldOrigns
 } from './polling';
 import { pathTo } from './paths';
@@ -393,10 +393,8 @@ reloadSettings().then(() => {
 		startSupporterInvitesCleanup();
 		startPotentialDuplicatesCleanup(adminService!);
 		startAccountAlertsCleanup();
-		startUpdatePastSupporters();
 		startClearTo10Origns(adminService!);
 		startClearVeryOldOrigns(adminService!);
-		pollPatreon(server, settings);
 	}
 
 	if (args.admin) {

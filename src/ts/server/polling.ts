@@ -1,55 +1,18 @@
 import * as fs from 'fs';
 import * as Bluebird from 'bluebird';
 import {
-	InternalGameServerState, BannedMuted, Settings, ServerConfig, InternalLoginServerState, SupporterFlags
+	InternalGameServerState, BannedMuted, InternalLoginServerState, SupporterFlags
 } from '../common/adminInterfaces';
 import { fromNow, delay } from '../common/utils';
-import { logger, logPatreon, system, logPerformance } from './logger';
-import { Auth, updateAccounts, updateAccount, queryAuths, queryAccounts, updateAuth, Account, SupporterInvite } from './db';
+import { logPerformance } from './logger';
+import { Auth, updateAccounts, queryAuths, Account, SupporterInvite } from './db';
 import { getDiskSpace, getCertificateExpirationDate, getMemoryUsage } from './serverUtils';
 import { HOUR, MINUTE, DAY, SECOND, YEAR } from '../common/constants';
-import {
-	fetchPatreonData, createPatreonClient, createUpdatePatreonInfo, createRemoveOldSupporters,
-	createUpdateSupporters, createAddTotalPledged
-} from './patreon';
-import { create } from './reporter';
 import { servers, serverStatus, loginServers, RemovedDocument } from './internal';
 import * as paths from './paths';
 import { updateSupporterInvites } from './services/supporterInvites';
 import { AdminService } from './services/adminService';
 import { clearOrigins } from './api/origins';
-import { config } from './config';
-
-let updatingPatreonPromise: Promise<void> | undefined;
-
-async function updatePatreonDataInternal(server: ServerConfig, accessToken: string) {
-	try {
-		const removeOldSupporters = createRemoveOldSupporters(updateAccounts, system);
-		const updateSupporters = createUpdateSupporters(updateAccount, system);
-		const addTotalPledged = createAddTotalPledged(updateAuth);
-		const updatePatreonInfo = createUpdatePatreonInfo(
-			queryAuths, queryAccounts, removeOldSupporters, updateSupporters, addTotalPledged);
-
-		const client = createPatreonClient(accessToken);
-		const data = await fetchPatreonData(client, logPatreon);
-		await updatePatreonInfo(data, new Date());
-
-		serverStatus.lastPatreonUpdate = (new Date()).toISOString();
-	} catch (e) {
-		const message = e.error ? (e.error.message || e.error.statusText || `${e}`) : e.message;
-		const stack = (e.error ? e.error.stack : e.stack) || '';
-		create(server).danger('Patreon update failed', `${message}\n${stack}`.trim());
-		logger.error(e);
-	} finally {
-		updatingPatreonPromise = undefined;
-	}
-}
-
-export async function updatePatreonData(server: ServerConfig, { patreonToken }: Settings) {
-	if (patreonToken && config.supporterLink) {
-		return updatingPatreonPromise = updatingPatreonPromise || updatePatreonDataInternal(server, patreonToken);
-	}
-}
 
 async function clearOldIgnores() {
 	const start = Date.now();
@@ -198,10 +161,6 @@ export async function pollImmediate(action: () => any, delayTime: number) {
 
 export function pollServers() {
 	return poll(() => Promise.all([...loginServers, ...servers].map(updateServerState)), 1 * SECOND);
-}
-
-export function pollPatreon(server: ServerConfig, settings: Settings) {
-	return poll(() => updatePatreonData(server, settings), 10 * MINUTE);
 }
 
 export const pollDiskSpace = () => pollImmediate(() =>

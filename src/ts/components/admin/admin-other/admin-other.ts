@@ -3,7 +3,6 @@ import { compact } from 'lodash';
 import { AdminModel } from '../../services/adminModel';
 import { Account, GeneralSettings } from '../../../common/adminInterfaces';
 import { Subscription } from '../../../common/interfaces';
-import { showTextInNewTab } from '../../../client/htmlUtils';
 
 interface Field {
 	key: keyof GeneralSettings;
@@ -71,20 +70,5 @@ export class AdminOther implements OnInit, OnDestroy {
 	}
 	resetSuspiciousPonies() {
 		this.suspiciousPonies = this.model.state.loginServers[0].suspiciousPonies;
-	}
-	updatePatreon() {
-		this.model.server.updatePatreon();
-	}
-	updatePatreonToken(patreonToken: string) {
-		this.model.updateSettings({ patreonToken });
-	}
-	getLastPatreonData() {
-		this.model.getLastPatreonData()
-			.then(data => {
-				showTextInNewTab(JSON.stringify(data, null, 2));
-			});
-	}
-	updatePastSupporters() {
-		this.model.updatePastSupporters();
 	}
 }

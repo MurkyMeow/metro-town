@@ -1,29 +1,35 @@
+import { makeDebugContext } from 'webgl-debug';
 import { WEBGL_CREATION_ERROR } from '../../common/errors';
-
-export function getRenderTargetSize(width: number, height: number) {
-	const max = Math.max(width, height);
-	let pow = 256;
-
-	while (pow < max) {
-		pow *= 2;
-	}
-
-	return pow;
-}
 
 export function getWebGLContext(canvas: HTMLCanvasElement): WebGLRenderingContext {
 	const options: WebGLContextAttributes = {
 		alpha: false,
+		preserveDrawingBuffer: false,
 		premultipliedAlpha: false,
 		antialias: false,
+		depth: false
 	};
 
-	const gl = canvas.getContext('webgl2', options)
+	let gl = canvas.getContext('webgl2', options)
 		|| canvas.getContext('webgl', options)
 		|| canvas.getContext('experimental-webgl', options);
 
 	if (!gl) {
 		throw new Error(WEBGL_CREATION_ERROR);
+	}
+
+	// debug context will check every GL call for errors and will
+	// emit a console message with a stack trace if there was an error,
+	// but it can slow execution down by more than 2x depending
+	// on the platform so it isn't on by default even in DEVELOPMENT
+	const useDebugContext = false;
+
+	if (useDebugContext) {
+		gl = makeDebugContext(gl);
+
+		if (!gl) {
+			throw new Error(WEBGL_CREATION_ERROR);
+		}
 	}
 
 	return gl;
@@ -64,4 +70,12 @@ export function unbindAllTexturesAndBuffers(gl: WebGLRenderingContext) {
 	} catch (e) {
 		DEVELOPMENT && console.error(e);
 	}
+}
+
+export function clearWebGLErrors(gl: WebGLRenderingContext) {
+	while (hasWebGLErrors(gl));
+}
+
+export function hasWebGLErrors(gl: WebGLRenderingContext) {
+	return gl.getError() !== gl.NO_ERROR;
 }

@@ -13,30 +13,10 @@
 				button.btn.btn-default.ml-1(type="button" (click)="resetFields()") Reset
 
 	.col-6
-		.form
-			.form-group
-				h3 Patreon
-			.form-group.d-flex
-				button.btn.btn-default((click)="updatePatreon()")
-					| Update Data
-				.input-group.ml-1(style="width: 400px")
-					input.form-control(#patreonToken placeholder="patreon token")
-					.input-group-append
-						button.btn.btn-warning((click)="updatePatreonToken(patreonToken.value); patreonToken.value = ''")
-							| Update Token
-			.form-group
-				| To get new token, got to #[a(href="https://www.patreon.com/portal/registration/register-clients") My Clients],
-				| refresh token and update patreon token field with "Creator's Access Token" from the site.
-			.form-group
-				button.btn.btn-default((click)="getLastPatreonData()")
-					| Get last patreon data
-
-		.form
-			.form-group
-				h3 Other
-			.form-group
-				button.btn.btn-default((click)="updatePastSupporters()")
-					| Update past supporters
+		h2.text-danger PATREON WARNING:
+		p.lead Code relating to Patreon syncing has been removed from the public pixel.horse codebase.
+		p.lead
+			| You <b>MUST</b> contact the Pony Town Team before opening a Patreon based off the Pony Town Custom Server source code. Not doing so is a violation of the <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC 4.0</a> license applied to the art and music assets supplied with the game. Please submit a request for approval to <a href="mailto:ponytownhelp@gmail.com">ponytownhelp@gmail.com</a>.
 
 .row
 	.col-12

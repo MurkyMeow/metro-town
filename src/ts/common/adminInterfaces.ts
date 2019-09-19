@@ -845,10 +845,6 @@ export interface IAdminServerActions {
 	getChat(search: string, date: string, caseInsensitive: boolean): Promise<string>;
 	getChatForAccounts(accountIds: string[], date: string): Promise<string>;
 	getRequestStats(): Promise<LoginStats>;
-	updatePatreon(): Promise<void>;
-	resetSupporter(accountId: string): Promise<void>;
-	getLastPatreonData(): Promise<PatreonData | undefined>;
-	updatePastSupporters(): Promise<void>;
 	// live
 	get(endPoint: 'events', id: string): Promise<any>;
 	getAll(endPoint: 'events', timestamp?: string): Promise<LiveResponse>;
