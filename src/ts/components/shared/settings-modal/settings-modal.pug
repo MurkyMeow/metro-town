@@ -30,14 +30,12 @@
 		tab(title="Graphics" [icon]="graphicsIcon")
 			div(*tabContent)
 				.form-group
-					custom-checkbox(
-						*ngIf="!lockLowGraphicsMode" [(checked)]="browser.lowGraphicsMode"
-						help="Can improve game performance in some cases")
-						| Low graphics mode
-					custom-checkbox(
-						*ngIf="lockLowGraphicsMode" [checked]="true" [disabled]="true"
-						help="Can improve game performance in some cases")
-						| Low graphics mode
+					label#graphics-quality-label Graphics quality
+					div
+						slider-bar.mr-2.mb-2(
+							[(value)]="browser.graphicsQuality" [min]="0" [max]="maxGraphicsQuality" [step]="1"
+							style="max-width: 300px" labelledBy="graphics-quality-label")
+						| {{graphicsQualityText}}
 				.form-group
 					custom-checkbox(
 						[(checked)]="browser.brightNight"

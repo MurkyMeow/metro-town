@@ -125,20 +125,20 @@ div(*ngIf="account")
 										button.dropdown-item((click)="unmerge(m._id, m.data.account, m.data.merge)")
 											| Split off #[b account]
 
-			h5 Support #[span.text-muted ({{support?.length || 0}})]
-			table.table.table-sm(*ngIf="support?.length")
-				thead
-					tr
-						th message
-						th date
-				tbody
-					tr(*ngFor="let l of support")
-						td
-							fa-icon.mr-1([icon]="l.icon" [ngClass]="l.class")
-							| {{l.message}}
-						td
-							time-field.mr-2([time]="l.date")
-							span.text-muted ({{l.date | date:'MMM d'}})
+			//- h5 Support #[span.text-muted ({{support?.length || 0}})]
+			//- table.table.table-sm(*ngIf="support?.length")
+			//- 	thead
+			//- 		tr
+			//- 			th message
+			//- 			th date
+			//- 	tbody
+			//- 		tr(*ngFor="let l of support")
+			//- 			td
+			//- 				fa-icon.mr-1([icon]="l.icon" [ngClass]="l.class")
+			//- 				| {{l.message}}
+			//- 			td
+			//- 				time-field.mr-2([time]="l.date")
+			//- 				span.text-muted ({{l.date | date:'MMM d'}})
 
 			h5 Ban log #[span.text-muted ({{banLog?.length || 0}})]
 			table.table.table-sm(*ngIf="banLog?.length")

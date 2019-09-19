@@ -7,7 +7,7 @@
 
 .action-bar {
 	overflow: hidden;
-	padding-bottom: 7px;
+	padding-bottom: 0px;
 	padding-top: 7px;
 	padding-right: 5px;
 	max-width: calc(100vw - 50px);
@@ -60,7 +60,14 @@
 	}
 }
 
-action-button {
+.action-icon {
+	font-size: 30px;
+	position: relative;
+	right: 6px;
+	bottom: 8px;
+}
+
+action-button, .action-settings {
 	pointer-events: auto;
 	margin: 3px 6px;
 

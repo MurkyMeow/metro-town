@@ -24,7 +24,8 @@ varying vec2 textureCoord;
 varying vec4 vColor;
 
 void main() {
-	float d = clamp((1.0 - length(textureCoord)) + 0.1, 0.0, 1.0);
-	float m = d * d * d;
+	float d = clamp(1.1 - length(textureCoord), 0.0, 1.0);
+	float m = d * d; // * d;
+
 	gl_FragColor = vec4(m, m, m, 1) * vColor;
 }

@@ -38,9 +38,6 @@ ng-template(#duplicatesPopover)
 			span.ml-3(title="Certificate expires in" [class.text-danger]="isOldCertificate")
 				fa-icon.mr-2([icon]="certificateIcon")
 				from-now([time]="status.certificateExpiration")
-			span.ml-3(title="Last Patreon update" [class.text-danger]="isOldPatreon")
-				fa-icon.mr-2([icon]="patreonIcon")
-				from-now([time]="status.lastPatreonUpdate")
 
 	pagination(
 		[totalItems]="filtered.length" [itemsPerPage]="itemsPerPage" [maxSize]="15" [(ngModel)]="currentPage"

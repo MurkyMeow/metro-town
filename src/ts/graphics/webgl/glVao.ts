@@ -62,6 +62,7 @@ class VAONative implements VAO {
 	}
 	dispose() {
 		this.ext.deleteVertexArrayOES(this.handle);
+		this.handle = {};
 	}
 	update(attributes: VAOAttributes[], elements: WebGLBuffer | null, elementsType?: number) {
 		this.bind();

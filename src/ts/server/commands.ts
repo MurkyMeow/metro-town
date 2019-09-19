@@ -372,10 +372,6 @@ export function createCommands(world: World): Command[] {
 			const query = { account: client.account._id, name: { $regex: regex } };
 			await swapCharacter(client, world, query);
 		}),
-		command(['s1'], '', 'sup1', shouldNotBeCalled),
-		command(['s2'], '', 'sup2', shouldNotBeCalled),
-		command(['s3'], '', 'sup3', shouldNotBeCalled),
-		command(['ss'], '/ss - supporter text', 'sup1', shouldNotBeCalled),
 
 		// mod
 		adminModChat(['m'], '/m - mod text', 'mod', MessageType.Mod),

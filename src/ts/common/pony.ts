@@ -71,6 +71,7 @@ export function createPony(
 		z: 0,
 		vx: 0,
 		vy: 0,
+		depth: 0,
 		info,
 		order: 0,
 		timestamp: 0,

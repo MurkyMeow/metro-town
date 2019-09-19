@@ -23,7 +23,6 @@ import { EmoteBox } from './emote-box/emote-box';
 import { SliderBar } from './slider-bar/slider-bar';
 import { SpriteBox } from './sprite-box/sprite-box';
 import { SpriteSelection } from './sprite-selection/sprite-selection';
-import { SupporterPony } from './supporter-pony/supporter-pony';
 import { DiscordButton } from './discord-button/discord-button';
 import { DiscordPony } from './discord-pony/discord-pony';
 import { SetSelection, SetOutlineHidden } from './set-selection/set-selection';
@@ -74,6 +73,8 @@ import { dropdownDirectives } from './directives/dropdown';
 import { SaveActiveTab } from './directives/saveActiveTab';
 
 import { SiteNamePipe } from './pipes/siteName';
+import { VisitPTButton } from './visit-pt-button/visit-pt-button';
+import { VisitPTPony } from './visit-pt-pony/visit-pt-pony';
 
 const declarations = [
 	ActionBar,
@@ -90,9 +91,10 @@ const declarations = [
 	SliderBar,
 	SpriteBox,
 	SpriteSelection,
-	SupporterPony,
 	DiscordButton,
 	DiscordPony,
+	VisitPTButton,
+	VisitPTPony,
 	SetSelection,
 	SetOutlineHidden,
 	CheckBox,

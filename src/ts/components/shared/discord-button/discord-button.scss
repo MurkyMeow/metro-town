@@ -28,14 +28,14 @@
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	height: 70px;
+	height: 80px;
 	width: 100px;
 	overflow: hidden;
 	border-radius: $border-radius-lg - 2px;
 
 	> discord-pony {
 		position: absolute;
-		bottom: -95px;
+		bottom: -80px;
 		left: -20px;
 	}
 

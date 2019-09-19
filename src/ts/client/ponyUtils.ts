@@ -39,7 +39,6 @@ export const tails = createCompleteSets(sprites.tails, 3);
 export const chest = createCompleteSets(sprites.chestAccessories, bodyFrames);
 export const chestBehind = createCompleteSets(sprites.chestAccessoriesBehind, bodyFrames);
 export const backAccessories = createCompleteSets(sprites.backAccessories, bodyFrames);
-sprites.neckAccessories.forEach(f => f && f.pop()); // TEMP: remove headphones
 export const neckAccessories = createCompleteSets(sprites.neckAccessories, bodyFrames);
 export const waistAccessories = createCompleteSets(sprites.waistAccessories, bodyFrames + 1);
 
@@ -144,10 +143,6 @@ function mergeSpriteSets(...sets: ColorExtraSets[]): ColorExtraSets {
 
 export const backLegSleeves: Sets = sprites.backLegSleeves
 	.map(sets => sets && [undefined, undefined, undefined, undefined, undefined, ...sets]);
-
-// TEMP: remove summer hat
-sprites.headAccessoriesBehind.pop();
-sprites.headAccessories.pop();
 
 export const mergedManes = mergeSpriteSets(sprites.behindManes, sprites.topManes, sprites.frontManes)!;
 export const mergedBackManes = mergeSpriteSets(sprites.backBehindManes, sprites.backFrontManes)!;

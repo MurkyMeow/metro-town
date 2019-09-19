@@ -14,7 +14,7 @@ import {
 } from '../client/ponyUtils';
 import { CM_SIZE } from './constants';
 
-export const VERSION = 5; // old manes version is 3
+export const VERSION = 5; // previous: 3
 
 const VERSION_BITS = 6; // max 63
 const COLORS_LENGTH_BITS = 10; // max 1024

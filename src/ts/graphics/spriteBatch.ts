@@ -2,11 +2,12 @@ import { Sprite, SpriteBatch as ISpriteBatch, Matrix2D } from '../common/interfa
 import { BaseSpriteBatch, getColorFloat } from './baseSpriteBatch';
 
 function vertex(
-	vertices: Float32Array, _verticesUint32: Uint32Array, index: number,
-	x: number, y: number, u: number, v: number, c: number, transform: Matrix2D
+	vertices: Float32Array, index: number,
+	x: number, y: number, depth: number, u: number, v: number, c: number, transform: Matrix2D
 ) {
 	vertices[index++] = transform[0] * x + transform[2] * y + transform[4];
 	vertices[index++] = transform[1] * x + transform[3] * y + transform[5];
+	vertices[index++] = depth;
 	vertices[index++] = u;
 	vertices[index++] = v;
 	vertices[index++] = c;
@@ -18,16 +19,9 @@ function vertex(
 
 export class SpriteBatch extends BaseSpriteBatch implements ISpriteBatch {
 	palette = false;
-	depth = 0;
-	constructor(
-		gl: WebGLRenderingContext,
-		capacity: number,
-		buffer: ArrayBuffer,
-		vertexBuffer: WebGLBuffer,
-		indexBuffer: WebGLBuffer
-	) {
-		super(gl, capacity, buffer, vertexBuffer, indexBuffer, [
-			{ name: 'position', size: 2 },
+	constructor(gl: WebGLRenderingContext, vertexCapacityMax: number, indexBuffer: WebGLBuffer) {
+		super(gl, vertexCapacityMax, indexBuffer, [
+			{ name: 'position', size: 3 },
 			{ name: 'texcoord0', size: 2 }, // , type: gl.UNSIGNED_SHORT },
 			{ name: 'color', size: 4, type: gl.UNSIGNED_BYTE, normalized: true },
 		]);
@@ -36,7 +30,7 @@ export class SpriteBatch extends BaseSpriteBatch implements ISpriteBatch {
 		color: number, sx: number, sy: number, sw: number, sh: number,
 		dx: number, dy: number, dw: number, dh: number
 	) {
-		if (this.capacity <= this.spritesCount) {
+		if (this.spritesCapacity <= this.spritesCount) {
 			this.flush();
 		}
 
@@ -51,19 +45,17 @@ export class SpriteBatch extends BaseSpriteBatch implements ISpriteBatch {
 		const v2 = sy + sh;
 
 		const vertices = this.vertices;
-		const verticesUint32 = this.verticesUint32;
 		const transform = this.transform;
 
 		const index = this.index;
 
-		vertex(vertices, verticesUint32, index, dx, dy, u1, v1, c, transform);
-		vertex(vertices, verticesUint32, index + 5, x2, dy, u2, v1, c, transform);
-		vertex(vertices, verticesUint32, index + 10, x2, y2, u2, v2, c, transform);
-		vertex(vertices, verticesUint32, index + 15, dx, y2, u1, v2, c, transform);
+		vertex(vertices, index, dx, dy, this.depth, u1, v1, c, transform);
+		vertex(vertices, index + 6, x2, dy, this.depth, u2, v1, c, transform);
+		vertex(vertices, index + 12, x2, y2, this.depth, u2, v2, c, transform);
+		vertex(vertices, index + 18, dx, y2, this.depth, u1, v2, c, transform);
 
-		this.index += 20;
+		this.index += 24;
 		this.spritesCount++;
-		this.tris += 2;
 	}
 	drawRect(color: number, x: number, y: number, w: number, h: number) {
 		if (w && h) {

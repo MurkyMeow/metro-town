@@ -20,12 +20,13 @@ div(*ngIf="!playing")
 			div(*ngIf="!!account")
 				.form-group
 					discord-button
+					visit-pt-button
 				.form-group(*ngIf="canInstall")
 					install-button
 				.form-group
 					character-select([(error)]="error" [editButton]="true" (preview)="previewPony = $event")
 				.form-group
-					character-preview([pony]="previewInfo" [state]="state" [passive]="true" [name]="previewName" [tag]="previewTag")
+					character-preview([pony]="previewInfo" [state]="state" [passive]="false" [name]="previewName" [tag]="previewTag")
 				.form-group.text-center
 					play-box([(error)]="error")
 

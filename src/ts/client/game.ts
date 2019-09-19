@@ -5,7 +5,7 @@ import {
 	EntityState, Pony, Notification, TileType, Action, IServerActions, Season, WorldState, Holiday,
 	TileSets, ChatMessage, PartyInfo, Entity, DrawOptions, Engine, defaultDrawOptions, PonyStateFlags,
 	DoAction, ChatType, WorldStateFlags, DebugFlags, MessageType, AccountSettings, Matrix4,
-	FakeEntity, SelectFlags, WorldMap, MapType, MapFlags, EntityFlags, houseTiles, isValidTile
+	FakeEntity, SelectFlags, WorldMap, MapType, MapFlags, EntityFlags, houseTiles, isValidTile, GraphicsQuality
 } from '../common/interfaces';
 import {
 	clamp, lengthOfXY, setFlag, hasFlag, boundsIntersect, point, toInt, lerpColor, distanceXY
@@ -27,7 +27,7 @@ import { toggleWalls } from '../common/mixins';
 import { getEntityTypeName, hammer, broom, createAnEntity, saw, placeableEntities, shovel } from '../common/entities';
 import { hasExtendedInfo, setHeadAnimation, createPony } from '../common/pony';
 import { PaletteManager } from '../graphics/paletteManager';
-import { getRenderTargetSize, isWebGL2 } from '../graphics/webgl/webglUtils';
+import { isWebGL2 } from '../graphics/webgl/webglUtils';
 import { drawFullScreenMessage, drawNames, drawChat } from '../graphics/graphicsUtils';
 import { Key } from './input/input';
 import { loadAndInitSpriteSheets } from './spriteUtils';
@@ -62,7 +62,7 @@ import { initializeToys } from './ponyDraw';
 import { ErrorReporter } from '../components/services/errorReporter';
 import { mockPaletteManager } from '../common/ponyInfo';
 import { timeStart, timeEnd, timingCollate, timeReset } from './timing';
-import { bindFrameBuffer, unbindFrameBuffer, resizeFrameBuffer } from '../graphics/webgl/frameBuffer';
+import { createFrameBuffer, bindFrameBuffer, unbindFrameBuffer, disposeFrameBuffer } from '../graphics/webgl/frameBuffer';
 import { WebGL, initWebGL, disposeWebGL, initWebGLResources } from './webgl';
 import { bindTexture } from '../graphics/webgl/texture2d';
 import {
@@ -208,7 +208,6 @@ export class PonyTownGame implements Game {
 	supporterPony = createPony(0, 0, SUPPORTER_PONY, mockPaletteManager.addArray(defaultPalette), mockPaletteManager);
 	discordPony = createPony(0, 0, DISCORD_PONY, mockPaletteManager.addArray(defaultPalette), mockPaletteManager);
 	scale: number;
-	failedFBO = false;
 	rightOverride?: boolean;
 	headTurnedOverride?: boolean;
 	stateOverride?: EntityState;
@@ -248,6 +247,8 @@ export class PonyTownGame implements Game {
 	private deltaMultiplier = 1;
 	private lastDraw = 0;
 	private entitiesDrawn = 0;
+	private lightEntitiesDrawn = 0;
+	private lightSpriteEntitiesDrawn = 0;
 	private lastFps = performance.now();
 	private frames = 0;
 	private drawFps = 0;
@@ -274,6 +275,16 @@ export class PonyTownGame implements Game {
 		private errorReporter: ErrorReporter,
 		private zone: NgZone,
 	) {
+		if (settings.browser.lowGraphicsMode !== undefined) {
+			settings.browser.graphicsQuality = (settings.browser.lowGraphicsMode === true ? GraphicsQuality.Low : GraphicsQuality.High);
+			settings.browser.lowGraphicsMode = undefined;
+			settings.saveBrowserSettings();
+		}
+		if (settings.browser.graphicsQuality === undefined) {
+			settings.browser.graphicsQuality = GraphicsQuality.High;
+			settings.saveBrowserSettings();
+		}
+
 		this.scale = this.getScale();
 		this.audio.initTracks(this.season, this.holiday, this.map.type);
 		this.audio.setVolume(this.volume);
@@ -290,7 +301,22 @@ export class PonyTownGame implements Game {
 		return this.settings.browser.volume || 0;
 	}
 	get disableLighting() {
-		return !!this.settings.browser.lowGraphicsMode || this.failedFBO;
+		if (this.settings.browser.graphicsQuality === GraphicsQuality.Low) {
+			return true;
+		}
+		if (this.webgl) {
+			return this.webgl.failedFBO;
+		}
+		return false;
+	}
+	get disableLightMasksFixing() {
+		if (this.settings.browser.graphicsQuality !== GraphicsQuality.High) {
+			return true;
+		}
+		if (this.webgl) {
+			return this.webgl.failedDepthBuffer;
+		}
+		return false;
 	}
 	get frameDelay() {
 		return (this.settings.browser.powerSaving || this.editingActions) ? (1000 / 45) : 0;
@@ -325,8 +351,16 @@ export class PonyTownGame implements Game {
 		}
 	}
 	private toggleDisableLighting() {
-		if (!this.failedFBO) {
-			this.settings.browser.lowGraphicsMode = !this.settings.browser.lowGraphicsMode;
+		if (!this.webgl) {
+			return;
+		}
+		if (!this.webgl.failedFBO) {
+			if (this.settings.browser.graphicsQuality === GraphicsQuality.Low) {
+				this.settings.browser.graphicsQuality = GraphicsQuality.High;
+			}
+			else {
+				this.settings.browser.graphicsQuality = GraphicsQuality.Low;
+			}
 			this.settings.saveBrowserSettings();
 		}
 	}
@@ -1198,10 +1232,8 @@ export class PonyTownGame implements Game {
 		this.lastDraw = now;
 
 		// draw
-		const {
-			gl, frameBuffer, frameBufferSheet, spriteShader, spriteBatch, lightShader, paletteBatch, paletteShader,
-			palettes,
-		} = this.webgl;
+		const { gl, frameBuffer, frameBuffer2, spriteBatch, paletteBatch, palettes, failedFBO,
+			mergeShader, paletteShader, spriteShader, spriteShaderWithColor, lightShader } = this.webgl;
 
 		TIMING && timeStart('draw');
 
@@ -1246,7 +1278,7 @@ export class PonyTownGame implements Game {
 			drawOptions.engine = this.engine;
 		}
 
-		ortho(this.fboMatrix, 0, gl.drawingBufferWidth / actualScale, gl.drawingBufferHeight / actualScale, 0, 0, 1000);
+		ortho(this.fboMatrix, 0, gl.drawingBufferWidth / actualScale, gl.drawingBufferHeight / actualScale, 0, 0, 1000, false);
 		TIMING && timeEnd();
 
 		TIMING && timeStart('ensureAllVisiblePon...');
@@ -1263,132 +1295,134 @@ export class PonyTownGame implements Game {
 			lerpColor(light, white, 0.3);
 		}
 
-		if (this.engine === Engine.NewLighting) {
-			// ...
-		} else if (this.disableLighting) {
-			ortho(this.viewMatrix, camera.x, camera.x + camera.w, camera.actualY + camera.h, camera.actualY, 0, 1000);
-			lerpColor(light, white, 0.1); // adjust lighting for missing lights
+		// you'd draw directly onto the screen only when there's no framebuffer
+		// or the graphics is low and framebuffer size matches screen size
 
-			// color -> screen
-			gl.clearColor(bg[0], bg[1], bg[2], bg[3]);
-			gl.clear(gl.COLOR_BUFFER_BIT);
+		TIMING && timeStart('initializeFrameBuffers');
+		this.initializeFrameBuffers(this.webgl, width, height, this.settings.browser.graphicsQuality === GraphicsQuality.High);
+		TIMING && timeEnd();
+
+		const useDepthBuffer =
+			!failedFBO && (this.settings.browser.graphicsQuality === GraphicsQuality.High) && !!frameBuffer!.depthStencilRenderbuffer;
+		const useLighting = !failedFBO && (this.settings.browser.graphicsQuality !== GraphicsQuality.Low);
+		const drawSceneDirectlyOntoScreen =
+			failedFBO || (useLighting === false);
+
+		drawOptions.useDepthBuffer = useDepthBuffer;
+
+		let matrixTop = camera.actualY;
+		let matrixBottom = camera.actualY + camera.h;
+		if (!drawSceneDirectlyOntoScreen) {
+			[matrixTop, matrixBottom] = [matrixBottom, matrixTop];
+		}
+
+		ortho(this.viewMatrix, camera.x, camera.x + camera.w, matrixBottom, matrixTop, 0, 1000, false);
+
+		let mapDrawingColor = white;
+		if (!useLighting) {
+			mapDrawingColor = light;
+			lerpColor(mapDrawingColor, white, 0.1); // adjust lighting for missing lights
+		}
+
+		gl.clearColor(bg[0], bg[1], bg[2], bg[3]);
+		gl.enable(gl.BLEND);
+		gl.blendEquation(gl.FUNC_ADD);
+		gl.depthFunc(gl.ALWAYS);
+
+		if (drawSceneDirectlyOntoScreen) {
+			TIMING && timeStart('color -> screen');
 			gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-			gl.disable(gl.DEPTH_TEST);
-			gl.enable(gl.BLEND);
-			gl.blendEquation(gl.FUNC_ADD);
+			gl.clear(gl.COLOR_BUFFER_BIT);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-			this.drawMap(this.webgl, this.map, this.viewMatrix, light, drawOptions);
-		} else {
-			ortho(this.viewMatrix, camera.x, camera.x + camera.w, camera.actualY, camera.actualY + camera.h, 0, 1000);
-
-			TIMING && timeStart('initializeFrameBuffer');
-			this.initializeFrameBuffer(this.webgl, width, height);
+			this.drawMap(this.webgl, this.map, this.viewMatrix, mapDrawingColor, drawOptions);
 			TIMING && timeEnd();
+		}
+		else {
+			// if (!isWebGL2(gl)) {
+			// 	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+			// 	gl.clear(gl.COLOR_BUFFER_BIT); // hack, doing this clear fixes black screen issues for some older devices
+			// }
 
-			if (!frameBuffer) {
-				DEVELOPMENT && console.warn('No frame buffer');
-				return;
+			let clearMask = gl.COLOR_BUFFER_BIT;
+			if (useDepthBuffer) {
+				gl.depthMask(true);
+				clearMask |= gl.DEPTH_BUFFER_BIT;
 			}
 
-			// color -> fbo
-			TIMING && timeStart('color -> fbo');
-			// gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer.handle);
-			bindFrameBuffer(gl, frameBuffer);
-			gl.viewport(0, 0, frameBuffer.width, frameBuffer.height);
-			gl.clearColor(bg[0], bg[1], bg[2], bg[3]);
-			gl.clear(gl.COLOR_BUFFER_BIT); // | gl.DEPTH_BUFFER_BIT);
+			TIMING && timeStart('color -> framebuffer');
+			bindFrameBuffer(gl, frameBuffer!);
+			gl.viewport(0, 0, frameBuffer!.width, frameBuffer!.height); // clearing the whole surface is preferable for most GPUs
+			gl.clear(clearMask);
 			gl.viewport(0, 0, width, height);
-			gl.disable(gl.DEPTH_TEST);
-			//gl.depthFunc(gl.LEQUAL);
-			gl.enable(gl.BLEND);
-			gl.blendEquation(gl.FUNC_ADD);
-			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-			this.drawMap(this.webgl, this.map, this.viewMatrix, white, drawOptions);
+			this.drawMap(this.webgl, this.map, this.viewMatrix, mapDrawingColor, drawOptions);
+			gl.depthMask(false);
 			TIMING && timeEnd();
 
-			// color -> screen
-			TIMING && timeStart('color -> screen');
-			// gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			unbindFrameBuffer(gl);
-			gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-			gl.clearColor(0, 0, 0, 1);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			// gl.disable(gl.DEPTH_TEST);
-			gl.disable(gl.BLEND);
+			if (useLighting) {
+				TIMING && timeStart('light -> fbo');
+				bindFrameBuffer(gl, frameBuffer2!);
+				gl.viewport(0, 0, frameBuffer2!.width, frameBuffer2!.height); // clearing the whole surface is preferable for most GPUs
+				gl.clearColor(light[0], light[1], light[2], light[3]);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				gl.viewport(0, 0, width, height);
+				gl.blendFunc(gl.ONE, gl.ONE);
 
-			gl.useProgram(spriteShader.program);
-			gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.fboMatrix);
-			gl.uniform4fv(spriteShader.uniforms.lighting, white);
-			gl.uniform1f(spriteShader.uniforms.textureSize, frameBufferSheet.texture!.width);
-			bindTexture(gl, 0, frameBufferSheet.texture);
-			spriteBatch.begin();
-			spriteBatch.drawImage(WHITE, 0, 0, width, height, 0, 0, width, height);
-			spriteBatch.end();
-			TIMING && timeEnd();
+				gl.useProgram(lightShader.program);
+				gl.uniformMatrix4fv(lightShader.uniforms.transform, false, this.viewMatrix);
+				gl.uniform4fv(lightShader.uniforms.lighting, white);
+				spriteBatch.begin();
+				this.lightEntitiesDrawn = drawEntityLights(spriteBatch, this.map.entitiesLight, this.camera, drawOptions);
+				spriteBatch.end();
 
-			// light -> fbo
-			TIMING && timeStart('light -> fbo');
-			// gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer.handle);
-			bindFrameBuffer(gl, frameBuffer);
-			gl.viewport(0, 0, frameBuffer.width, frameBuffer.height);
-			gl.clearColor(light[0], light[1], light[2], light[3]);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			gl.viewport(0, 0, width, height);
-			//gl.enable(gl.DEPTH_TEST);
-			gl.enable(gl.BLEND);
-			gl.blendEquation(gl.FUNC_ADD);
-			gl.blendFunc(gl.ONE, gl.ONE);
-			TIMING && timeEnd();
+				if (useDepthBuffer) {
+					gl.depthFunc(gl.GEQUAL);
+				}
+				gl.useProgram(spriteShaderWithColor.program);
+				gl.uniformMatrix4fv(spriteShaderWithColor.uniforms.transform, false, this.viewMatrix);
+				gl.uniform4fv(spriteShaderWithColor.uniforms.lighting, white);
+				gl.uniform2f(spriteShaderWithColor.uniforms.textureSize,
+					normalSpriteSheet.texture!.width, normalSpriteSheet.texture!.height);
+				bindTexture(gl, 0, normalSpriteSheet.texture);
+				spriteBatch.begin();
+				this.lightSpriteEntitiesDrawn = drawEntityLightSprites(spriteBatch, this.map.entitiesLightSprite, this.camera, drawOptions);
+				spriteBatch.end();
+				gl.depthFunc(gl.ALWAYS);
+				if (isWebGL2(gl)) {
+					(gl as WebGL2RenderingContext).invalidateFramebuffer(gl.FRAMEBUFFER, [gl.DEPTH_ATTACHMENT]);
+				}
+				TIMING && timeEnd();
 
-			// shadows
-			//for (const e of map.entities) {
-			//	if (e.drawShadow && camera.isBoundVisible(e.shadowBounds || e.bounds, e.x, e.y)) {
-			//		this.spriteBatch.depth = camera.mapDepth(e.y);
-			//		e.drawShadow(this.spriteBatch);
-			//	}
-			//}
+				TIMING && timeStart('color + lights -> screen');
+				unbindFrameBuffer(gl);
+				gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+				gl.disable(gl.BLEND);
 
-			// soft lights
-			TIMING && timeStart('drawEntityLights');
-			gl.useProgram(lightShader.program);
-			gl.uniformMatrix4fv(lightShader.uniforms.transform, false, this.viewMatrix);
-			gl.uniform4fv(lightShader.uniforms.lighting, white);
-			spriteBatch.begin();
-			drawEntityLights(spriteBatch, this.map.entitiesLight, this.camera, drawOptions);
-			spriteBatch.end();
-			TIMING && timeEnd();
+				gl.useProgram(mergeShader.program);
+				gl.uniformMatrix4fv(mergeShader.uniforms.transform, false, this.fboMatrix);
+				gl.uniform2f(mergeShader.uniforms.textureSize, frameBuffer!.colorTexture.width, frameBuffer!.colorTexture.height);
+				bindTexture(gl, 0, frameBuffer!.colorTexture);
+				bindTexture(gl, 1, frameBuffer2!.colorTexture);
+				spriteBatch.begin();
+				spriteBatch.drawImage(WHITE, 0, 0, width, height, 0, 0, width, height);
+				spriteBatch.end();
+				TIMING && timeEnd();
+			}
+			else {
+				TIMING && timeStart('color framebuffer -> screen');
+				unbindFrameBuffer(gl);
+				gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+				gl.disable(gl.BLEND);
 
-			// light sprites
-			TIMING && timeStart('drawEntityLightSprites');
-			gl.useProgram(spriteShader.program);
-			gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.viewMatrix);
-			gl.uniform4fv(spriteShader.uniforms.lighting, white);
-			gl.uniform1f(spriteShader.uniforms.textureSize, normalSpriteSheet.texture!.width);
-			bindTexture(gl, 0, normalSpriteSheet.texture);
-			spriteBatch.begin();
-			drawEntityLightSprites(spriteBatch, this.map.entitiesLightSprite, this.camera, drawOptions);
-			spriteBatch.end();
-			TIMING && timeEnd();
-
-			// light -> screen
-			TIMING && timeStart('light -> screen');
-			// gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			unbindFrameBuffer(gl);
-			gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-			gl.enable(gl.BLEND);
-			gl.blendEquation(gl.FUNC_ADD);
-			gl.blendFunc(gl.DST_COLOR, gl.ZERO);
-
-			gl.useProgram(spriteShader.program);
-			gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.fboMatrix);
-			gl.uniform4fv(spriteShader.uniforms.lighting, white);
-			gl.uniform1f(spriteShader.uniforms.textureSize, frameBufferSheet.texture!.width);
-			bindTexture(gl, 0, frameBufferSheet.texture);
-			spriteBatch.begin();
-			spriteBatch.drawImage(WHITE, 0, 0, width, height, 0, 0, width, height);
-			spriteBatch.end();
-			TIMING && timeEnd();
+				gl.useProgram(spriteShader.program);
+				gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.fboMatrix);
+				gl.uniform4fv(spriteShader.uniforms.lighting, white);
+				gl.uniform2f(spriteShader.uniforms.textureSize, frameBuffer!.colorTexture.width, frameBuffer!.colorTexture.height);
+				bindTexture(gl, 0, frameBuffer!.colorTexture);
+				spriteBatch.begin();
+				spriteBatch.drawImage(WHITE, 0, 0, width, height, 0, 0, width, height);
+				spriteBatch.end();
+				TIMING && timeEnd();
+			}
 		}
 
 		// ui -> screen
@@ -1401,7 +1435,7 @@ export class PonyTownGame implements Game {
 		gl.uniformMatrix4fv(paletteShader.uniforms.transform, false, this.fboMatrix);
 		gl.uniform4fv(paletteShader.uniforms.lighting, white);
 		gl.uniform1f(paletteShader.uniforms.pixelSize, this.paletteManager.pixelSize);
-		gl.uniform1f(paletteShader.uniforms.textureSize, paletteSpriteSheet.texture!.width);
+		gl.uniform1f(paletteShader.uniforms.textureSize, 1.0 / paletteSpriteSheet.texture!.width);
 		bindTexture(gl, 0, paletteSpriteSheet.texture);
 		bindTexture(gl, 1, this.paletteManager.texture);
 		paletteBatch.begin();
@@ -1467,12 +1501,13 @@ export class PonyTownGame implements Game {
 		paletteBatch.end();
 		TIMING && timeEnd();
 
-		gl.useProgram(spriteShader.program);
-		gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.fboMatrix);
-		gl.uniform4fv(spriteShader.uniforms.lighting, white);
+		gl.useProgram(spriteShaderWithColor.program);
+		gl.uniformMatrix4fv(spriteShaderWithColor.uniforms.transform, false, this.fboMatrix);
+		gl.uniform4fv(spriteShaderWithColor.uniforms.lighting, white);
 
 		if (BETA && this.showMinimap && this.minimap) {
-			gl.uniform1f(spriteShader.uniforms.textureSize, normalSpriteSheet.texture!.width);
+			gl.uniform2f(spriteShaderWithColor.uniforms.textureSize,
+				normalSpriteSheet.texture!.width, normalSpriteSheet.texture!.height);
 			bindTexture(gl, 0, normalSpriteSheet.texture);
 			spriteBatch.begin();
 			spriteBatch.save();
@@ -1500,7 +1535,8 @@ export class PonyTownGame implements Game {
 		}
 
 		if (BETA && this.debug.showRegions && this.player) {
-			gl.uniform1f(spriteShader.uniforms.textureSize, normalSpriteSheet.texture!.width);
+			gl.uniform2f(spriteShaderWithColor.uniforms.textureSize,
+				normalSpriteSheet.texture!.width, normalSpriteSheet.texture!.height);
 			bindTexture(gl, 0, normalSpriteSheet.texture);
 			spriteBatch.begin();
 			drawDebugRegions(spriteBatch, this.map, this.player, this.camera);
@@ -1510,22 +1546,23 @@ export class PonyTownGame implements Game {
 		const showFPS = !!this.settings.browser.showFps;
 		const showHelp = BETA && this.input.isPressed(Key.F1);
 		const showPalette = DEVELOPMENT && this.debug.showPalette;
+		const showAdditionalStats = false;
 
-		if (showFPS || showHelp || showPalette) {
+		if (showFPS || showHelp || showPalette || showAdditionalStats) {
 			// 1 to 1 pixel scale drawing
 			TIMING && timeStart('showFps');
 			const scale = 2;
-			// const height = gl.drawingBufferHeight / (ratio * scale);
-			ortho(this.fboMatrix, 0, gl.drawingBufferWidth / ratio, gl.drawingBufferHeight / ratio, 0, 0, 1000);
-			gl.uniformMatrix4fv(spriteShader.uniforms.transform, false, this.fboMatrix);
-			gl.uniform1f(spriteShader.uniforms.textureSize, normalSpriteSheet.texture!.width);
+			ortho(this.fboMatrix, 0, gl.drawingBufferWidth / ratio, gl.drawingBufferHeight / ratio, 0, 0, 1000, false);
+			gl.uniformMatrix4fv(spriteShaderWithColor.uniforms.transform, false, this.fboMatrix);
+			gl.uniform2f(spriteShaderWithColor.uniforms.textureSize,
+				normalSpriteSheet.texture!.width, normalSpriteSheet.texture!.height);
 			bindTexture(gl, 0, normalSpriteSheet.texture);
 			spriteBatch.begin();
 			spriteBatch.save();
 			spriteBatch.scale(scale, scale);
 
 			if (showFPS) {
-				drawText(spriteBatch, this.drawFps.toFixed(), fontSmall, BLACK, 2, 2);
+				drawOutlinedText(spriteBatch, this.drawFps.toFixed(), fontSmall, WHITE, BLACK, 2, 2);
 
 				if (this.timingsText) {
 					const size = measureText(this.timingsText, fontMono);
@@ -1543,19 +1580,18 @@ export class PonyTownGame implements Game {
 				}
 			}
 
-			// if (DEVELOPMENT) {
-			// 	const width = gl.drawingBufferWidth / (ratio * scale);
-			// 	const { isCollidingCount, isCollidingObjectCount } = getCollisionStats();
-			// 	const text =
-			// 		`${isCollidingCount.toString().padStart(7)} calls\n` +
-			// 		`${isCollidingObjectCount.toString().padStart(7)} total checks\n` +
-			// 		`${this.markedColliding.toString().padStart(7)} player checks`;
-			// 	const size = measureText(text, fontMono);
-			// 	const x = width - 160;
-			// 	const y = 26;
-			// 	spriteBatch.drawRect(0x000000aa, x, y, 150, size.h + 10);
-			// 	drawText(spriteBatch, text, fontMono, WHITE, x + 5, y + 5);
-			// }
+			if (showAdditionalStats) {
+				const width = gl.drawingBufferWidth / (ratio * scale);
+				const text =
+					`entities ${this.entitiesDrawn}/${this.map.entitiesDrawable.length}\n` +
+					`light enitities ${this.lightEntitiesDrawn}/${this.map.entitiesLight.length}\n` +
+					`light sprite entities ${this.lightSpriteEntitiesDrawn}/${this.map.entitiesLightSprite.length}`;
+				const size = measureText(text, fontMono);
+				const x = width - Math.max(160, size.w);
+				const y = 26;
+				spriteBatch.drawRect(0x000000aa, x, y, 150, size.h + 10);
+				drawText(spriteBatch, text, fontMono, WHITE, x + 5, y + 5);
+			}
 
 			spriteBatch.restore();
 			spriteBatch.end();
@@ -1564,13 +1600,14 @@ export class PonyTownGame implements Game {
 				const paletteTexture = this.paletteManager.texture!;
 				const { width, height } = paletteTexture;
 
-				gl.uniform1f(spriteShader.uniforms.textureSize, normalSpriteSheet.texture!.width);
+				gl.uniform2f(spriteShaderWithColor.uniforms.textureSize,
+					normalSpriteSheet.texture!.width, normalSpriteSheet.texture!.height);
 				bindTexture(gl, 0, normalSpriteSheet.texture);
 				spriteBatch.begin();
 				spriteBatch.drawRect(0x00000066, 20, 20, width, height);
 				spriteBatch.end();
 
-				gl.uniform1f(spriteShader.uniforms.textureSize, width);
+				gl.uniform2f(spriteShaderWithColor.uniforms.textureSize, width, height);
 				bindTexture(gl, 0, paletteTexture);
 				spriteBatch.begin();
 				spriteBatch.drawImage(WHITE, 0, 0, width, height, 20, 20, width, height);
@@ -1601,15 +1638,17 @@ export class PonyTownGame implements Game {
 		drawFullScreenMessage(paletteBatch, this.camera, message, palettes.mainFont.white);
 	}
 	private drawMap(webgl: WebGL, map: WorldMap, viewMatrix: Matrix4, lighting: Float32Array, options: DrawOptions) {
-		const { gl, paletteBatch, paletteShader } = webgl;
+		const { gl, paletteBatch, paletteShader, paletteShaderWithDepth } = webgl;
+
+		const mapPaletteShader = options.useDepthBuffer ? paletteShaderWithDepth : paletteShader;
 
 		TIMING && timeStart('drawMap');
 		if (this.tileSets && this.player) {
-			gl.useProgram(paletteShader.program);
-			gl.uniformMatrix4fv(paletteShader.uniforms.transform, false, viewMatrix);
-			gl.uniform4fv(paletteShader.uniforms.lighting, lighting);
-			gl.uniform1f(paletteShader.uniforms.pixelSize, this.paletteManager.pixelSize);
-			gl.uniform1f(paletteShader.uniforms.textureSize, paletteSpriteSheet.texture!.width);
+			gl.useProgram(mapPaletteShader.program);
+			gl.uniformMatrix4fv(mapPaletteShader.uniforms.transform, false, viewMatrix);
+			gl.uniform4fv(mapPaletteShader.uniforms.lighting, lighting);
+			gl.uniform1f(mapPaletteShader.uniforms.pixelSize, this.paletteManager.pixelSize);
+			gl.uniform1f(mapPaletteShader.uniforms.textureSize, 1.0 / paletteSpriteSheet.texture!.width);
 			bindTexture(gl, 0, paletteSpriteSheet.texture);
 			bindTexture(gl, 1, this.paletteManager.texture);
 			paletteBatch.begin();
@@ -1618,7 +1657,7 @@ export class PonyTownGame implements Game {
 			paletteBatch.end();
 
 			if (this.highlightEntity && this.highlightEntity.draw) {
-				gl.uniform4fv(paletteShader.uniforms.lighting, highlightColor);
+				gl.uniform4fv(mapPaletteShader.uniforms.lighting, highlightColor);
 				paletteBatch.begin();
 				this.highlightEntity.draw(paletteBatch, this.drawOptions);
 				paletteBatch.end();
@@ -1680,16 +1719,29 @@ export class PonyTownGame implements Game {
 			DEVELOPMENT && log(`scrollY: ${window.scrollY}`);
 		}
 	}
-	private initializeFrameBuffer({ gl, frameBuffer }: WebGL, width: number, height: number) {
-		const targetSize = getRenderTargetSize(width, height);
+	private initializeFrameBuffers(
+		{ gl, frameBuffer, frameBuffer2 }: WebGL, width: number, height: number, useDepthBuffer: boolean
+	) {
+		if (!frameBuffer || !frameBuffer2) {
+			return;
+		}
 
-		if (frameBuffer && targetSize !== frameBuffer.width) {
+		const hasDepth = frameBuffer.depthStencilRenderbuffer !== null;
+		const isSizeChanged = width !== frameBuffer.width || height !== frameBuffer.height;
+		const isDepthChanged = hasDepth !== useDepthBuffer;
+
+		if (isSizeChanged || isDepthChanged) {
 			const maxSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+			const isSizeTooBig = maxSize != null && (width > maxSize || height > maxSize);
 
-			if (maxSize != null && targetSize > maxSize) {
-				this.setScale(this.scale + 1);
+			if (isSizeTooBig) {
+				this.setScale(this.scale + 1); // should not happen, useDepthBuffer is also ignored if it does
+				DEVELOPMENT && console.warn('Cannot resize framebuffer');
 			} else {
-				resizeFrameBuffer(gl, frameBuffer, targetSize, targetSize);
+				disposeFrameBuffer(gl, frameBuffer);
+				disposeFrameBuffer(gl, frameBuffer2);
+				createFrameBuffer(gl, frameBuffer, width, height, false, useDepthBuffer, null);
+				createFrameBuffer(gl, frameBuffer2, width, height, false, false, frameBuffer.depthStencilRenderbuffer);
 			}
 		}
 	}
@@ -1742,7 +1794,7 @@ export class PonyTownGame implements Game {
 				let value = '';
 
 				if (this.settings.browser.showStats) {
-					const tris = spriteBatch.tris + paletteBatch.tris;
+					const tris = spriteBatch.drawnTrisStats + paletteBatch.drawnTrisStats;
 					const flush = paletteBatch.flushes;
 					const sent = this.sent.toFixed();
 					const recv = this.recv.toFixed();
@@ -1772,9 +1824,9 @@ export class PonyTownGame implements Game {
 
 		TIMING && timeReset();
 
-		spriteBatch!.tris = 0;
+		spriteBatch!.drawnTrisStats = 0;
 		spriteBatch!.flushes = 0;
-		paletteBatch!.tris = 0;
+		paletteBatch!.drawnTrisStats = 0;
 		paletteBatch!.flushes = 0;
 	}
 }

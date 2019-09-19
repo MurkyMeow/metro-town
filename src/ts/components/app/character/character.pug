@@ -14,7 +14,7 @@ page-loader(*ngIf="!playing")
 		h2.sr-only Character selection
 		.mx-auto(style="max-width: 400px;")
 			discord-button.mb-3
-			install-button.mb-3
+			visit-pt-button.mb-3
 			character-select(
 				[(error)]="error" [newButton]="true" [removeButton]="true" (change)="updateMuzzles()"
 				(preview)="previewPony = $event")

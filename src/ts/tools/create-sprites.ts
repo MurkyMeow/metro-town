@@ -33,8 +33,9 @@ import { sheets, Sheet } from '../common/sheets';
 import { colorToCSS } from '../common/color';
 import { bitWriter } from '../common/bitUtils';
 
-const head0Indices = [0, 1, 2, 4, 7, 8, 9, 10, 12, 13, 14, 16, 18, 19]; // regular
-const head1Indices = [0, 1, 3, 5, 6, 8, 9, 11, 12, 13, 15, 17, 18, 19]; // clipped
+// face markings
+const head0Indices = [0, 1, 2, 4, 7, 8, 9, 10, 12, 13, 14, 16, 18, 19]; // regular (right facing)
+const head1Indices = [0, 1, 3, 5, 6, 8, 9, 11, 12, 13, 15, 17, 18, 19]; // clipped (left facing, displayed in char creator)
 
 const MAX_PALETTE_SIZE = 128;
 const { assetsPath } = require('../../../config.json');
@@ -293,7 +294,13 @@ function importSprites({ sprites, objects2 }: Result, sheet: Sheet) {
 
 	const animations = sets.map(({ layerName, name, mask, reverse, maskFile, mirror, mirrorOffsetX }) => {
 		const layer = findLayerSafe(layerName, psd);
-		let color = getLayerCanvasSafe('color', layer);
+
+		let color = getLayerCanvas('color', layer);
+		if (!color) {
+			color = createExtCanvas(psd.width, psd.height, layer.info);
+			console.warn('Layer ' + layer.info + ' is empty');
+		}
+
 		const extraCanvas = sheet.extra ? getLayerCanvas('extra', layer) : undefined;
 		const patterns = getPatternCanvases(layer);
 
@@ -315,7 +322,7 @@ function importSprites({ sprites, objects2 }: Result, sheet: Sheet) {
 				const { x, y } = importOffsets && importOffsets[frame] || { x: 0, y: 0 };
 				const getAndPadBase = (canvas: ExtCanvas) => padCanvas(getImage(canvas, frame, type), -x, -y);
 				const getAndPad = mirror ? (canvas: ExtCanvas) => mirrorCanvas(getAndPadBase(canvas), mirrorOffsetX) : getAndPadBase;
-				const accessoryFrame = getAndPad(color);
+				const accessoryFrame = getAndPad(color!);
 				const extraFrame = extraCanvas && getAndPad(extraCanvas);
 
 				if (isCanvasEmpty(accessoryFrame)) {
@@ -405,7 +412,7 @@ function importSprites({ sprites, objects2 }: Result, sheet: Sheet) {
 		}
 
 		if (sheet.single) {
-			objects2[`${name}: StaticSprites${hasExtra ? 'Extra' : ''}`] = frames[0];
+			objects2[`${name}: StaticSprites${hasExtra ? 'Extra' : ''}`] = frames[0] || [];
 		} else {
 			objects2[`${name}: AnimatedSprites`] = frames;
 		}
