@@ -1,5 +1,5 @@
 ng-template(#actionsModal)
-	actions-modal((close)="closeActions()" [focusTrap]="true" (keydown)="$event.stopPropagation()")
+	actions-modal((close)="closeActions()" (notify)="actionsModalNotify()" (keydown)="$event.stopPropagation()")
 
 .action-bar(
 	[class.has-scroller]="hasScroller" [class.is-mobile]="mobile" [class.is-blurred]="blurred"

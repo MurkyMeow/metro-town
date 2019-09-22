@@ -276,6 +276,15 @@ Tools are accessible at `<base_url>/tools/` (only available in dev mode or when 
 
 ## Changelog
 
+### Pony.Town v0.54.0
+- Added a separate logo file for Visit Pony Town button
+- Fixed users not being able to close actions menu in some cases
+- Fixed torch flames having wrong outlines in some cases
+- Fixed lights sometimes popping up through ponies
+- Fixed lights being visible through pony eyeshadows
+- Fixed lights of held items flickering for some users
+- Updated credits
+
 ### Pony.Town v0.53.2
 - Added changes from Pony.Town update v0.53.2 (https://pony.town/about)
 - Updated readme with further instructions on updating server and adding assets
