@@ -1,4 +1,4 @@
-import { Sprite, Palette, PaletteSpriteBatch as IPaletteSpriteBatch, Matrix2D } from '../common/interfaces';
+import { Sprite, Palette, PaletteSpriteBatch as IPaletteSpriteBatch, Matrix2D, Batch } from '../common/interfaces';
 import { BaseSpriteBatch, getColorFloat } from './baseSpriteBatch';
 import { colorFromRGBA, colorToFloat } from '../common/color';
 import { createSprite } from '../client/spriteUtils';
@@ -235,6 +235,11 @@ export class PaletteSpriteBatch extends BaseSpriteBatch implements IPaletteSprit
 				);
 				this.spritesCount++;
 			}
+		}
+	}
+	patchBatchDepth(batch: Batch) {
+		for (let i = 0; i < batch.length; i += 9) {
+			batch[i + 2] = this.depth;
 		}
 	}
 }

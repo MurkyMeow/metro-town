@@ -35,6 +35,7 @@ export class ActionsModal implements OnInit, OnDestroy {
 	readonly devIcon = faCogs;
 	readonly dev = BETA;
 	@Output() close = new EventEmitter();
+	@Output() notify = new EventEmitter();
 	actions = createButtionActionActions();
 	commands = createButtonCommandActions();
 	emoteAction = expressionButtonAction(createExpression(Eye.Neutral, Eye.Neutral, Muzzle.Smile));
@@ -83,12 +84,17 @@ export class ActionsModal implements OnInit, OnDestroy {
 		if (BETA) {
 			this.entityActions = getEntityNames().map(name => entityButtonAction(name));
 		}
+
+		// not using timeout here causes some event ordering issues on mobile devices, and the modal stucks being open
+		// in case it still happens on some devices (unlikely), would make sense to increse the delay
+		setTimeout(() => this.notify.emit(), 250);
 	}
 	ngOnDestroy() {
 		document.body.classList.remove('actions-modal-opened');
 		this.game.editingActions = false;
 		clearInterval(this.interval);
 		this.subscription && this.subscription.unsubscribe();
+		this.notify.emit();
 	}
 	ok() {
 		this.close.emit();

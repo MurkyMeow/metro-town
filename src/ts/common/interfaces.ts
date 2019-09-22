@@ -128,6 +128,7 @@ export interface PaletteSpriteBatch extends SpriteBatchCommons {
 		sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number
 	): void;
 	drawSprite(sprite: Sprite, color: number, palette: Palette | undefined, x: number, y: number): void;
+	patchBatchDepth(batch: Batch): void;
 }
 
 export function isPaletteSpriteBatch(batch: SpriteBatch | PaletteSpriteBatch): batch is PaletteSpriteBatch {
