@@ -23,7 +23,10 @@ void main() {
 	vColor1 = vertexColor1;
 	float depth = position.z;
 	#ifdef DEPTH_BUFFERED
-		if (vColor.a < 0.975) {
+		if (depth < 0.0) {
+			depth = -depth;
+		}
+		else if (vColor.a < 0.975) {
 			depth = 0.0;
 		}
 	#endif

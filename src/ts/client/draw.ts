@@ -27,6 +27,7 @@ function drawEntities(batch: PaletteSpriteBatch, entities: Entity[], camera: Cam
 			batch.depth = depth;
 
 			if (entity.type === PONY_TYPE) {
+				batch.depth = -batch.depth;
 				drawPonyEntity(batch, entity as Pony, options);
 				entitiesDrawn++;
 			} else if (entity.draw !== undefined) {

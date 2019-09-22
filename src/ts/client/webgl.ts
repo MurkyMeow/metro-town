@@ -66,8 +66,8 @@ export function initWebGLResources(gl: WebGLRenderingContext, paletteManager: Pa
 	gl.disable(gl.DITHER);
 
 	try {
-		createFrameBuffer(gl, frameBuffer, camera.w, camera.h, false, true, null);
-		createFrameBuffer(gl, frameBuffer2, camera.w, camera.h, true, false, frameBuffer.depthStencilRenderbuffer);
+		createFrameBuffer(gl, frameBuffer, camera.w, camera.h, true, null);
+		createFrameBuffer(gl, frameBuffer2, camera.w, camera.h, false, frameBuffer.depthStencilRenderbuffer);
 	} catch (e) {
 		DEVELOPMENT && console.warn(e);
 		failedFBO = true;

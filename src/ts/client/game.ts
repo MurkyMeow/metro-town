@@ -1740,8 +1740,8 @@ export class PonyTownGame implements Game {
 			} else {
 				disposeFrameBuffer(gl, frameBuffer);
 				disposeFrameBuffer(gl, frameBuffer2);
-				createFrameBuffer(gl, frameBuffer, width, height, false, useDepthBuffer, null);
-				createFrameBuffer(gl, frameBuffer2, width, height, false, false, frameBuffer.depthStencilRenderbuffer);
+				createFrameBuffer(gl, frameBuffer, width, height, useDepthBuffer, null);
+				createFrameBuffer(gl, frameBuffer2, width, height, false, frameBuffer.depthStencilRenderbuffer);
 			}
 		}
 	}

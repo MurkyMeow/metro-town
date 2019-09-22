@@ -23,6 +23,7 @@ export class ActionBar {
 	shortcuts = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
 	private modalRef?: BsModalRef;
 	private _editable = false;
+	private isWaitingForActionsModal = false;
 	constructor(private game: PonyTownGame, private settings: SettingsService, private modalService: BsModalService) {
 	}
 	@Input() get editable() {
@@ -74,18 +75,31 @@ export class ActionBar {
 		}
 	}
 	openActions() {
+		if (this.isWaitingForActionsModal) {
+			return;
+		}
+
 		if (this.modalRef) {
 			this.closeActions();
 		}
 		else {
+			this.isWaitingForActionsModal = true;
 			this.modalRef = this.modalService.show(this.actionsModal, { ignoreBackdropClick: true });
 		}
 	}
 	closeActions() {
+		if (this.isWaitingForActionsModal) {
+			return;
+		}
+
 		if (this.modalRef) {
+			this.isWaitingForActionsModal = true;
 			this.modalRef.hide();
 			this.modalRef = undefined;
 		}
+	}
+	actionsModalNotify() {
+		this.isWaitingForActionsModal = false;
 	}
 	private updateFreeSlots() {
 		const actions = this.actions;

@@ -10,7 +10,7 @@ export interface FrameBuffer {
 }
 
 export function createFrameBuffer(
-	gl: WebGLRenderingContext, target: FrameBuffer, width: number, height: number, useLinearMagnify: boolean,
+	gl: WebGLRenderingContext, target: FrameBuffer, width: number, height: number,
 	createDepthStencil: boolean, depthStencilRenderbuffer: WebGLRenderbuffer | null
 ) {
 	const handle = gl.createFramebuffer();
@@ -18,7 +18,7 @@ export function createFrameBuffer(
 		throw new Error('Failed to create frame buffer');
 	}
 
-	const resources = createFrameBufferResources(gl, width, height, createDepthStencil, useLinearMagnify);
+	const resources = createFrameBufferResources(gl, width, height, createDepthStencil);
 	target.handle = handle;
 	target.colorTexture = resources.colorTexture;
 	target.depthStencilRenderbuffer = resources.depthStencilRenderbuffer;
@@ -77,14 +77,11 @@ function bindFrameBufferAttachments(gl: WebGLRenderingContext, { colorTexture, d
 }
 
 function createFrameBufferResources(
-	gl: WebGLRenderingContext, width: number, height: number, createDepthBuffer: boolean, useLinearMagnify: boolean
+	gl: WebGLRenderingContext, width: number, height: number, createDepthBuffer: boolean
 ) {
 	const colorTexture = createEmptyTexture(gl, false, width, height, gl.RGB);
 	if (!colorTexture) {
 		throw new Error('Failed to create frame buffer\'s color texture');
-	}
-	if (useLinearMagnify) {
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	}
 
 	let depthStencilRenderbuffer: WebGLRenderbuffer | null = null;

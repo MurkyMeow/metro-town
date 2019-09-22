@@ -127,6 +127,8 @@ export const CONTRIBUTORS: Contributors[] = [
 			{ name: 'SC', links: ['https://0somecunt0.tumblr.com/tagged/sfw'] },
 			{ name: 'SailorDolpin', links: ['https://vk.com/id324582699'] },
 			{ name: 'Deeraw', links: ['https://www.deviantart.com/deerdraw', 'https://twitter.com/TheOnlyDeeraw'] },
+			{ name: 'Aviivix' },
+			{ name: 'SnowFl8keAnge1' },
 		],
 	},
 ];

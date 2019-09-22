@@ -260,6 +260,7 @@ export function drawPonyEntity(batch: PaletteSpriteBatch, pony: Pony, drawOption
 	}
 
 	if (pony.batch !== undefined) {
+		batch.patchBatchDepth(pony.batch);
 		batch.drawBatch(pony.batch);
 	} else if (pony.palettePonyInfo !== undefined) {
 		let swimming = false;
