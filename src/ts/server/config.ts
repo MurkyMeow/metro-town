@@ -29,6 +29,8 @@ export interface AppConfig {
 		trackingID: string;
 	};
 	assetsPath?: string;
+	season?: string;
+	holiday?: string;
 	oauth: { [key: string]: any };
 	servers: ServerConfig[];
 	facebookAppId?: string;

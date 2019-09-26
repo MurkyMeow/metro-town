@@ -29,6 +29,8 @@ import { liveSettings } from './liveSettings';
 import { createIsSuspiciousMessage } from '../common/security';
 import { updateCharacterState } from './characterUtils';
 import { FriendsService } from './services/friends';
+import { config } from './config';
+import { parseSeason, parseHoliday } from '../common/utils';
 
 async function refreshSettings(account: IAccount) {
 	const a = await Account.findOne({ _id: account._id }, 'settings').exec();
@@ -59,8 +61,8 @@ export function createServerActionsFactory(
 	const statesCounter = new CounterService<CharacterState>(10 * SECOND);
 	const logChatMessage: LogChat = (client, text, type, ignored, target) => chat(server, client, text, type, ignored, target);
 
-	world.season = SEASON;
-	world.holiday = HOLIDAY;
+	world.season = parseSeason(server.season) || parseSeason(config.season) || SEASON;
+	world.holiday = parseHoliday(server.holiday) || parseHoliday(config.holiday) || HOLIDAY;
 
 	try {
 		const hidingData = fs.readFileSync(hidingDataPath(server.id), 'utf8');

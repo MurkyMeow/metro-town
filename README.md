@@ -164,6 +164,8 @@ Add `config.json` file in root directory with following content. You can use `co
   },
   "facebookAppId": "<facebook_id>", // optional facebook app link
   "assetsPath": "<path_to_graphics_assets>", // optional, for asset generation
+  "season": "spring", // optional, defaults to spring; season for all servers, seasons are "spring", "summer", "autumn" and "winter"
+  "holiday": "none", // optional, defaults to none; holiday for all servers, holidays are "none", "halloween", "christmas", "stpatricks" and "easter"
   "oauth": {
 		"google": {
 			"clientID": "<CLIENT_ID_HERE>",
@@ -179,6 +181,8 @@ Add `config.json` file in root directory with following content. You can use `co
       "local": "localhost:8090",
       "name": "Dev server",
       "desc": "Development server",
+      "season": "summer", // optional, defaults to summer, seasons are "spring", "summer", "autumn" and "winter"
+      "holiday": "none", // optional, defaults to none, holidays are "none", "halloween", "christmas", "stpatricks" and "easter"
       "flag": "test", // optional flag ("test", "star" or space separated list of country flags)
       "flags": { // optional feature flags
         "test": true, // test server

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Point, Rect, Entity, Dict } from './interfaces';
+import { Point, Rect, Entity, Dict, Holiday, Season } from './interfaces';
 import { tileWidth, tileHeight, SECOND, MINUTE, HOUR, DAY } from './constants';
 import { ACCESS_ERROR, NOT_FOUND_ERROR, OFFLINE_ERROR, PROTECTION_ERROR } from './errors';
 
@@ -514,6 +514,29 @@ export function processCommand(text: string) {
 	const command = (space === -1 ? text : text.substr(0, space)).trim() as string | undefined;
 	const args = space === -1 ? '' : text.substr(space + 1).trim();
 	return { command, args };
+}
+
+export function parseSeason(value?: string): Season | undefined {
+	if (!value) return undefined;
+	switch (value.toLowerCase()) {
+		case 'spring': return Season.Spring;
+		case 'summer': return Season.Summer;
+		case 'autumn': return Season.Autumn;
+		case 'winter': return Season.Winter;
+		default: return undefined;
+	}
+}
+
+export function parseHoliday(value?: string): Holiday | undefined {
+	if (!value) return undefined;
+	switch (value.toLowerCase()) {
+		case 'none': return Holiday.None;
+		case 'halloween': return Holiday.Halloween;
+		case 'christmas': return Holiday.Christmas;
+		case 'stpatricks': return Holiday.StPatricks;
+		case 'easter': return Holiday.Easter;
+		default: return undefined;
+	}
 }
 
 // events

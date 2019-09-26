@@ -1,6 +1,6 @@
 import { Season, Holiday } from './interfaces';
 
-export const SEASON: Season = Season.Autumn;
+export const SEASON: Season = Season.Spring;
 export const HOLIDAY: Holiday = Holiday.None;
 
 export const SECOND = 1000;

@@ -150,6 +150,8 @@ export interface ServerConfig {
 	name: string;
 	desc: string;
 	flag: string;
+	season?: string;
+	holiday?: string;
 	host?: string;
 	alert?: string;
 	require?: string;
