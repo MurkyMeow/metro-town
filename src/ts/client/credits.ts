@@ -91,7 +91,6 @@ export const CONTRIBUTORS: Contributors[] = [
 		group: 'Programmers',
 		contributors: [
 			{ name: 'Industrialice' },
-			{ name: 'Stubenhocker', links: ['https://twitter.com/Stubenhocker13'] },
 		],
 	},
 	{
