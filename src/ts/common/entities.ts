@@ -1176,11 +1176,17 @@ export const sandPileBig = doodad(n('sandpile-big'), sprites.snowpile_big, 43, 2
 
 // pumpkins
 
+const pumpkinOffOnSprites: AnimatedRenderable = {frames: [sprites.pumpkin_off.color, sprites.pumpkin_on.color],
+	palette: sprites.pumpkin_on.palettes![0],
+	shadow: sprites.pumpkin_on.shadow};
+const pumpkinLightSprite: AnimatedRenderable1 = {frames: [undefined, sprites.pumpkin_light]};
 const pumpkinCollider = mixColliderRounded(-11, -6, 22, 12, 5, false);
 const pumpkinPickable = mixPickable(26, 50);
 const pumpkinParts = [pumpkinCollider, pumpkinPickable];
 const pumpkinDX = 11;
 const pumpkinDY = 15;
+const pumpkinAnimOff = [0];
+const pumpkinAnimOn = [1];
 
 export const pumpkin = doodad(n('pumpkin'), sprites.pumpkin_default, pumpkinDX, pumpkinDY, 0,
 	...pumpkinParts);
@@ -1193,11 +1199,20 @@ export const jackoOn = doodad(n('jacko-on'), sprites.pumpkin_on, pumpkinDX, pump
 	mixLight(jackoLightColor, 0, 0, 256, 192),
 	mixLightSprite(sprites.pumpkin_light, WHITE, pumpkinDX, pumpkinDY));
 
-export const jacko = doodad(n('jacko'), sprites.pumpkin_on, pumpkinDX, pumpkinDY, 0,
+export const jacko = registerMix(n('jacko'),
+	mixAnimation(pumpkinOffOnSprites, 8, pumpkinDX, pumpkinDY, {
+		lightSprite: pumpkinLightSprite,
+		animations: [pumpkinAnimOff, pumpkinAnimOn],
+	}),
+	...pumpkinParts,
+	mixLight(jackoLightColor, 0, 0, 256, 192),
+	mixFlags(EntityFlags.OnOff));
+
+/*export const jacko = doodad(n('jacko'), sprites.pumpkin_on, pumpkinDX, pumpkinDY, 0,
 	...pumpkinParts,
 	mixLight(jackoLightColor, 0, 0, 256, 192),
 	mixLightSprite(sprites.pumpkin_light, WHITE, pumpkinDX, pumpkinDY),
-	mixFlags(EntityFlags.OnOff));
+	mixFlags(EntityFlags.OnOff));*/
 
 // tombstones
 
@@ -2358,10 +2373,14 @@ export const fruits = [
 ];
 
 export const tools = [
-	{ type: saw.type, text: 'Saw: place & remove walls' },
-	{ type: broom.type, text: 'Broom: remove furniture' },
-	{ type: hammer.type, text: 'Hammer: place furniture\nuse [mouse wheel] to switch item' },
-	{ type: shovel.type, text: 'Shovel: change floor\nuse [mouse wheel] to switch floor type' },
+	{ type: saw.type, text: 'Saw: place & remove walls', textMobile: undefined },
+	{ type: broom.type, text: 'Broom: remove furniture', textMobile: undefined },
+	{ type: hammer.type,
+		text: 'Hammer: place furniture\nuse [mouse wheel] to switch item',
+		textMobile: 'Hammer: place furniture\nuse [Switch item to place] action to switch item' },
+	{ type: shovel.type,
+		text: 'Shovel: change floor\nuse [mouse wheel] to switch floor type',
+		textMobile: 'Shovel: change floor\nuse [Switch tile to place] action to switch floor type' },
 ];
 
 export const candies1Types = [candyCane1, candyCane2, cookie, cookiePony].map(e => e.type);

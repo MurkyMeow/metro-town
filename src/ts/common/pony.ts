@@ -2,7 +2,7 @@ import { PONY_WIDTH, PONY_HEIGHT, BLINK_FRAMES, canFly } from '../client/ponyUti
 import { stand, sneeze, defaultHeadAnimation, defaultBodyFrame, defaultHeadFrame } from '../client/ponyAnimations';
 import {
 	PaletteSpriteBatch, Pony, BodyAnimation, EntityState, SpriteBatch, ExpressionExtra, HeadAnimation, Palette,
-	PaletteManager, DrawOptions, Rect, EntityFlags, IMap, Entity, DoAction, Muzzle, Expression, isEyeSleeping,
+	PaletteManager, DrawOptions, Rect, EntityFlags, IMap, Entity, DoAction, Muzzle, Expression, getEyeOpenness,
 	Iris, EntityPlayerState,
 } from './interfaces';
 import { hasFlag, setFlag } from './utils';
@@ -26,7 +26,7 @@ import {
 } from './animator';
 import {
 	trotting, flying, hovering, toBoopState, isFlyingUpOrDown, isFlyingDown, isSittingDown, isSittingUp, swinging,
-	standing, sitting, lying, swimming, isSwimmingState, swimmingToFlying,
+	standing, sitting, lying, swimming, isSwimmingState, swimmingToFlying, toKissState,
 } from '../client/ponyStates';
 import { decodePonyInfo } from './compressPony';
 import { defaultPonyState, defaultDrawPonyOptions, isStateEqual } from '../client/ponyHelpers';
@@ -197,6 +197,14 @@ export function updatePonyInfo(pony: Pony, info: string | Uint8Array, apply: () 
 
 		apply();
 	}
+}
+
+export function isPonyBug(pony: Pony) {
+	if (pony.info === undefined || pony.palettePonyInfo === undefined) {
+		return false;
+	}
+	const wingType = pony.palettePonyInfo.wings && pony.palettePonyInfo.wings.type || 0;
+	return wingType === 4;
 }
 
 export function ensurePonyInfoDecoded(pony: Pony) {
@@ -445,6 +453,9 @@ export function updatePonyEntity(pony: Pony, delta: number, gameTime: number, sa
 			case DoAction.HoldPoof:
 				playAnimation(pony.holdPoofEffect, holdPoofAnimation);
 				break;
+			case DoAction.Kiss:
+				setAnimatorState(pony.animator, toKissState(animationState) || animationState);
+				break;
 			default:
 				if (DEVELOPMENT) {
 					console.error(`Invalid DoAction: ${pony.doAction}`);
@@ -587,8 +598,8 @@ function filterExpression(expression: Expression) {
 		blush ||
 		hasFlag(extra, ExpressionExtra.Hearts) ||
 		hasFlag(extra, ExpressionExtra.Cry) ||
-		isEyeSleeping(expression.left) ||
-		isEyeSleeping(expression.right)
+		(getEyeOpenness(expression.left) === 0) ||
+		(getEyeOpenness(expression.right) === 0)
 	) {
 		if (expression.muzzle === Muzzle.SmilePant || expression.muzzle === Muzzle.NeutralPant) {
 			expression.muzzle = Muzzle.Neutral;

@@ -1,7 +1,8 @@
 import {
 	PonyEye, PonyState, PalettePonyInfo, PaletteSpriteSet, Palette, HeadAnimationFrame,
 	Eye, Iris, ColorExtraSets, ExpressionExtra, BodyAnimationFrame, DrawPonyOptions, Muzzle, BodyShadow, DrawOptions,
-	NoDraw, PaletteSpriteBatch, defaultDrawOptions, PonyStateFlags, PaletteManager, isEyeSleeping, Matrix2D,
+	NoDraw, PaletteSpriteBatch, defaultDrawOptions, PonyStateFlags, PaletteManager, Matrix2D, HeadAnimationProperties,
+	getEyeOpenness, Expression, getMuzzleOpenness,
 } from '../common/interfaces';
 import { WHITE, SHINES_COLOR, FAR_COLOR, TRANSPARENT, fillToOutlineColor } from '../common/colors';
 import { toInt, hasFlag, repeat, flatten, point } from '../common/utils';
@@ -232,6 +233,7 @@ function getWakeIndex(info: Info) {
 export function drawPony(batch: Batch, info: Info, state: State, ponyX: number, ponyY: number, options: Options) {
 	const frame = getPonyAnimationFrame(state.animation, state.animationFrame, defaultBodyFrame);
 	const headFrame = getPonyAnimationFrame(state.headAnimation || defaultHeadAnimation, state.headAnimationFrame, defaultHeadFrame);
+	const headAnimationProperties = (state.headAnimation || defaultHeadAnimation).properties;
 	const baseX = ponyX - PONY_WIDTH / 2;
 	const baseY = ponyY - PONY_HEIGHT;
 	const x = baseX + frame.bodyX;
@@ -502,7 +504,7 @@ export function drawPony(batch: Batch, info: Info, state: State, ponyX: number, 
 		drawSet(batch, sprites.behindManes, info.mane, 0, maneBehindOffsetY, WHITE);
 	}
 
-	drawHead(batch, info, 0, 0, headSprite, headFrame, state, options, headFlip, maneOffsetY);
+	drawHead(batch, info, 0, 0, headSprite, headFrame, headAnimationProperties, state, options, headFlip, maneOffsetY);
 	drawSet(batch, sprites.headAccessories, info.headAccessory, hatOffset.x, hatOffset.y + hatOffsetY, WHITE);
 
 	batch.restore();
@@ -514,7 +516,7 @@ export function drawPony(batch: Batch, info: Info, state: State, ponyX: number, 
 
 export function drawHead(
 	batch: Batch, info: Info, x: number, y: number, headSprites: ColorExtraSets, headFrame: HeadAnimationFrame,
-	{ blinkFrame, expression, holding, blushColor, drawFaceExtra }: State,
+	animationProperties: HeadAnimationProperties, { blinkFrame, expression, holding, blushColor, drawFaceExtra }: State,
 	options: Options, flip: boolean, maneOffsetY: number,
 ) {
 	const extraOffset = at(EXTRA_ACCESSORY_OFFSETS, info.mane && info.mane.type) || pointZero;
@@ -550,18 +552,18 @@ export function drawHead(
 
 			// make sure eyes are closed if sleeping
 			if (hasFlag(expression.extra, ExpressionExtra.Zzz)) {
-				if (!isEyeSleeping(eyeLeftBase)) {
+				if (getEyeOpenness(eyeLeftBase) !== 0) {
 					eyeLeftBase = Eye.Closed;
 				}
 
-				if (!isEyeSleeping(eyeRightBase)) {
+				if (getEyeOpenness(eyeRightBase) !== 0) {
 					eyeRightBase = Eye.Closed;
 				}
 			}
 		}
 
-		const eyeRight = getEyeFrame(info.eyeOpennessRight || 1, eyeRightBase, headFrame.right, blinkFrame);
-		const eyeLeft = getEyeFrame(info.eyeOpennessLeft || 1, eyeLeftBase, headFrame.left, blinkFrame);
+		const eyeRight = getEyeFrame(info.eyeOpennessRight || 1, eyeRightBase, headFrame.right, animationProperties, blinkFrame);
+		const eyeLeft = getEyeFrame(info.eyeOpennessLeft || 1, eyeLeftBase, headFrame.left, animationProperties, blinkFrame);
 		const eyeFrameLeft = flip ? eyeRight : eyeLeft;
 		const eyeFrameRight = flip ? eyeLeft : eyeRight;
 		const eyeColorLeft = flip ? info.eyeColorRight : info.eyeColorLeft;
@@ -613,12 +615,7 @@ export function drawHead(
 	}
 
 	if (draw(options, NoDraw.Body) && draw(options, NoDraw.Nose)) {
-		const muzzle = holding ?
-			Muzzle.Smile :
-			headFrame.mouth === -1 ?
-				(expression ? expression.muzzle : info.muzzle) :
-				headFrame.mouth;
-
+		const muzzle = getMouthFrame(!!holding, expression, headFrame.mouth, info.muzzle, animationProperties);
 		const noses = at(sprites.noses, muzzle);
 		const nose = att(noses, info.nose && info.nose.type)![0];
 
@@ -723,11 +720,18 @@ function drawLeg(
 	}
 }
 
-function getEyeFrame(base: Eye, expression: Eye, anim: Eye, blinkFrame: number) {
-	if (anim !== -1)
-		return anim;
-
+function getEyeFrame(base: Eye, expression: Eye, anim: Eye, animationProperties: HeadAnimationProperties, blinkFrame: number) {
 	const frame = expression === -1 ? base : expression;
+
+	if (anim !== -1) {
+		if (hasFlag(animationProperties, HeadAnimationProperties.DontIncreaseEyeOpenness)) {
+			if (getEyeOpenness(anim) > getEyeOpenness(frame)) {
+				return frame;
+			}
+		}
+		return anim;
+	}
+
 	const blink = blinkFrames[frame];
 
 	if (blinkFrame > 1 && blink) {
@@ -739,6 +743,29 @@ function getEyeFrame(base: Eye, expression: Eye, anim: Eye, blinkFrame: number) 
 	}
 
 	return frame;
+}
+
+function getMouthFrame(holding: boolean, expression: Expression | undefined, headFrameMuzzle: Muzzle,
+	currentMuzzle: Muzzle | undefined, properties: HeadAnimationProperties) {
+	if (holding) {
+		return Muzzle.Smile;
+	}
+
+	let applyMuzzle = currentMuzzle;
+	if (expression) {
+		applyMuzzle = expression.muzzle;
+	}
+
+	if (headFrameMuzzle !== -1) {
+		if (applyMuzzle && hasFlag(properties, HeadAnimationProperties.DontDecreaseMouthOpenness)) {
+			if (getMuzzleOpenness(headFrameMuzzle) < getMuzzleOpenness(applyMuzzle)) {
+				return applyMuzzle;
+			}
+		}
+		return headFrameMuzzle;
+	}
+
+	return applyMuzzle;
 }
 
 function drawEye(

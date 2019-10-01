@@ -275,6 +275,7 @@ export function createCommands(world: World): Command[] {
 		action(['laugh', 'lol', 'haha', 'хаха', 'jaja'], Action.Laugh),
 		action(['sneeze', 'achoo'], Action.Sneeze),
 		action(['magic'], Action.Magic),
+		action(['kiss'], Action.Kiss),
 
 		// house
 		command(['savehouse'], '/savehouse - saves current house setup', '', async ({ }, client) => {
@@ -342,8 +343,10 @@ export function createCommands(world: World): Command[] {
 			client.reporter.systemLog(`House unlocked`);
 		}),
 		command(['removetoolbox'], '/removetoolbox - removes toolbox from the house', '', ({ world }, client) => {
-			if (!isValidMapForEditing(client.map, client, false, true))
+			if (!isValidMapForEditing(client.map, client, true, true))
 				return;
+
+			client.lastMapLoadOrSave = Date.now();
 
 			removeToolbox(world, client.map);
 
@@ -351,8 +354,10 @@ export function createCommands(world: World): Command[] {
 			client.reporter.systemLog(`Toolbox removed`);
 		}),
 		command(['restoretoolbox'], '/restoretoolbox - restores toolbox to the house', '', ({ }, client) => {
-			if (!isValidMapForEditing(client.map, client, false, true))
+			if (!isValidMapForEditing(client.map, client, true, true))
 				return;
+
+			client.lastMapLoadOrSave = Date.now();
 
 			restoreToolbox(world, client.map);
 
