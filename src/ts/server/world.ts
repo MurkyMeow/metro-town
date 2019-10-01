@@ -138,6 +138,13 @@ export class World {
 			}
 		}
 	}
+	removeWalls(map: ServerMap) {
+		for (const controller of map.controllers) {
+			if (controller.removeWalls) {
+				controller.removeWalls();
+			}
+		}
+	}
 	getState(): WorldState {
 		return {
 			time: this.time,
@@ -291,22 +298,13 @@ export class World {
 		const nowSeconds = now / 1000;
 		const deltaSeconds = delta / 1000;
 
-		timingStart('update tiles');
+		timingStart('update tiles and colliders');
 		for (const map of this.maps) {
 			if (!map.dontUpdateTilesAndColliders) {
 				for (const region of map.regions) {
 					if (region.tilesDirty) {
 						updateTileIndices(region, map);
 					}
-				}
-			}
-		}
-		timingEnd();
-
-		timingStart('update colliders');
-		for (const map of this.maps) {
-			if (!map.dontUpdateTilesAndColliders) {
-				for (const region of map.regions) {
 					if (region.colliderDirty) {
 						generateRegionCollider(region, map);
 					}
@@ -325,9 +323,7 @@ export class World {
 
 					if (delta > 0) {
 						if (entity.vx !== 0 || entity.vy !== 0) {
-							timingStart('updatePosition()');
 							updatePosition(entity, delta, map);
-							timingEnd();
 						}
 
 						entity.timestamp = nowSeconds;
@@ -370,15 +366,15 @@ export class World {
 		timingEnd();
 
 		timingStart('timeoutEntityExpression + inTheAirDelay');
-		for (const { pony } of this.clients) {
+		for (const client of this.clients) {
 			// timeout expressions
-			if (pony.exprTimeout && pony.exprTimeout < now) {
-				setEntityExpression(pony, undefined); // NOTE: creates updates
+			if (client.pony.exprTimeout && client.pony.exprTimeout < now) {
+				setEntityExpression(client.pony, undefined); // NOTE: creates updates
 			}
 
 			// count down in-the-air delay
-			if (pony.inTheAirDelay !== undefined && pony.inTheAirDelay > 0) {
-				pony.inTheAirDelay -= deltaSeconds;
+			if (client.pony.inTheAirDelay !== undefined && client.pony.inTheAirDelay > 0) {
+				client.pony.inTheAirDelay -= deltaSeconds;
 			}
 		}
 		timingEnd();

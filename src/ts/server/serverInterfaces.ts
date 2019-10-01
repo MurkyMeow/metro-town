@@ -156,6 +156,7 @@ export interface IClient extends ClientActions, ClientExtensions {
 	characterName: string;
 	character: ICharacter;
 
+	isMobile: boolean;
 	isMod: boolean;
 	shadowed: boolean;
 	supporterLevel: number;
@@ -181,8 +182,7 @@ export interface IClient extends ClientActions, ClientExtensions {
 	safeX: number;
 	safeY: number;
 	lastPacket: number;
-	lastAction: number;
-	lastBoopAction: number;
+	lastBoopOrKissAction: number;
 	lastExpressionAction: number;
 	lastSays: LastSay[];
 	lastX: number;
@@ -278,6 +278,7 @@ export interface Controller {
 	update(delta: number, now: number): void;
 	sparseUpdate?(): void;
 	toggleWall?(x: number, y: number, type: TileType): void;
+	removeWalls?(): void;
 }
 
 export interface AccountService {

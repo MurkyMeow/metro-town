@@ -7,9 +7,9 @@ import {
 	BodyAnimationFrame as IBodyAnimationFrame,
 	HeadAnimation as IHeadAnimation,
 	HeadAnimationFrame as IHeadAnimationFrame,
-	ColorExtraSet, PonyInfo, PonyObject, BodyShadow, PonyEye
+	ColorExtraSet, PonyInfo, PonyObject, BodyShadow, PonyEye, HeadAnimationProperties
 } from '../../../common/interfaces';
-import { removeItem, repeat, isKeyEventInvalid, cloneDeep, array } from '../../../common/utils';
+import { removeItem, repeat, isKeyEventInvalid, cloneDeep, array, hasFlag } from '../../../common/utils';
 import { toPalette, createDefaultPony, syncLockedPonyInfo } from '../../../common/ponyInfo';
 import { Key } from '../../../client/input/input';
 import { defaultPonyState, defaultDrawPonyOptions } from '../../../client/ponyHelpers';
@@ -63,6 +63,8 @@ interface BodyAnimation extends BaseAnimation {
 interface HeadAnimation extends BaseAnimation {
 	lockEyes?: boolean;
 	frames: HeadAnimationFrame[];
+	dontOpenEyes?: boolean;
+	dontCloseMouth?: boolean;
 }
 
 interface AnimationsData {
@@ -201,6 +203,13 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 			if (!this.playing) {
 				if (this.mode === 'body') {
 					this.state.animationFrame = this.frame;
+
+					if (this.state.headAnimation) {
+						const headFrames = this.state.headAnimation.frames.length;
+						let headFrame = Math.floor(this.frame / this.state.animation.frames.length * headFrames);
+						headFrame = Math.min(headFrame, headFrames - 1);
+						this.state.headAnimationFrame = headFrame;
+					}
 				} else {
 					this.state.headAnimationFrame = this.frame;
 				}
@@ -459,9 +468,10 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 				console.log(`shadow: [${shadow.map(x => `[${x.join(', ')}]`).join(', ')}]`);
 			}
 		} else {
-			const animation = toHeadAnimation(this.headAnimation, true);
-			const compressed = animation.frames.map(compressHeadFrame);
-			console.log(JSON.stringify(compressed));
+			const frames = this.headAnimation.frames
+			.map(f => [f.duration, '[' + compressHeadFrame(f).join(', ') + ']'])
+			.map(([repeat, frame]) => repeat > 1 ? `...repeat(${repeat}, ${frame})` : frame);
+			console.log(`frames: [\n${frames.map(x => `\t${x}`).join(',\n')}\n]`);
 		}
 	}
 	png(scale = 1) {
@@ -531,9 +541,11 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 		if (this.playing) {
 			this.time += delta;
 
-			if (this.mode === 'body') {
+			const isBodyMode = this.mode === 'body';
+
+			if (isBodyMode) {
 				if (this.state.animation) {
-					const frame = this.time * this.state.animation.fps;
+					const frame = Math.floor(this.time * this.state.animation.fps);
 
 					if (frame > this.state.animation.frames.length && !this.state.animation.loop) {
 						this.bodyAnimationPlaying = (this.bodyAnimationPlaying + 1) % this.bodyAnimationsToPlay.length;
@@ -541,14 +553,15 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 						this.state.animationFrame = 0;
 						this.time = 0;
 					} else {
-						this.state.animationFrame = Math.floor(frame) % this.state.animation.frames.length;
+						this.state.animationFrame = frame % this.state.animation.frames.length;
 					}
 				}
-			} else {
-				if (this.state.headAnimation) {
-					const frame = Math.floor(this.time * this.state.headAnimation.fps);
-					this.state.headAnimationFrame = frame % this.state.headAnimation.frames.length;
-				}
+			}
+
+			if (this.state.headAnimation) {
+				const fps = this.state.headAnimation.fps;
+				const frame = Math.floor(this.time * fps) + (isBodyMode && !this.state.headAnimation.loop ? fps : 0);
+				this.state.headAnimationFrame = frame % this.state.headAnimation.frames.length;
 			}
 		}
 	}
@@ -564,9 +577,10 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 		return this.storage.getJSON<AnimationsData>('tools-animations', {});
 	}
 	private createAnimationSprites(scale: number) {
+		const isBodyMode = this.mode === 'body';
 		const animation = toBodyAnimation(this.bodyAnimation, true, this.switch);
 		const headAnimation = toHeadAnimation(this.headAnimation, true);
-		const frames = this.mode === 'body' ? animation.frames.length : headAnimation.frames.length;
+		const frames = isBodyMode ? animation.frames.length : headAnimation.frames.length;
 		const buffer = createCanvas(ponyWidth, ponyHeight);
 		const batch = new ContextSpriteBatch(buffer);
 		const info = toPalette(this.pony.info);
@@ -582,14 +596,23 @@ export class ToolsAnimation implements OnInit, OnDestroy {
 			const x = i % cols;
 			const y = Math.floor(i / cols);
 
+			let headFrame = 0;
+			if (isBodyMode) {
+				let animTime = i / animation.fps;
+				if (!headAnimation.loop) {
+					animTime += 1;
+				}
+				headFrame = Math.floor(animTime * headAnimation.fps);
+			}
+
 			batch.start(sprites.paletteSpriteSheet, 0);
 
 			drawPony(batch, info, {
 				...defaultPonyState(),
 				animation,
-				animationFrame: this.mode === 'body' ? i : 0,
-				headAnimation: this.mode === 'head' ? headAnimation : undefined,
-				headAnimationFrame: this.mode === 'head' ? i : 0,
+				animationFrame: isBodyMode ? i : 0,
+				headAnimation: headAnimation,
+				headAnimationFrame: isBodyMode ? headFrame : i,
 				blinkFrame: 1,
 			}, ponyWidth / 2, ponyHeight - 10, options);
 
@@ -696,7 +719,7 @@ function compressBodyFrame(f: BodyAnimationFrame): number[] {
 	], x => !x);
 }
 
-function fromHeadAnimation({ name, fps, loop, frames }: IHeadAnimation, index: number): HeadAnimation {
+function fromHeadAnimation({ name, fps, loop, properties, frames }: IHeadAnimation, index: number): HeadAnimation {
 	const fs: HeadAnimationFrame[] = [];
 
 	frames.forEach(f => {
@@ -713,18 +736,30 @@ function fromHeadAnimation({ name, fps, loop, frames }: IHeadAnimation, index: n
 		builtin: true,
 		fps,
 		loop,
+		dontOpenEyes: hasFlag(properties, HeadAnimationProperties.DontIncreaseEyeOpenness),
+		dontCloseMouth: hasFlag(properties, HeadAnimationProperties.DontDecreaseMouthOpenness),
 		name: `# builtin ${index.toString().padStart(2, '0')} # ${name}`,
 		frames: fs,
 	};
 }
 
-function toHeadAnimation({ name, frames, fps, loop }: HeadAnimation, full: boolean): IHeadAnimation {
+function toHeadAnimation({ name, frames, fps, loop, dontOpenEyes, dontCloseMouth }: HeadAnimation, full: boolean):
+	IHeadAnimation {
 	const fs = (full && !loop) ? repeat(fps, createDefaultHeadFrame()).concat(frames) : frames;
+
+	let properties = HeadAnimationProperties.None;
+	if (dontOpenEyes) {
+		properties |= HeadAnimationProperties.DontIncreaseEyeOpenness;
+	}
+	if (dontCloseMouth) {
+		properties |= HeadAnimationProperties.DontDecreaseMouthOpenness;
+	}
 
 	return {
 		name,
 		fps,
 		loop,
+		properties,
 		frames: flatMap(fs, f => repeat(full ? f.duration : 1, f)),
 	};
 }
@@ -788,6 +823,7 @@ function fixHeadAnimation(a: HeadAnimation): HeadAnimation {
 		fps: a.fps || 24,
 		loop: a.loop || false,
 		lockEyes: a.lockEyes || false,
+		dontOpenEyes: a.dontOpenEyes || false,
 		frames: (a.frames || []).map(fixHeadFrame),
 	};
 }

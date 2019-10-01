@@ -280,7 +280,7 @@ const constants = createPlainMap<() => Expression | undefined>({
 	'😆': () => expression(Eye.X, Eye.X, Muzzle.SmileOpen),
 	'😟': () => expression(Eye.Sad, Eye.Sad, Muzzle.Neutral),
 	'😠': () => expression(Eye.Angry, Eye.Angry, Muzzle.Smile),
-	'🤔': () => expression(Eye.Neutral, Eye.Frown2, Muzzle.Kiss),
+	'🤔': () => expression(Eye.Neutral, Eye.Frown2, Muzzle.Concerned),
 	'😈': () => expression(Eye.Angry, Eye.Angry, Muzzle.Smile, Iris.Up, Iris.Forward),
 	'👿': () => expression(Eye.Angry, Eye.Angry, Muzzle.SmileTeeth),
 });

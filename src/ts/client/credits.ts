@@ -91,6 +91,7 @@ export const CONTRIBUTORS: Contributors[] = [
 		group: 'Programmers',
 		contributors: [
 			{ name: 'Industrialice' },
+			{ name: 'Stubenhocker', links: ['https://twitter.com/Stubenhocker13'] },
 		],
 	},
 	{
@@ -129,6 +130,7 @@ export const CONTRIBUTORS: Contributors[] = [
 			{ name: 'Deeraw', links: ['https://www.deviantart.com/deerdraw', 'https://twitter.com/TheOnlyDeeraw'] },
 			{ name: 'Aviivix' },
 			{ name: 'SnowFl8keAnge1' },
+			{ name: '3aHo3a', links: ['http://twitter.com/imnuclearimwild'] },
 		],
 	},
 ];

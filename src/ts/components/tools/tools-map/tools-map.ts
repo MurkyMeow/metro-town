@@ -17,7 +17,7 @@ import { createCamera } from '../../../common/camera';
 import { mockPaletteManager } from '../../../common/ponyInfo';
 import { isCritter } from '../../../common/entityUtils';
 import {
-	createAnEntity, cloud, pony, apple, apple2, orange, orange2, candy, gift1, gift2, appleGreen, appleGreen2
+	createAnEntity, cloud, pony, apple, apple2, orange, orange2, candy, gift1, gift2, appleGreen, appleGreen2, bunny
 } from '../../../common/entities';
 import { drawMap } from '../../../client/draw';
 import { includes, observableToPromise, hasFlag } from '../../../common/utils';
@@ -142,7 +142,7 @@ function drawTheMap(canvas: HTMLCanvasElement, map: WorldMap, info: ToolsMapOthe
 		};
 
 		const ignoreTypes = [
-			cloud, pony, apple, apple2, appleGreen, appleGreen2, orange, orange2, candy, gift1, gift2
+			cloud, pony, apple, apple2, appleGreen, appleGreen2, orange, orange2, candy, gift1, gift2, bunny
 		].map(e => e.type);
 
 		const shouldDraw = (e: Entity) => {

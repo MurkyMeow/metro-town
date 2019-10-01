@@ -83,6 +83,13 @@ export class ActionBar {
 			this.closeActions();
 		}
 		else {
+			// if the action menu was opened from the settings dropdown, just do nothing
+			// it means you can't close that menu by clicking on this button, but it's
+			// a minor issue
+			if (document.body.classList.contains('actions-modal-opened')) {
+				return;
+			}
+
 			this.isWaitingForActionsModal = true;
 			this.modalRef = this.modalService.show(this.actionsModal, { ignoreBackdropClick: true });
 		}

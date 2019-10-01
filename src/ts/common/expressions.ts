@@ -283,7 +283,7 @@ export const expressions: [string, Result][] = [
 	['😆', [Eye.X, Eye.X, Muzzle.SmileOpen]],
 	['😟', [Eye.Sad, Eye.Sad, Muzzle.Neutral]],
 	['😠', [Eye.Angry, Eye.Angry, Muzzle.Smile]],
-	['🤔', [Eye.Neutral, Eye.Frown2, Muzzle.Kiss]],
+	['🤔', [Eye.Neutral, Eye.Frown2, Muzzle.Concerned]],
 	['😈', [Eye.Angry, Eye.Angry, Muzzle.Smile, Iris.Up, Iris.Forward]],
 	['👿', [Eye.Angry, Eye.Angry, Muzzle.SmileTeeth]],
 	// unsafe faces

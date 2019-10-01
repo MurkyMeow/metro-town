@@ -2,7 +2,7 @@ import { compact } from 'lodash';
 import {
 	Expression, ExpressionButtonAction, CommandButtonAction, ActionButtonAction, ItemButtonAction,
 	ColorShadow, Eye, Muzzle, Iris, ButtonActionSlot, ExpressionExtra, ButtonAction, ChatType, BodyAnimation,
-	Action, isPartyChat, EntityButtonAction, defaultDrawOptions
+	Action, isPartyChat, EntityButtonAction, defaultDrawOptions, HeadAnimationProperties
 } from '../common/interfaces';
 import * as sprites from '../generated/sprites';
 import { createExpression } from './clientUtils';
@@ -11,7 +11,7 @@ import { PonyTownGame } from './game';
 import { boopAction, upAction, downAction, turnHeadAction } from './playerActions';
 import { ACTIONS_LIMIT, COMMAND_ACTION_TIME_DELAY } from '../common/constants';
 import { cloneDeep, hasFlag } from '../common/utils';
-import { boop, defaultHeadFrame, stand, sneeze, yawn, lie, sit, fly, laugh, excite } from './ponyAnimations';
+import { boop, defaultHeadFrame, stand, sneeze, yawn, lie, sit, fly, laugh, kiss, excite } from './ponyAnimations';
 import { createDefaultPony, syncLockedPonyInfo, toPalette, mockPaletteManager } from '../common/ponyInfo';
 import {
 	ACTION_EXPRESSION_EYE_COLOR, ACTION_EXPRESSION_BG, ACTION_ACTION_COAT_COLOR, WHITE, HEARTS_COLOR,
@@ -118,10 +118,7 @@ const actionActions = [
 	actionButtonAction('drop', 'Drop item', Action.Drop),
 	actionButtonAction('drop-toy', 'Drop toy', Action.DropToy),
 	actionButtonAction('magic', 'Magic', Action.Magic),
-	actionButtonAction('switch-tool', 'Switch tool', Action.SwitchTool),
-	actionButtonAction('switch-entity', 'Switch item to place'),
-	actionButtonAction('switch-entity-rev', 'Switch item to place (reverse)'),
-	actionButtonAction('switch-tile', 'Switch tile to place'),
+	actionButtonAction('kiss', 'Kiss', Action.Kiss),
 ];
 
 const commandActions = [
@@ -395,7 +392,8 @@ export function drawAction(canvas: HTMLCanvasElement, action: ButtonAction | und
 				const buffer = drawCanvas(bufferSize, bufferSize, sprites.paletteSpriteSheet, undefined, batch => {
 					const state = { ...createState(), expression: action.expression };
 					const options = { ...defaultDrawPonyOptions(), noEars: true };
-					drawHead(batch, expressionPony, headX, headY, undefined, defaultHeadFrame, state, options, false, 0);
+					drawHead(batch, expressionPony, headX, headY, undefined,
+						defaultHeadFrame, HeadAnimationProperties.None, state, options, false, 0);
 
 					if (action.expression) {
 						const extra = action.expression.extra;
@@ -523,6 +521,11 @@ export function drawAction(canvas: HTMLCanvasElement, action: ButtonAction | und
 								const state = { ...createState(), headAnimation: laugh, headAnimationFrame: 3 };
 								drawPony(batch, actionPonyWithHorn, state, 17, 48, defaultDrawPonyOptions());
 								batch.drawSprite(sprites.magic_icon, WHITE, defaultPalette, 4, 2);
+								break;
+							}
+							case 'kiss': {
+								const state = { ...createState(), headAnimation: kiss, headAnimationFrame: 9 };
+								drawPony(batch, actionPony, state, 17, 40, defaultDrawPonyOptions());
 								break;
 							}
 							case 'switch-tool': {

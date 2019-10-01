@@ -8,6 +8,7 @@ import { oauthProviders } from '../../../client/data';
 import { Model } from '../../services/model';
 import { getProviderIcon } from '../../shared/sign-in-box/sign-in-box';
 import { faStar, faExclamationCircle, faSync } from '../../../client/icons';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'account',
@@ -33,9 +34,10 @@ export class Account implements OnInit, OnDestroy {
 	removedAccount?: boolean;
 	accountError?: string;
 	accountSaved = false;
+	isNewAccount = false;
 	hides: HiddenPlayer[] | undefined = undefined;
 	page = 0;
-	constructor(private model: Model) {
+	constructor(private model: Model, private router: Router) {
 	}
 	ngOnInit() {
 		const account = this.account!;
@@ -44,6 +46,7 @@ export class Account implements OnInit, OnDestroy {
 			name: account.name,
 			birthdate: account.birthdate,
 		};
+		this.isNewAccount = account.birthdate === '';
 
 		this.pageChanged();
 	}
@@ -88,6 +91,9 @@ export class Account implements OnInit, OnDestroy {
 	get showAccountAlert() {
 		return this.model.missingBirthdate;
 	}
+	get saveButtonText() {
+		return this.isNewAccount ? 'Save and continue' : 'Save';
+	}
 	icon(id: string) {
 		return getProviderIcon(id);
 	}
@@ -98,6 +104,9 @@ export class Account implements OnInit, OnDestroy {
 			this.model.updateAccount(this.data)
 				.catch((e: Error) => this.accountError = e.message)
 				.then(() => this.accountSaved = true);
+			if (this.isNewAccount) {
+				this.router.navigate(['home']);
+			}
 		}
 	}
 	removeSite(site: SocialSiteInfo) {

@@ -142,7 +142,7 @@ const exampleCM = [
 	BLUE, BLUE, BLUE, BLUE, BLUE,
 ];
 
-const frontLegsCount = 39;
+const frontLegsCount = 40;
 const backLegsCount = 27;
 
 const frontLegsSheet = {
