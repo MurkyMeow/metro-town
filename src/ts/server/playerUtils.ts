@@ -836,7 +836,7 @@ export function switchTool(client: IClient, reverse: boolean) {
 		const newIndex = reverse ? (index === -1 ? tools.length - 1 : index - 1) : ((index + 1) % tools.length);
 		const tool = tools[newIndex];
 		holdItem(client.pony, tool.type);
-		console.log('isMobile ' + client.isMobile);
+		// console.log('isMobile ' + client.isMobile);
 		const text = (client.isMobile && tool.textMobile) ? tool.textMobile : tool.text;
 		saySystem(client, text);
 	}
