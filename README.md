@@ -342,6 +342,26 @@ Read more about it [here](https://stackoverflow.com/questions/1139762/ignore-fil
 
 ## Changelog
 
+### Pony.Town v0.55.0
+- Added Kiss action
+- Added being able to extinguish torches by sneezing
+- Fixed house tool instructions saying "use mouse wheel" on mobile
+- Fixed being able to open two actions menus in some cases
+- Fixed actions menu button getting disabled by closing actions menu with the Escape key
+- Fixed Yawn and Sneeze animations glitching with some eye styles
+- Fixed :thinking: expression being inconsistent with /thinking command
+- Fixed flying entities slowing down when flying over water
+- Fixed jack-o'-lantern not turning off during the day
+- Fixed some UI issues
+
+- Added combining of head and body animations in the Animation tool
+- Added flag to not allow closing mouths in Animation tool
+- Fixed issue with gif preview in Animation tool
+- Added a front leg frame
+- Added Save button in account settings automatically redirecting to Home for new accounts
+- Updated Help page to provide more workarounds for users who experience game showing black screen
+- Updated contributor list
+
 ### Pony.Town v0.54.0
 - Added a separate logo file for Visit Pony Town button
 - Fixed users not being able to close actions menu in some cases

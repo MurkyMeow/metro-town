@@ -34,8 +34,8 @@ creator(s):
 	SnowFl8keAnge1
 
 
-Pony Town's art assets are released under the CC BY-NC 4.0 non-commercial license. 
-The assets cannot be used for commercial purposes in any way including crowdfunding such as Patreon or PayPal donations without permission. 
+Pony Town's art assets are released under the CC BY-NC 4.0 non-commercial license.
+The assets cannot be used for commercial purposes in any way including crowdfunding such as Patreon or PayPal donations without permission.
 To discuss licensing, contact ponytownhelp@gmail.com.
 
 

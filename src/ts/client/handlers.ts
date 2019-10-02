@@ -14,7 +14,8 @@ import { getPonyState, setPonyState, isPonyFlying, addChatBubble, isHidden } fro
 import {
 	isPony, createPony, setPonyExpression, updatePonyInfo, updatePonyHold, doPonyAction, hasHeadAnimation,
 	setHeadAnimation,
-	doBoopPonyAction
+	doBoopPonyAction,
+	isPonyBug
 } from '../common/pony';
 import { PonyTownGame } from './game';
 import { setupPlayer, savePlayerPosition } from './sec';
@@ -25,7 +26,7 @@ import { decodeUpdate, readOneUpdate } from '../common/encoders/updateDecoder';
 import { updateEntityVelocity } from '../common/entityUtils';
 import { decodePonyInfo } from '../common/compressPony';
 import { mockPaletteManager } from '../common/ponyInfo';
-import { yawn, laugh, sneeze, excite } from './ponyAnimations';
+import { yawn, laugh, sneeze, kiss, kissFly, kissFlyBug, excite } from './ponyAnimations';
 import {
 	findEntityById, getRegionGlobal, setTile, removeEntity, addEntity, removeEntityDirectly, setRegion,
 	addEntityToMapRegion, switchEntityRegion, getRegionUnsafe, addOrRemoveFromEntityList,
@@ -418,6 +419,22 @@ export function handleAction(game: PonyTownGame, id: number, action: Action) {
 			case Action.Excite:
 				if (!hasHeadAnimation(pony)) {
 					setHeadAnimation(pony, excite);
+				}
+				break;
+			case Action.Kiss:
+				if (!pony.ponyState.headTurned) {
+					doPonyAction(pony, DoAction.Kiss);
+				}
+				if (isPonyFlying(pony)) {
+					if (isPonyBug(pony)) {
+						setHeadAnimation(pony, kissFlyBug);
+					}
+					else {
+						setHeadAnimation(pony, kissFly);
+					}
+				}
+				else {
+					setHeadAnimation(pony, kiss);
 				}
 				break;
 			default:

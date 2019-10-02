@@ -10,8 +10,8 @@ import {
 } from '../common/utils';
 import { CharacterState, ServerConfig, AccountState, CharacterStateFlags, GameServerSettings } from '../common/adminInterfaces';
 import {
-	EntityState, Expression, PonyOptions, Action, ExpressionExtra, Eye, Muzzle, CLOSED_MUZZLES,
-	isExpressionAction, EntityPlayerState, UpdateFlags, InteractAction
+	EntityState, Expression, PonyOptions, Action, ExpressionExtra, Eye, Muzzle, getMuzzleOpenness,
+	isExpressionAction, EntityPlayerState, UpdateFlags, InteractAction, Rect
 } from '../common/interfaces';
 import { encodeExpression, EMPTY_EXPRESSION, decodeExpression } from '../common/encoders/expressionEncoder';
 import { EXPRESSION_TIMEOUT, DAY, FLY_DELAY, SECOND, PONY_TYPE } from '../common/constants';
@@ -31,7 +31,7 @@ import {
 import { replaceEmojis } from '../client/emoji';
 import { expression, parseExpression } from '../common/expressionUtils';
 import {
-	canBoop2, isPonySitting, isPonyStanding, getBoopRect, canStand, isPonyFlying, setPonyState, canSit, canLie
+	canBoopOrKiss, isPonySitting, isPonyStanding, getBoopRect, canStand, isPonyFlying, setPonyState, canSit, canLie, getkissRect, getSneezeRect
 } from '../common/entityUtils';
 import { withBorder } from '../common/rect';
 import { isOnlineFriend } from './services/friends';
@@ -75,6 +75,17 @@ export function updateClientCharacter(client: IClient, character: ICharacter) {
 	client.characterName = replaceEmojis(client.character.name);
 }
 
+function isMobileUserAgent(userAgent?: string) {
+	if (!userAgent) {
+		return false;
+	}
+	return userAgent.includes('Android') ||
+		userAgent.includes('iPhone') ||
+		userAgent.includes('iPad') ||
+		userAgent.includes('iPod') ||
+		userAgent.includes('Windows Phone');
+}
+
 export function createClient(
 	client: IClient, account: IAccount, friends: string[], hides: string[], character: ICharacter, pony: ServerEntity,
 	defaultMap: ServerMap, reporter: Reporter, origin: IOriginInfo | undefined
@@ -85,6 +96,7 @@ export function createClient(
 	client.country = origin && origin.country || '??';
 	client.userAgent = client.originalRequest && client.originalRequest.headers['user-agent'];
 
+	client.isMobile = isMobileUserAgent(client.userAgent);
 	client.accountId = account._id.toString();
 	client.accountName = account.name;
 	client.ignores = new Set(account.ignores);
@@ -117,8 +129,7 @@ export function createClient(
 	client.safeY = pony.y;
 
 	client.lastPacket = Date.now();
-	client.lastAction = 0;
-	client.lastBoopAction = 0;
+	client.lastBoopOrKissAction = 0;
 	client.lastExpressionAction = 0;
 	client.lastSays = [];
 	client.lastX = pony.x;
@@ -307,7 +318,7 @@ export function parseOrCurrentExpression(pony: ServerEntity, message: string) {
 export function playerSleep(pony: ServerEntity, args = '') {
 	if (pony.vx === 0 && pony.vy === 0) {
 		const base = parseOrCurrentExpression(pony, args) || expression(Eye.Closed, Eye.Closed, Muzzle.Neutral);
-		const muzzle = CLOSED_MUZZLES.indexOf(base.muzzle) !== -1 ? base.muzzle : Muzzle.Neutral;
+		const muzzle = getMuzzleOpenness(base.muzzle) === 0 ? base.muzzle : Muzzle.Neutral;
 		const expr = { ...base, muzzle, left: Eye.Closed, right: Eye.Closed, extra: ExpressionExtra.Zzz };
 		setEntityExpression(pony, expr, 0, true);
 	}
@@ -397,7 +408,8 @@ export function useHeldItem(client: IClient) {
 }
 
 export function canPerformAction(client: IClient) {
-	return client.lastAction < Date.now();
+	const now = Date.now();
+	return client.lastExpressionAction < now && client.lastBoopOrKissAction < now;
 }
 
 export function updateEntityPlayerState(client: IClient, entity: ServerEntity) {
@@ -416,53 +428,72 @@ export function turnHead(client: IClient) {
 const purpleGrapeTypes = entities.grapesPurple.map(x => x.type);
 const greenGrapeTypes = entities.grapesGreen.map(x => x.type);
 
-export function boop(client: IClient, now: number) {
-	if (canPerformAction(client) && canBoop2(client.pony) && client.lastBoopAction < now) {
-		cancelEntityExpression(client.pony);
-		sendAction(client.pony, Action.Boop);
+function boopEntity(client: IClient, rect: Rect, isOnlyBooping: boolean) {
+	if (!client.shadowed && (isPonySitting(client.pony) || isPonyStanding(client.pony))) {
+		const boopBounds = withBorder(rect, 1);
+		const entities = findEntitiesInBounds(client.map, boopBounds);
+		const entity = entities.find(e => canBoopEntity(e, rect));
 
-		if (!client.shadowed && (isPonySitting(client.pony) || isPonyStanding(client.pony))) {
-			const boopRect = getBoopRect(client.pony);
-			const boopBounds = withBorder(boopRect, 1);
-			const entities = findEntitiesInBounds(client.map, boopBounds);
-			const entity = entities.find(e => canBoopEntity(e, boopRect));
+		if (entity) {
+			if (entity.boop) {
+				entity.boop(client);
+			} else if (!isOnlyBooping && entity.type === PONY_TYPE) {
+				const clientHold = client.pony.options!.hold || 0;
 
-			if (entity) {
-				if (entity.boop) {
-					entity.boop(client);
-				} else if (entity.type === PONY_TYPE) {
-					const clientHold = client.pony.options!.hold || 0;
+				if (isHoldingGrapes(entity) && clientHold !== grapeGreen.type && clientHold !== grapePurple.type) {
+					let index = purpleGrapeTypes.indexOf(entity.options!.hold || 0);
 
-					if (isHoldingGrapes(entity) && clientHold !== grapeGreen.type && clientHold !== grapePurple.type) {
-						let index = purpleGrapeTypes.indexOf(entity.options!.hold || 0);
+					if (index !== -1) {
+						holdItem(client.pony, grapePurple.type);
+
+						if (index === (purpleGrapeTypes.length - 1)) {
+							unholdItem(entity);
+						} else {
+							holdItem(entity, purpleGrapeTypes[index + 1]);
+						}
+					} else {
+						let index = greenGrapeTypes.indexOf(entity.options!.hold || 0);
 
 						if (index !== -1) {
-							holdItem(client.pony, grapePurple.type);
+							holdItem(client.pony, grapeGreen.type);
 
-							if (index === (purpleGrapeTypes.length - 1)) {
+							if (index === (greenGrapeTypes.length - 1)) {
 								unholdItem(entity);
 							} else {
-								holdItem(entity, purpleGrapeTypes[index + 1]);
-							}
-						} else {
-							let index = greenGrapeTypes.indexOf(entity.options!.hold || 0);
-
-							if (index !== -1) {
-								holdItem(client.pony, grapeGreen.type);
-
-								if (index === (greenGrapeTypes.length - 1)) {
-									unholdItem(entity);
-								} else {
-									holdItem(entity, greenGrapeTypes[index + 1]);
-								}
+								holdItem(entity, greenGrapeTypes[index + 1]);
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+}
 
-		client.lastBoopAction = now + 500;
+export function boop(client: IClient, now: number) {
+	if (canPerformAction(client) && canBoopOrKiss(client.pony)) {
+		cancelEntityExpression(client.pony);
+		sendAction(client.pony, Action.Boop);
+		boopEntity(client, getBoopRect(client.pony), false);
+		client.lastBoopOrKissAction = now + 850;
+	}
+}
+
+export function kiss(client: IClient, now: number) {
+	if (canPerformAction(client) && canBoopOrKiss(client.pony)) {
+		cancelEntityExpression(client.pony);
+		sendAction(client.pony, Action.Kiss);
+		boopEntity(client, getkissRect(client.pony), false);
+		client.lastBoopOrKissAction = now + 3350;
+	}
+}
+
+export function sneeze(client: IClient) {
+	if (canPerformAction(client)) {
+		cancelEntityExpression(client.pony);
+		sendAction(client.pony, Action.Sneeze);
+		boopEntity(client, getSneezeRect(client.pony), true);
+		client.lastExpressionAction = Date.now() + 750;
 	}
 }
 
@@ -526,10 +557,10 @@ export function fly(client: IClient) {
 }
 
 export function expressionAction(client: IClient, action: Action) {
-	if (canPerformAction(client) && isExpressionAction(action) && client.lastExpressionAction < Date.now()) {
+	if (canPerformAction(client) && isExpressionAction(action)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, action);
-		client.lastExpressionAction = Date.now() + 500;
+		client.lastExpressionAction = Date.now() + 750;
 	}
 }
 
@@ -729,6 +760,9 @@ export function execAction(client: IClient, action: Action, settings: GameServer
 		case Action.TurnHead:
 			turnHead(client);
 			break;
+		case Action.Sneeze:
+			sneeze(client);
+			break;
 		case Action.Stand:
 			stand(client);
 			break;
@@ -766,6 +800,9 @@ export function execAction(client: IClient, action: Action, settings: GameServer
 				updateEntityState(client.pony, setFlag(client.pony.state, EntityState.Magic, !has));
 			}
 			break;
+		case Action.Kiss:
+			kiss(client, Date.now());
+			break;
 		case Action.SwitchTool:
 			switchTool(client, false);
 			break;
@@ -799,7 +836,9 @@ export function switchTool(client: IClient, reverse: boolean) {
 		const newIndex = reverse ? (index === -1 ? tools.length - 1 : index - 1) : ((index + 1) % tools.length);
 		const tool = tools[newIndex];
 		holdItem(client.pony, tool.type);
-		saySystem(client, tool.text);
+		// console.log('isMobile ' + client.isMobile);
+		const text = (client.isMobile && tool.textMobile) ? tool.textMobile : tool.text;
+		saySystem(client, text);
 	}
 }
 

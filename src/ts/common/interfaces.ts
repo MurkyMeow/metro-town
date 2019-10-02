@@ -566,6 +566,7 @@ export const enum DoAction {
 	Boop,
 	Swing,
 	HoldPoof,
+	Kiss,
 }
 
 export interface Pony extends Entity {
@@ -1098,6 +1099,7 @@ export const enum Action {
 	RequestEntityInfo,
 	ACL,
 	Magic,
+	Kiss,
 	RemoveEntity,
 	PlaceEntity,
 	SwitchTool,
@@ -1221,6 +1223,7 @@ export interface SpriteSet<T> extends SpriteSetBase {
 }
 
 export interface PonyInfoBase<T, SET> {
+	//body: SET | undefined;
 	head: SET | undefined;
 	nose: SET | undefined;
 	ears: SET | undefined;
@@ -1387,10 +1390,17 @@ export interface HeadAnimationFrame {
 	mouth: Muzzle;
 }
 
+export const enum HeadAnimationProperties {
+	None = 0,
+	DontIncreaseEyeOpenness = 1,
+	DontDecreaseMouthOpenness = 2
+}
+
 export interface HeadAnimation {
 	name: string;
 	loop: boolean;
 	fps: number;
+	properties: HeadAnimationProperties;
 	frames: HeadAnimationFrame[];
 }
 
@@ -1548,10 +1558,44 @@ export const enum Muzzle {
 	// max: 31
 }
 
-export const CLOSED_MUZZLES = [
-	Muzzle.Smile, Muzzle.Frown, Muzzle.Neutral, Muzzle.Scrunch, Muzzle.Flat, Muzzle.Concerned,
-	Muzzle.Kiss, Muzzle.Kiss2,
-];
+export function getMuzzleOpenness(muzzle: Muzzle) {
+	switch (muzzle) {
+		case Muzzle.Smile:
+		case Muzzle.Frown:
+		case Muzzle.Neutral:
+		case Muzzle.Scrunch:
+		case Muzzle.Blep:
+		case Muzzle.Flat:
+		case Muzzle.Concerned:
+		case Muzzle.Kiss:
+		case Muzzle.Kiss2:
+		case Muzzle.FlatBlep:
+			return 0;
+		case Muzzle.SmileOpen:
+		case Muzzle.ConcernedOpen:
+		case Muzzle.FrownOpen:
+		case Muzzle.NeutralOpen2:
+		case Muzzle.SmileTeeth:
+		case Muzzle.FrownTeeth:
+		case Muzzle.NeutralTeeth:
+		case Muzzle.ConcernedTeeth:
+		case Muzzle.Oh:
+			return 1;
+		case Muzzle.SmileOpen2:
+			return 2;
+		case Muzzle.ConcernedOpen2:
+		case Muzzle.SmileOpen3:
+		case Muzzle.NeutralOpen3:
+		case Muzzle.SmilePant:
+		case Muzzle.NeutralPant:
+			return 3;
+		case Muzzle.ConcernedOpen3:
+			return 4;
+		default:
+			console.error('unregistered muzzle in getMuzzleOpenness');
+			return 0;
+	}
+}
 
 export const enum Eye {
 	None = 0,
@@ -1582,10 +1626,43 @@ export const enum Eye {
 	// max: 31
 }
 
-export function isEyeSleeping(eye: Eye) {
-	return eye === Eye.Closed ||
-		(eye >= Eye.Lines && eye <= Eye.ClosedHappy) ||
-		(eye >= Eye.Peaceful && eye <= Eye.X2);
+export function getEyeOpenness(eye: Eye) {
+	switch (eye) {
+		case Eye.None:
+		case Eye.Closed:
+		case Eye.ClosedHappy:
+		case Eye.ClosedHappy2:
+		case Eye.ClosedHappy3:
+		case Eye.Lines:
+		case Eye.Peaceful:
+		case Eye.Peaceful2:
+		case Eye.X:
+		case Eye.X2:
+			return 0;
+		case Eye.Neutral5:
+		case Eye.Frown4:
+			return 1;
+		case Eye.Neutral4:
+		case Eye.Frown3:
+		case Eye.Sad4:
+			return 2;
+		case Eye.Neutral3:
+		case Eye.Frown2:
+		case Eye.Sad3:
+		case Eye.Angry2:
+			return 3;
+		case Eye.Neutral2:
+		case Eye.Sad2:
+		case Eye.Angry:
+		case Eye.Frown:
+			return 4;
+		case Eye.Neutral:
+		case Eye.Sad:
+			return 5;
+		default:
+			console.error('unregistered eye in getEyeOpenness');
+			return 5;
+	}
 }
 
 export const enum Iris {

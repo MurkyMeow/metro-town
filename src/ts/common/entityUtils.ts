@@ -60,6 +60,18 @@ export function getBoopRect(entity: Entity) {
 	return rect(entity.x + (right ? 0.6 : -0.9) * (sitting ? 0.6 : 1), entity.y - 0.2, 0.3, 0.4);
 }
 
+export function getkissRect(entity: Entity) {
+	const right = hasFlag(entity.state, EntityState.FacingRight);
+	const sitting = isPonySitting(entity);
+	return rect(entity.x + (right ? 0.4 : -0.8) * (sitting ? 0.6 : 1), entity.y - 0.225, 0.4, 0.45);
+}
+
+export function getSneezeRect(entity: Entity) {
+	const right = hasFlag(entity.state, EntityState.FacingRight);
+	const sitting = isPonySitting(entity);
+	return rect(entity.x + (right ? 0.45 : -0.95) * (sitting ? 0.6 : 1), entity.y - 0.25, 0.6, 0.5);
+}
+
 export function isMoving(entity: Entity) {
 	return entity.vx !== 0 || entity.vy !== 0;
 }
@@ -126,7 +138,7 @@ export function canBoop(pony: Pony) {
 	return isIdle(pony);
 }
 
-export function canBoop2(entity: Entity) {
+export function canBoopOrKiss(entity: Entity) {
 	return !isMoving(entity) && (isPonyStanding(entity) || isPonySitting(entity) || isPonyLying(entity) || isPonyFlying(entity));
 }
 

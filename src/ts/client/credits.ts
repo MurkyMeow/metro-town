@@ -64,7 +64,7 @@ export const CREDITS: Credit[] = [
 		name: 'Stubenhocker',
 		title: 'Programmer',
 		avatarIndex: 6,
-		links: ['https://github.com/Stubenhocker1399']
+		links: ['https://github.com/Stubenhocker1399', 'https://twitter.com/Stubenhocker13']
 	},
 	{
 		name: 'Terncode',
@@ -129,6 +129,7 @@ export const CONTRIBUTORS: Contributors[] = [
 			{ name: 'Deeraw', links: ['https://www.deviantart.com/deerdraw', 'https://twitter.com/TheOnlyDeeraw'] },
 			{ name: 'Aviivix' },
 			{ name: 'SnowFl8keAnge1' },
+			{ name: '3aHo3a', links: ['https://twitter.com/imnuclearimwild'] },
 		],
 	},
 ];

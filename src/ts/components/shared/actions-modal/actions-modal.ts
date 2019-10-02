@@ -94,6 +94,7 @@ export class ActionsModal implements OnInit, OnDestroy {
 		this.game.editingActions = false;
 		clearInterval(this.interval);
 		this.subscription && this.subscription.unsubscribe();
+		this.close.emit(); // need to emit in case the menu wasn't closed with the Close button
 		this.notify.emit();
 	}
 	ok() {

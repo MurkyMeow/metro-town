@@ -1,4 +1,4 @@
-import { BodyAnimation, BodyAnimationFrame, HeadAnimation, HeadAnimationFrame, BodyShadow } from '../common/interfaces';
+import { BodyAnimation, BodyAnimationFrame, HeadAnimation, HeadAnimationFrame, BodyShadow, HeadAnimationProperties } from '../common/interfaces';
 import { repeat, flatten } from '../common/utils';
 
 // body animations
@@ -23,7 +23,7 @@ export function createBodyAnimation(
 	name: string, fps: number, loop: boolean, frames: number[][], shadowOffsets?: number[][]
 ): Readonly<BodyAnimation> {
 	if (shadowOffsets && shadowOffsets.length !== frames.length) {
-		throw new Error(`Incorrect frame count for shadowOffsets for ${name}`);
+		throw new Error(`Incorrect frame count for shadowOffsets for ${name}, animation frames ${frames.length}, shadow frames ${shadowOffsets.length}`);
 	}
 
 	const shadow = shadowOffsets && shadowOffsets.map<BodyShadow>(([frame, offset]) => ({ frame, offset }));
@@ -459,14 +459,163 @@ export const swing = createBodyAnimation('swing', 12, false, [
 	...repeat(3, [2, 1, 0, 0, 12, 17, 11, 11, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1]),
 ]);
 
-export const flyAnims = [undefined, fly, fly, fly, flyBug];
+export const kissBody = createBodyAnimation('kiss-body', 24, false, [
+	...repeat(3, [2, 1, 0, 0, 1, 1, 1, 1, -1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1]),
+	[2, 1, 1, 0, 28, 28, 18, 18, -2, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1],
+	[2, 1, 1, 0, 26, 26, 19, 19, -3, 0, -1, 1, 1, -1, 1, -1, 1, -1, 1, -1],
+	...repeat(2, [5, 1, 1, 0, 26, 26, 19, 19, -10, -6, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1]),
+	...repeat(60, [5, 1, 1, 0, 27, 27, 20, 20, -11, -6, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1]),
+	...repeat(2, [5, 1, 1, 0, 26, 26, 19, 19, -10, -6, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1]),
+	[5, 1, 1, 0, 28, 28, 18, 18, -9, -5, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1],
+	...repeat(2, [2, 1, 1, 0, 1, 1, 1, 1, -1, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1])
+]);
+
+export const kissLiftHoofBody = createBodyAnimation('kiss-lift-hoof-body', 24, false, [
+	...repeat(3, [2, 1, 0, 0, 1, 1, 1, 1, -1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1]),
+	[2, 1, 1, 0, 28, 28, 18, 18, -2, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1],
+	[2, 1, 1, 0, 27, 26, 19, 19, -3, 0, -1, 1, 1, -1, 1, -1, 1, -1, 1, -1],
+	...repeat(2, [5, 1, 1, 0, 8, 26, 19, 19, -10, -6, 1, 0, 1, 2, 1, 1, 1, -1, 1, -1]),
+	...repeat(60, [5, 1, 1, 0, 8, 27, 20, 20, -11, -6, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1]),
+	...repeat(2, [5, 1, 1, 0, 8, 26, 19, 19, -10, -6, 1, 0, 1, 2, 1, 1, 1, -1, 1, -1]),
+	[5, 1, 1, 0, 28, 28, 18, 18, -9, -5, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1],
+	...repeat(2, [2, 1, 1, 0, 1, 1, 1, 1, -1, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1])
+]);
+
+export const kissFlyBody = createBodyAnimation('kiss-fly-body', 16, false, [
+	[1, 1, 3, 0, 8, 10, 6, 5, 0, -16],
+	[1, 1, 4, 0, 8, 10, 6, 5, 0, -15],
+	[1, 1, 5, 0, 8, 10, 6, 5, 0, -14],
+	[1, 1, 6, 0, 8, 10, 6, 5, 0, -14],
+	[1, 1, 7, 0, 8, 10, 6, 5, -1, -15],
+	[1, 1, 8, 0, 9, 10, 5, 5, -1, -17, -1],
+	[1, 1, 9, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 10, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 11, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 12, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 6, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 7, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 8, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 9, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 10, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 11, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 12, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 6, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 7, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 8, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 9, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 10, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 11, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 12, 0, 9, 10, 4, 4, 0, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 8, 10, 5, 4, 0, -16, 0, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 8, 10, 6, 5, 0, -15]
+]);
+
+export const kissFlyBugBody = createBodyAnimation('kiss-fly-bug-body', 24, false, [
+	[1, 1, 3, 0, 8, 10, 6, 5, 0, -16],
+	[1, 1, 4, 0, 8, 10, 6, 5, 0, -16],
+	[1, 1, 5, 0, 8, 10, 6, 5, 0, -15],
+	[1, 1, 4, 0, 8, 10, 6, 5, 0, -15],
+	[1, 1, 3, 0, 8, 10, 6, 5, -1, -14],
+	[1, 1, 4, 0, 9, 10, 5, 5, -1, -14],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -14, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -15, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -16, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 3, 0, 9, 10, 4, 4, -1, -18, -1, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 9, 10, 4, 4, 0, -17, -1, 0, 0, 0, 0, -1],
+	[1, 1, 5, 0, 8, 10, 5, 4, 0, -17, 0, 0, 0, 0, 0, -1],
+	[1, 1, 4, 0, 8, 10, 6, 5, 0, -17]
+]);
+
+export const kissLieBody = createBodyAnimation('kiss-lie-body', 24, false, [
+	...repeat(3, [14, 1, 0, 2, 38, 38, 26, 26]),
+	...repeat(2, [15, 1, 0, 2, 38, 38, 26, 26]),
+	[13, 1, 0, 2, 38, 38, 26, 26, 0, 0, -1],
+	...repeat(2, [13, 1, 0, 2, 38, 38, 26, 26, -1, 0, -1, 0, 1, 0, 1, 0, 1, 0, 1]),
+	...repeat(57, [13, 1, 0, 2, 38, 38, 26, 26, -1, 0, -2, 0, 1, 0, 1, 0, 1, 0, 1]),
+	...repeat(2, [13, 1, 0, 2, 38, 38, 26, 26, 0, 0, -2]),
+	[13, 1, 0, 2, 38, 38, 26, 26, 0, 0, -1],
+	...repeat(2, [14, 1, 0, 2, 38, 38, 26, 26, 0, 0, -1]),
+	...repeat(2, [14, 1, 0, 2, 38, 38, 26, 26])
+], [...repeat(72, [3, 3])]);
+
+export const kissSitBody = createBodyAnimation('kiss-sit-body', 24, false, [
+	...repeat(3, [8, 1, 2, 2, 34, 34, 25, 25]),
+	...repeat(2, [9, 1, 2, 2, 34, 34, 26, 26]),
+	[9, 1, 2, 2, 34, 34, 26, 26, 0, -1, -1, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+	...repeat(2, [9, 1, 2, 2, 39, 39, 26, 26, -1, -1, -1, 0, 0, 1, 0, 1, 1, 1, 1, 1]),
+	...repeat(60, [9, 1, 2, 2, 39, 39, 26, 26, -1, -1, -2, 0, 0, 1, 0, 1, 1, 1, 1, 1]),
+	...repeat(2, [9, 1, 2, 2, 34, 34, 26, 26, 0, -1, -2, 0, 0, 1, 0, 1, 0, 1, 0, 1]),
+	...repeat(2, [9, 1, 2, 2, 34, 34, 26, 26, 0, 0, -1])
+], [...repeat(72, [0, 6])]);
+
+export const kissSwimBody = createBodyAnimation('kiss-swim-body', 8, false, [
+	...repeat(2, [1, 1, 0, 0, 8, 10, 6, 5, 0, 14]),
+	[1, 1, 0, 0, 9, 10, 5, 5, -1, 13],
+	[1, 1, 0, 0, 9, 10, 4, 4, -1, 13, -1, 0, 0, 0, 0, -1],
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 12, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 13, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 14, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 13, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 12, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 13, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 14, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 13, -1, 0, 0, 0, 0, -1]),
+	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 12, -1, 0, 0, 0, 0, -1]),
+	[1, 1, 0, 0, 8, 10, 4, 4, 0, 13, -1, 0, 0, 0, 0, -1],
+	[1, 1, 0, 0, 8, 10, 5, 5, 0, 13]
+]);
+
+export const kissToTrot = createBodyAnimation('kiss-to-trot-body', 24, false, [
+	[2, 1, 0, 0, 8, 4, 19, 4, -1, 0, -1, 1, 0, 0, 0, 0, 1, -1],
+	[1, 1, 0, 0, 12, 5, 13, 5, 0, -2],
+	[1, 1, 0, 0, 14, 6, 14, 6, 0, -2],
+	[1, 1, 0, 0, 15, 7, 15, 7, 0, -2],
+	[1, 1, 0, 0, 16, 8, 16, 8, 0, -1],
+	[1, 1, 0, 0, 17, 9, 17, 9]
+]);
+
+export const flyAnims = [undefined, fly, fly, fly, flyBug, kissFlyBody, kissFlyBugBody];
 export const flyUpAnims = [undefined, flyUp, flyUp, flyUp, flyUpBug];
 export const flyDownAnims = [undefined, flyDown, flyDown, flyDown, flyDownBug];
 
 export const animations = [
 	stand, trot, boop, boopSit, boopLie, boopSwim, boopFly, boopFlyBug, sit, sitDown, standUp, lie, lieDown, sitUp,
 	fly, flyBug, flyUp, flyUpBug, flyDown, flyDownBug, sitToTrot, lieToTrot, flyToTrot, flyToTrotBug,
-	swim, trotToSwim, swimToTrot, flyToSwim, swimToFly,
+	swim, trotToSwim, swimToTrot, flyToSwim, swimToFly, kissBody, kissLiftHoofBody, kissFlyBody, kissFlyBugBody, kissLieBody,
+	kissSitBody, kissSwimBody, kissToTrot
 ];
 
 export const sitDownUp = mergeAnimations('sit', 24, false, [...repeat(12, stand), sitDown, ...repeat(12, sit), standUp]);
@@ -488,8 +637,12 @@ export function createHeadFrame([headX = 0, headY = 0, left = 0, right = 0, mout
 	return { headX, headY, left, right, mouth };
 }
 
-export function createHeadAnimation(name: string, fps: number, loop: boolean, frames: number[][]): HeadAnimation {
-	return { name, fps, loop, frames: frames.map(createHeadFrame) };
+export function createHeadAnimation(name: string, fps: number, loop: boolean, frames: number[][],
+	properties?: HeadAnimationProperties): HeadAnimation {
+	if (!properties) {
+		properties = HeadAnimationProperties.None;
+	}
+	return { name, fps, loop, properties, frames: frames.map(createHeadFrame) };
 }
 
 export const smile = createHeadAnimation('smile', 24, true, [
@@ -510,7 +663,7 @@ export const yawn = createHeadAnimation('yawn', 12, false, [
 	...repeat(18, [1, -1, 12, 12, 16]),
 	...repeat(8, [0, 0, 12, 12, 12]),
 	[0, 0, 18, 18, 2],
-]);
+], HeadAnimationProperties.DontIncreaseEyeOpenness);
 
 export const surprise = createHeadAnimation('surprise', 8, false, [
 	[0, 1, 6, 6, 1],
@@ -538,7 +691,7 @@ export const sneeze = createHeadAnimation('sneeze', 12, false, [
 	...repeat(2, [1, -1, 18, 18, 16]),
 	...repeat(8, [-1, 1, 23, 23, 13]),
 	...repeat(4, [0, 0, 18, 18, 7]),
-]);
+], HeadAnimationProperties.DontIncreaseEyeOpenness);
 
 export const happy_tongue = createHeadAnimation('happy_tongue', 12, false, [
 	...repeat(3, [0, 0, 1, 1, 0]),
@@ -558,8 +711,32 @@ export const happy_tongue_meno_2 = createHeadAnimation('happy_tongue_meno_2', 12
 	...repeat(8, [0, 0, 11, 11, 4]),
 ]);
 
+export const kiss = createHeadAnimation('kiss', 24, false, [
+	...repeat(2, [0, 0, 1, 1, 0]),
+	...repeat(2, [0, 0, 3, 3, 0]),
+	...repeat(63, [0, 0, 6, 6, 13]),
+	[0, 0, 3, 3, 17],
+	[0, 0, 1, 1, 0]
+], HeadAnimationProperties.DontIncreaseEyeOpenness);
+
+export const kissFly = createHeadAnimation('kiss-fly', 24, false, [
+	...repeat(2, [0, 0, 1, 1, 0]),
+	...repeat(2, [0, 0, 3, 3, 0]),
+	...repeat(38, [0, 0, 6, 6, 13]),
+	[0, 0, 3, 3, 17],
+	[0, 0, 1, 1, 0]
+], HeadAnimationProperties.DontIncreaseEyeOpenness);
+
+export const kissFlyBug = createHeadAnimation('kiss-fly-bug', 24, false, [
+	...repeat(2, [0, 0, 1, 1, 0]),
+	...repeat(2, [0, 0, 3, 3, 0]),
+	...repeat(35, [0, 0, 6, 6, 13]),
+	[0, 0, 3, 3, 17],
+	[0, 0, 1, 1, 0]
+], HeadAnimationProperties.DontIncreaseEyeOpenness);
+
 export const headAnimations = [
-	smile, nom, laugh, yawn, surprise, surpriseSad, sneeze, excite,
+	smile, nom, laugh, yawn, surprise, surpriseSad, sneeze, excite, kiss, kissFly, kissFlyBug
 ];
 
 // default animations
