@@ -839,6 +839,7 @@ function state(
 		name: '',
 		loop: false,
 		fps: 24,
+		disableHeadTurnFrames: 0,
 		frames: times(frames, i => ({
 			...createBodyFrame([]),
 			head: (head || ones)[i],

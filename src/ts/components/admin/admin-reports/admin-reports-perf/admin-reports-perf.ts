@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { AdminModel } from '../../../services/adminModel';
-import { TimingEntry, TimingEntryType } from '../../../../common/adminInterfaces';
+import { TimingEntry, TimingEntryType, WorldPerfStats, defaultWorldPerfStats } from '../../../../common/adminInterfaces';
 import { findById, pointInRect, clamp } from '../../../../common/utils';
 import { SERVER_FPS } from '../../../../common/constants';
 import { AgDragEvent } from '../../../shared/directives/agDrag';
@@ -39,6 +39,7 @@ export class AdminReportsPerf {
 	endTime = 0;
 	listing: ListingEntry[] = [];
 	timings: TimingEntry[] = [];
+	worldPerfStats = defaultWorldPerfStats();
 	private tooltips: Tooltip[] = [];
 	private startTimeFrom = 0;
 	private endTimeFrom = 0;
@@ -53,9 +54,22 @@ export class AdminReportsPerf {
 				}
 			}, 100);
 		}
+
+		setInterval(this.update, frameTime, this);
 	}
 	get servers() {
 		return this.model.state.gameServers.map(s => s.id);
+	}
+	disable() {
+		this.loaded = false;
+		this.timings = [];
+		this.listing = [];
+		this.model.setTimingEnabled(this.server, false);
+		this.redraw();
+	}
+	async enable() {
+		this.loaded = true;
+		await this.load(this.server);
 	}
 	async load(server: string) {
 		this.server = server;
@@ -71,6 +85,17 @@ export class AdminReportsPerf {
 		}
 
 		this.redraw();
+	}
+	async update(self: AdminReportsPerf) {
+		if (self.server) {
+			const result = await self.model.getWorldPerfStats(self.server);
+			if (result) {
+				self.worldPerfStats = result as WorldPerfStats;
+			}
+		}
+		else {
+			self.worldPerfStats = defaultWorldPerfStats();
+		}
 	}
 	mouseMove(e: MouseEvent) {
 		const rect = this.container.nativeElement.getBoundingClientRect() as DOMRect;
@@ -117,6 +142,10 @@ export class AdminReportsPerf {
 		}
 	}
 	resetZoom() {
+		if (!this.timings.length) {
+			return;
+		}
+
 		const firstTime = this.timings[0].time;
 		const lastTime = this.timings[this.timings.length - 1].time;
 		this.startTime = firstTime - timePadding;
@@ -125,6 +154,10 @@ export class AdminReportsPerf {
 		this.lastZoom = 0;
 	}
 	fitZoom() {
+		if (!this.timings.length) {
+			return;
+		}
+
 		const firstTime = this.timings[0].time;
 		const lastTime = this.timings[this.timings.length - 1].time;
 		const totalTime = lastTime - firstTime;
@@ -134,6 +167,10 @@ export class AdminReportsPerf {
 		this.lastZoom = 1;
 	}
 	fullFrameZoom() {
+		if (!this.timings.length) {
+			return;
+		}
+
 		const firstTime = this.timings[0].time;
 		const lastTime = firstTime + frameTime;
 		this.startTime = firstTime - 2;
@@ -245,6 +282,10 @@ export class AdminReportsPerf {
 		}
 	}
 	recalcListing() {
+		if (!this.timings.length) {
+			return;
+		}
+
 		interface Entry extends TimingEntry {
 			excludedTime: number;
 		}

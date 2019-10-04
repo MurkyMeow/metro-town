@@ -15,10 +15,11 @@ import { createReloadSettings } from './internal-common';
 import { UserError } from '../userError';
 import { liveSettings } from '../liveSettings';
 import { formatDuration, invalidEnum } from '../../common/utils';
-import { timingEntries } from '../timing';
+import { timingEntries, setTimingEnabled } from '../timing';
 import { toPairs, groupBy } from 'lodash';
 import { getSizeOfMap } from '../serverMap';
 import { teleportTo } from '../playerUtils';
+import { getWorldPerfStats } from '../worldPerfStats';
 
 export const createAccountChanged =
 	(world: World, tokens: TokenService, findAccount: FindAccountSafe) =>
@@ -269,6 +270,8 @@ export function createInternalApi(
 		shutdownServer: createShutdownServer(world, live),
 		accountHidden: createHiddenStats(hiding),
 		getTimings: async () => timingEntries(),
+		setTimingEnabled: async (isEnabled: boolean) => setTimingEnabled(isEnabled),
+		getWorldPerfStats: async () => getWorldPerfStats(),
 		teleportTo: createTeleportTo(world),
 	};
 }

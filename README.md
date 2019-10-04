@@ -342,6 +342,13 @@ Read more about it [here](https://stackoverflow.com/questions/1139762/ignore-fil
 
 ## Changelog
 
+#### Pony.Town v0.55.2
+- Optimized server performance
+- Fixed various animation issues
+- Fixed issues with kiss animation while turning head
+- Added additional server performance stats to the admin panel
+- Changed the button on admin panel that removes old events from 10min to 1day
+
 ### Pony.Town v0.55.0
 - Added Kiss action
 - Added being able to extinguish torches by sneezing

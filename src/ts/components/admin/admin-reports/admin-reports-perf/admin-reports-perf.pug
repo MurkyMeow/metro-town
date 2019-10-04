@@ -1,18 +1,22 @@
 div(style="position: relative;")
 	div(style="position: absolute; top: -50px; right: 0;")
 		b.p-2 {{server}}
-		.btn-group(*ngIf="server")
+		.btn-group(*ngIf="loaded")
 			button.btn.btn-default((click)="resetZoom()")
 				| Reset zoom
 			button.btn.btn-default((click)="fitZoom()")
 				| Fit zoom
 			button.btn.btn-default((click)="fullFrameZoom()")
 				| Full frame
-		button.btn.btn-default.ml-1(*ngIf="server" (click)="load(server)")
+		button.btn.btn-default.ml-1(*ngIf="loaded" (click)="load(server)")
 			| Refresh
+		button.btn.btn-default.ml-1(*ngIf="loaded" (click)="disable()")
+			| Disable
+		button.btn.btn-default.ml-1(*ngIf="!loaded && server" (click)="enable()")
+			| Enable
 		.btn-group.dropdown.ml-1(dropdown)
 			button.btn.btn-default.dropdown-toggle(dropdownToggle)
-				| Load
+				| Select
 			.dropdown-menu.dropdown-menu-right(*dropdownMenu)
 				button.dropdown-item(*ngFor="let s of servers" (click)="load(s)")
 					| {{s}}
@@ -20,11 +24,88 @@ div(style="position: relative;")
 	div(#container style="position: relative; overflow: hidden;")
 		canvas(#canvas (mousemove)="mouseMove($event)" (wheel)="wheel($event)" (agDrag)="drag($event)")
 		div(#tooltip style="display: none; position: absolute; left: 0; top: 0; padding: 2px 6px; background: #111; border-radius: 2px; font-size: 12px; white-space: pre; pointer-events: none;")
-		
+			
+		p
 		.float-right.text-muted
-			div total samples: {{timings.length}}
+			div samples: {{timings.length}}
+				
+		br
+		.float-right.text-muted
+			div sampling: {{worldPerfStats.isSamplingEnabled}}
+				
+		br
+		.float-right.text-muted
+			div avg update: {{worldPerfStats.avgUpdateTime.toFixed(2)}}
 
-		table.table.table-sm(style="font-size: small; width: 1000px;")
+		br
+		.float-right.text-muted
+			div last update: {{worldPerfStats.lastUpdateTime.toFixed(2)}}
+				
+		br
+		.float-right.text-muted
+			div max update: {{worldPerfStats.maxUpdateTime.toFixed(2)}}
+				
+		br
+		.float-right.text-muted
+			div min update: {{worldPerfStats.minUpdateTime.toFixed(2)}}
+				
+		br
+		.float-right.text-muted
+			div moving entities: {{worldPerfStats.movingEntities}}
+				
+		br
+		.float-right.text-muted
+			div controllers: {{worldPerfStats.controllersCount}}
+				
+		br
+		.float-right.text-muted
+			div regions: {{worldPerfStats.regionsCount}}
+				
+		br
+		.float-right.text-muted
+			div maps: {{worldPerfStats.mapsCount}}
+				
+		br
+		.float-right.text-muted
+			div clients: {{worldPerfStats.clients}}
+				
+		br
+		.float-right.text-muted
+			div clients with adds: {{worldPerfStats.clientsWithAdds}}
+				
+		br
+		.float-right.text-muted
+			div clients with updates: {{worldPerfStats.clientsWithUpdates}}
+				
+		br
+		.float-right.text-muted
+			div clients with says: {{worldPerfStats.clientsWithSays}}
+				
+		br
+		.float-right.text-muted
+			div total says: {{worldPerfStats.totalSays}}
+				
+		br
+		.float-right.text-muted
+			div client queue: {{worldPerfStats.clientQueue}}
+				
+		br
+		.float-right.text-muted
+			div client sent: {{(worldPerfStats.sent / 1024).toFixed(2) + 'kb'}}
+				
+		br
+		.float-right.text-muted
+			div client received: {{(worldPerfStats.received / 1024).toFixed(2) + 'kb'}}
+				
+		br
+		.float-right.text-muted
+			div client sent packets: {{worldPerfStats.sentPackets}}
+				
+		br
+		.float-right.text-muted
+			div client received packets: {{worldPerfStats.receivedPackets}}
+
+		table.table.table-sm(style="position: relative; bottom : 410px; font-size: small; width: 1000px;")
 			thead
 				tr
 					th.text-right Self Time

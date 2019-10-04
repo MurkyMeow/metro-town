@@ -1380,6 +1380,7 @@ export interface BodyAnimation {
 	fps: number;
 	frames: BodyAnimationFrame[];
 	shadow?: BodyShadow[];
+	disableHeadTurnFrames: number;
 }
 
 export interface HeadAnimationFrame {
@@ -1854,4 +1855,18 @@ export const enum UpdateFlags {
 	PlayerState = 1024,
 	SwitchRegion = 2048,
 	// max 32768
+}
+
+export let counterNow: () => number;
+
+if (typeof window !== 'undefined') {
+	counterNow = performance.now;
+} else {
+	const hrtime = process.hrtime;
+	const getNanoSeconds = () => {
+		const hr = hrtime();
+		return hr[0] * 1e9 + hr[1];
+	};
+	const nodeLoadTime = getNanoSeconds() - process.uptime() * 1e9;
+	counterNow = () => (getNanoSeconds() - nodeLoadTime) / 1e6;
 }

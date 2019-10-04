@@ -132,6 +132,8 @@ export interface InternalApi extends InternalCommonApi {
 	cancelUpdate(): Promise<void>;
 	shutdownServer(value: boolean): Promise<void>;
 	getTimings(): Promise<any[]>;
+	setTimingEnabled(isEnabled: boolean): Promise<void>;
+	getWorldPerfStats(): Promise<any>;
 	teleportTo(adminAccountId: string, targetAccountId: string): Promise<void>;
 }
 
@@ -822,6 +824,35 @@ export interface TimingEntry {
 	name?: string;
 }
 
+export interface WorldPerfStats {
+	lastUpdateTime: number;
+	maxUpdateTime: number;
+	minUpdateTime: number;
+	avgUpdateTime: number;
+	isSamplingEnabled: boolean;
+	clients: number;
+	movingEntities: number;
+	regionsCount: number;
+	mapsCount: number;
+	clientQueue: number;
+	controllersCount: number;
+	clientsWithAdds: number;
+	clientsWithUpdates: number;
+	clientsWithSays: number;
+	totalSays: number;
+	sent: number;
+	received: number;
+	sentPackets: number;
+	receivedPackets: number;
+}
+
+export function defaultWorldPerfStats() {
+	return { lastUpdateTime: 0, maxUpdateTime: 0, minUpdateTime: 0, avgUpdateTime: 0, isSamplingEnabled: false,
+		clients: 0, movingEntities: 0, regionsCount: 0, mapsCount: 0, clientQueue: 0, controllersCount: 0,
+		clientsWithAdds: 0, clientsWithUpdates: 0, clientsWithSays: 0, totalSays: 0, sent: 0, received: 0,
+		sentPackets: 0, receivedPackets: 0 };
+}
+
 export type ModelTypes =
 	'accounts' | 'auths' | 'origins' | 'ponies' | 'accountAuths' | 'accountOrigins' | 'accountPonies';
 
@@ -917,5 +948,7 @@ export interface IAdminServerActions {
 	clearSessions(accountId: string): Promise<void>;
 	// other
 	getTimings(serverId: string): Promise<any[]>;
+	setTimingEnabled(serverId: string, isEnabled: boolean): Promise<void>;
+	getWorldPerfStats(serverId: string): Promise<any>;
 	teleportTo(accountId: string): Promise<void>;
 }
