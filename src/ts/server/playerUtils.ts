@@ -32,7 +32,7 @@ import { replaceEmojis } from '../client/emoji';
 import { expression, parseExpression } from '../common/expressionUtils';
 import {
 	canBoopOrKiss, isPonySitting, isPonyStanding, getBoopRect, canStand, isPonyFlying, setPonyState, canSit,
-	canLie, getkissRect, getSneezeRect
+	canLie, getKissRect, getSneezeRect
 } from '../common/entityUtils';
 import { withBorder } from '../common/rect';
 import { isOnlineFriend } from './services/friends';
@@ -484,7 +484,7 @@ export function kiss(client: IClient, now: number) {
 	if (canPerformAction(client, now) && canBoopOrKiss(client.pony)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, Action.Kiss);
-		boopEntity(client, getkissRect(client.pony), false);
+		boopEntity(client, getKissRect(client.pony), false);
 		client.lastBoopOrKissAction = now + 3400;
 	}
 }

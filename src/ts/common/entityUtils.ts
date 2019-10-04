@@ -60,7 +60,7 @@ export function getBoopRect(entity: Entity) {
 	return rect(entity.x + (right ? 0.6 : -0.9) * (sitting ? 0.6 : 1), entity.y - 0.2, 0.3, 0.4);
 }
 
-export function getkissRect(entity: Entity) {
+export function getKissRect(entity: Entity) {
 	const right = hasFlag(entity.state, EntityState.FacingRight);
 	const sitting = isPonySitting(entity);
 	return rect(entity.x + (right ? 0.4 : -0.8) * (sitting ? 0.6 : 1), entity.y - 0.225, 0.4, 0.45);
