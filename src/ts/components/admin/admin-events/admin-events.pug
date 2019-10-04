@@ -12,9 +12,9 @@ ng-template(#duplicatesPopover)
 		button.btn.btn-sm.btn-default.ml-1((click)="cleanupDeleted()" title="Cleanup deleted events")
 			fa-icon.mr-1([icon]="syncIcon" size="lg")
 			| clear
-		button.btn.btn-sm.btn-default.ml-1((click)="removeEvents(1000 * 60 * 10)" title="Delete all older than 10 minutes")
+		button.btn.btn-sm.btn-default.ml-1((click)="removeEvents(1000 * 60 * 60 * 24)" title="Delete all older than 1 day")
 			fa-icon.mr-1([icon]="clockIcon" size="lg")
-			| 10min
+			| 1day
 		button.btn.btn-sm.btn-default.ml-1((click)="removeEvents(1000 * 3)" title="Delete all events")
 			fa-icon.mr-1([icon]="trashIcon" size="lg")
 			| all

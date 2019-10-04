@@ -276,6 +276,13 @@ Tools are accessible at `<base_url>/tools/` (only available in dev mode or when 
 
 ## Changelog
 
+#### Pony.Town v0.55.2
+- Optimized server performance
+- Fixed various animation issues
+- Fixed issues with kiss animation while turning head
+- Added additional server performance stats to the admin panel
+- Changed the button on admin panel that removes old events from 10min to 1day
+
 ### Pony.Town v0.55.0
 - Added Kiss action
 - Added being able to extinguish torches by sneezing

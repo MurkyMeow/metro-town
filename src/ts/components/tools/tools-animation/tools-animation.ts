@@ -685,6 +685,7 @@ function toBodyAnimation({ name, loop, fps, frames }: BodyAnimation, full: boole
 		loop,
 		fps,
 		shadow,
+		disableHeadTurnFrames: 0,
 		frames: flatMap(frames, f => repeat(full ? f.duration : 1, {
 			body: f.body,
 			head: f.head,
@@ -706,7 +707,7 @@ function toBodyAnimation({ name, loop, fps, frames }: BodyAnimation, full: boole
 			backLegY: switchFarClose ? f.backFarLegY : f.backLegY,
 			backFarLegX: switchFarClose ? f.backLegX : f.backFarLegX,
 			backFarLegY: switchFarClose ? f.backLegY : f.backFarLegY,
-		})),
+		}))
 	};
 }
 

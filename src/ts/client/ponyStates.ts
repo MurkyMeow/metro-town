@@ -127,20 +127,19 @@ transition(standing, kissing, { exitAfter: 0 });
 transition(kissingHoof, standing);
 transition(standing, kissingHoof, { exitAfter: 0 });
 transition(kissingFlying, hovering, { enterTime: 1.1 / 10 });
-transition(hovering, kissingFlying, { exitAfter: 0 });
-transition(kissingLying, lying);
-transition(lying, kissingLying, { exitAfter: 0 });
-transition(kissingSitting, sitting);
-transition(sitting, kissingSitting, { exitAfter: 0 });
+transition(hovering, kissingFlying, { exitAfter: 0, onlyDirectTo: kissingFlying });
 
 transition(kissing, kissingToTrotting, { exitAfter: 0, onlyDirectTo: trotting });
 transition(kissingToTrotting, trotting);
+transition(kissingToTrotting, standing);
 
 transition(kissingSitting, sittingToTrotting, { exitAfter: 0, onlyDirectTo: trotting });
-transition(sittingToTrotting, standing);
+transition(kissingSitting, sitting);
+transition(sitting, kissingSitting, { exitAfter: 0, onlyDirectTo: kissingSitting });
 
 transition(kissingLying, lyingToTrotting, { exitAfter: 0, onlyDirectTo: trotting });
-transition(lyingToTrotting, standing);
+transition(kissingLying, lying);
+transition(lying, kissingLying, { exitAfter: 0, onlyDirectTo: kissingLying });
 
 transition(anyState, trotting, { exitAfter: 0, keepTime: true });
 transition(anyState, flying, { exitAfter: 0, keepTime: true });

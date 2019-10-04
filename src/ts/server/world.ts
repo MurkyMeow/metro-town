@@ -1,7 +1,7 @@
 import { getWriterBuffer } from 'ag-sockets';
 import { remove, compact } from 'lodash';
 import {
-	TileType, WorldState, Season, Holiday, WorldStateFlags, LeaveReason, NotificationFlags, UpdateFlags, Action,
+	TileType, WorldState, Season, Holiday, WorldStateFlags, LeaveReason, NotificationFlags, UpdateFlags, Action, counterNow,
 } from '../common/interfaces';
 import { removeItem, distance, clamp, randomPoint, includes, fromNow } from '../common/utils';
 import { HOUR_LENGTH, DAY_LENGTH } from '../common/timeUtils';
@@ -31,12 +31,12 @@ import {
 import { roundPosition, roundPositionXMidPixel, roundPositionYMidPixel } from '../common/positionUtils';
 import { logger } from './logger';
 import { updateCamera, centerCameraOn } from '../common/camera';
-import { timingStart, timingEnd } from './timing';
+import { timingStart, timingEnd, timingUpdate } from './timing';
 import { getRegionGlobal, getTile } from '../common/worldMap';
 import { getEntityTypeName } from '../common/entities';
 import { toFriendOnline, toFriendOffline, FriendsService } from './services/friends';
 // import { Pool, createPool } from './pool';
-import { isStaticCollision, getCollisionStats, fixCollision, updatePosition } from '../common/collision';
+import { isStaticCollision, fixCollision, updatePosition } from '../common/collision';
 import { HidingService } from './services/hiding';
 import { generateRegionCollider } from '../common/region';
 import { updateTileIndices } from '../client/tileUtils';
@@ -44,6 +44,7 @@ import { removeEntityFromRegion } from './serverRegion';
 import { createIslandMap } from './maps/islandMap';
 import { createHouseMap } from './maps/houseMap';
 import { updateMainMapSeason } from './maps/mainMap';
+import { updateWorldPerfStats } from './worldPerfStats';
 
 interface MapSwitch {
 	map: ServerMap;
@@ -287,7 +288,15 @@ export class World {
 		}
 	}
 	update(delta: number, now: number) {
+		const statsStart = counterNow();
+		let movingEntities = 0;
+		let regionsCount = 0;
+		let mapsCount = 0;
+		let controllersCount = 0;
+
 		const started = Date.now();
+
+		timingUpdate();
 
 		timingStart('world.update()');
 
@@ -315,7 +324,10 @@ export class World {
 
 		timingStart('update positions');
 		for (const map of this.maps) {
+			++mapsCount;
 			for (const region of map.regions) {
+				++regionsCount;
+
 				// TODO: update only moving entities, separate list of movingEntities
 				for (const entity of region.movables) {
 					// TODO: make sure timestamp is initialized if entity is moving
@@ -323,6 +335,7 @@ export class World {
 
 					if (delta > 0) {
 						if (entity.vx !== 0 || entity.vy !== 0) {
+							++movingEntities;
 							updatePosition(entity, delta, map);
 						}
 
@@ -349,6 +362,7 @@ export class World {
 
 		for (const map of this.maps) {
 			for (const controller of map.controllers) {
+				++controllersCount;
 				controller.update(deltaSeconds, nowSeconds);
 			}
 		}
@@ -408,9 +422,7 @@ export class World {
 				totalSays += saysQueue.length;
 
 				setupTiming(client);
-				timingStart('client.update()');
 				client.update(unsubscribes, subscribes, updateBuffer, regionUpdates, saysQueue);
-				timingEnd();
 				clearTiming(client);
 
 				resetClientUpdates(client);
@@ -426,17 +438,16 @@ export class World {
 		}
 		timingEnd();
 
-		const { isCollidingCount, isCollidingObjectCount } = getCollisionStats();
-
-		timingStart(`adds [${clientsWithAdds}]\n` +
-			`updates [${clientsWithUpdates}]\n` +
-			`says [${totalSays} / ${clientsWithSays}]\n` +
-			`sockets [${this.socketStatsText()}]\n` +
-			`collisions [${isCollidingObjectCount} / ${isCollidingCount}]`);
+		timingStart(`cleanupOfflineClients`);
 		this.cleanupOfflineClients();
 		timingEnd();
 
 		timingEnd();
+
+		const { sent, received, sentPackets, receivedPackets } = this.socketStats.stats();
+		updateWorldPerfStats(statsStart, this.clients.length, movingEntities, regionsCount, mapsCount, this.joinQueue.length,
+			controllersCount, clientsWithAdds, clientsWithUpdates, clientsWithSays, totalSays,
+			sent, received, sentPackets, receivedPackets);
 	}
 	sparseUpdate(now: number) {
 		timingStart('world.sparseUpdate()');
@@ -535,11 +546,6 @@ export class World {
 		timingEnd();
 
 		timingEnd();
-	}
-	private socketStatsText() {
-		const { sent, received, sentPackets, receivedPackets } = this.socketStats.stats();
-		return `sent: ${(sent / 1024).toFixed(2)} kb (${sentPackets}), ` +
-			`recv: ${(received / 1024).toFixed(2)} kb (${receivedPackets})`;
 	}
 	updatesStats() {
 		timingStart('updatesStats()');

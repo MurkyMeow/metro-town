@@ -5,16 +5,6 @@ import { getRegionGlobal, isInWaterAt } from './worldMap';
 import { tileWidth, tileHeight, PONY_TYPE, REGION_SIZE, REGION_WIDTH, REGION_HEIGHT } from './constants';
 import { isInTheAir, isFlying } from './entityUtils';
 
-let isCollidingCount = 0;
-let isCollidingObjectCount = 0;
-
-export function getCollisionStats() {
-	const stats = { isCollidingCount, isCollidingObjectCount };
-	isCollidingCount = 0;
-	isCollidingObjectCount = 0;
-	return stats;
-}
-
 export function isOutsideMap<T>(x: number, y: number, map: IMap<T>): boolean {
 	return x < 0 || y < 0 || x >= map.width || y >= map.height;
 }
