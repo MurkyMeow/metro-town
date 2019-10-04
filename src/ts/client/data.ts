@@ -28,6 +28,7 @@ export const discordLink = attr('data-discord-link');
 export const twitterLink = attr('data-twitter-link');
 export const contactEmail = attr('data-email');
 export const copyrightName = attr('data-copyright');
+export const contactDiscord = attr('data-contact-discord');
 
 /* istanbul ignore next */
 export const oauthProviders = json<OAuthProvider[]>('oauth-providers', '[]')

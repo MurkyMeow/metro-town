@@ -7,6 +7,7 @@ export interface AppConfig {
 	supporterLink?: string;
 	discordLink?: string;
 	contactEmail?: string;
+	contactDiscord?: string;
 	port: number;
 	adminPort?: number;
 	host: string;

@@ -8,6 +8,9 @@ h1(focusTitle) About
 
 		h2 Contact
 		p For all inquiries please send an email to #[b {{contactEmail}}]
+			span(*ngIf="contactDiscord")
+				|  or message #[b {{contactDiscord}}] on Discord
+			| .
 
 		h2 Technology
 

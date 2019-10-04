@@ -101,6 +101,7 @@ export function createIndex(assetsPath: string, adminAssetsPath: string) {
 			twitterLink: config.twitterLink,
 			discordLink: config.discordLink,
 			email: config.contactEmail,
+			contactDiscord: config.contactDiscord,
 			logo: `${config.host}${getRevImageURL('logo-120.png')}`,
 			loadingImage: `data:image/png;base64,${loadingImage.toString('base64')}`,
 			version,

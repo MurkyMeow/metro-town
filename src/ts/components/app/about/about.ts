@@ -4,7 +4,7 @@ import { getUrl } from '../../../client/rev';
 import { CREDITS, CONTRIBUTORS, Credit } from '../../../client/credits';
 import { CHANGELOG } from '../../../generated/changelog';
 import { SUPPORTER_REWARDS_LIST } from '../../../common/constants';
-import { discordLink, contactEmail } from '../../../client/data';
+import { discordLink, contactEmail, contactDiscord } from '../../../client/data';
 
 function toCredit(credit: Credit) {
 	return {
@@ -28,4 +28,5 @@ export class About {
 	readonly rewards = SUPPORTER_REWARDS_LIST;
 	readonly discordLink = discordLink;
 	readonly contactEmail = contactEmail;
+	readonly contactDiscord = contactDiscord;
 }

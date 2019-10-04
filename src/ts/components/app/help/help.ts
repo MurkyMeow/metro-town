@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { emojis } from '../../../client/emoji';
 import { faArrowLeft, faArrowRight, faArrowUp, faArrowDown } from '../../../client/icons';
-import { contactEmail } from '../../../client/data';
+import { contactEmail, contactDiscord } from '../../../client/data';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -17,6 +17,7 @@ export class Help {
 	readonly emotes = emojis.map(e => e.names[0]);
 	readonly mac = /Macintosh/.test(navigator.userAgent);
 	readonly contactEmail = contactEmail;
+	readonly contactDiscord = contactDiscord;
 
 	// allow scrolling to #issues and #rules fragments
 

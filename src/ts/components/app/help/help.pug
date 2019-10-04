@@ -5,9 +5,12 @@ h1(focusTitle) Help
 	
 		section
 			h2 Contact
-			p.
-				For technical issues, see the #[a(routerLink="/help" fragment="issues") Common Issues] section. If it doesn't solve your problem, 
-				send an email to #[b {{contactEmail}}].
+			p
+				| For technical issues, see the #[a(routerLink="/help" fragment="issues") Common Issues] section. If it doesn't solve your problem, 
+				| send an email to #[b {{contactEmail}}]
+				span(*ngIf="contactDiscord")
+					|  or message #[b {{contactDiscord}}] on Discord
+				| .
 
 		section
 			h2 Controls

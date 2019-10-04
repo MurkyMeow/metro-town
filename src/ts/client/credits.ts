@@ -31,12 +31,6 @@ export const CREDITS: Credit[] = [
 		links: ['https://twitter.com/BytewaveMLP', 'https://github.com/BytewaveMLP']
 	},
 	{
-		name: 'Cloud Hop',
-		title: 'Programmer',
-		avatarIndex: 1,
-		links: ['https://twitter.com/blackhole0173', 'https://github.com/blackhole12']
-	},
-	{
 		name: 'CyberPon3',
 		title: 'Programmer / Moderator',
 		avatarIndex: 2,
@@ -49,22 +43,34 @@ export const CREDITS: Credit[] = [
 		links: ['https://github.com/Keupoz']
 	},
 	{
-		name: 'NotMyWing',
-		title: 'Programmer / Moderator',
-		avatarIndex: 4,
-		links: ['https://twitter.com/NotMyWing', 'https://github.com/Neeve01']
-	},
-	{
 		name: 'Luney',
 		title: 'Programmer',
 		avatarIndex: 5,
 		links: ['https://twitter.com/luneythesnep', 'https://github.com/LunarMist']
 	},
 	{
+		name: 'MysticBlare',
+		title: 'Artist',
+		avatarIndex: 1,
+		links: ['https://twitter.com/MysticBlare']
+	},
+	{
+		name: 'NotMyWing',
+		title: 'Programmer / Moderator',
+		avatarIndex: 4,
+		links: ['https://twitter.com/NotMyWing', 'https://github.com/Neeve01']
+	},
+	{
 		name: 'Stubenhocker',
 		title: 'Programmer',
 		avatarIndex: 6,
 		links: ['https://github.com/Stubenhocker1399', 'https://twitter.com/Stubenhocker13']
+	},
+	{
+		name: 'Sunberry',
+		title: 'Moderator',
+		avatarIndex: 9,
+		links: ['https://twitter.com/Sunberreiy']
 	},
 	{
 		name: 'Terncode',
@@ -118,7 +124,6 @@ export const CONTRIBUTORS: Contributors[] = [
 			{ name: 'Wellfugzee' },
 			{ name: 'ScribblesHeart', links: ['https://www.deviantart.com/scribblesdesu'] },
 			{ name: 'dsp2003', links: ['https://dsp2003.tumblr.com/', 'http://www.deviantart.com/dsp2003'] },
-			{ name: 'MysticBlare', links: ['https://twitter.com/MysticBlare'] },
 			{ name: 'Towmacow Waffles', links: ['https://www.deviantart.com/towmacowwaffles'] },
 			{ name: 'OrchidPony', links: ['https://www.deviantart.com/orchidpony'] },
 			{ name: 'Cherry Cerise', links: ['https://www.deviantart.com/cherryceriseart'] },

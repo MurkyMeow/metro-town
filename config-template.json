@@ -3,6 +3,7 @@
 	"discordLink": "<LINK_TO_DISCORD_INVITE>",
 	"twitterLink": "<LINK_TO_TWITTER>",
 	"contactEmail": "your_contact_email@example.com",
+	"contactDiscord": "your_contact_discord#0000",
 	"port": 8090,
 	"adminPort": 8091,
 	"host": "http://localhost:8090/",
