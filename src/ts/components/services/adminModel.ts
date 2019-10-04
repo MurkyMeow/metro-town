@@ -507,6 +507,14 @@ export class AdminModel {
 		return this.server.getTimings(server)
 			.catch(this.handleError);
 	}
+	setTimingEnabled(server: string, isEnabled: boolean) {
+		return this.server.setTimingEnabled(server, isEnabled)
+			.catch(this.handleError);
+	}
+	getWorldPerfStats(server: string) {
+		return this.server.getWorldPerfStats(server)
+			.catch(this.handleError);
+	}
 	teleportTo(accountId: string) {
 		return this.server.teleportTo(accountId)
 			.catch(this.handleError);

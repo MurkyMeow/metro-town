@@ -139,7 +139,21 @@ export function boopAction(game: PonyTownGame) {
 }
 
 export function turnHeadAction(game: PonyTownGame) {
-	if (game.player && game.send(server => server.action(Action.TurnHead))) {
+	if (!game.player) {
+		return;
+	}
+
+	if (game.player.animator.state) {
+		const disabledFrames = game.player.animator.state.animation.disableHeadTurnFrames;
+		if (disabledFrames > 0) {
+			const disabledTime = disabledFrames / game.player.animator.state.animation.fps;
+			if (disabledTime >= game.player.animator.time) {
+				return;
+			}
+		}
+	}
+
+	if (game.send(server => server.action(Action.TurnHead))) {
 		game.player.state = game.player.state ^ EntityState.HeadTurned;
 		game.headTurnedOverride = hasFlag(game.player.state, EntityState.HeadTurned);
 		game.onActionsUpdate.next();

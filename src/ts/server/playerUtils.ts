@@ -31,7 +31,8 @@ import {
 import { replaceEmojis } from '../client/emoji';
 import { expression, parseExpression } from '../common/expressionUtils';
 import {
-	canBoopOrKiss, isPonySitting, isPonyStanding, getBoopRect, canStand, isPonyFlying, setPonyState, canSit, canLie, getkissRect, getSneezeRect
+	canBoopOrKiss, isPonySitting, isPonyStanding, getBoopRect, canStand, isPonyFlying, setPonyState, canSit,
+	canLie, getKissRect, getSneezeRect
 } from '../common/entityUtils';
 import { withBorder } from '../common/rect';
 import { isOnlineFriend } from './services/friends';
@@ -407,8 +408,10 @@ export function useHeldItem(client: IClient) {
 	}
 }
 
-export function canPerformAction(client: IClient) {
-	const now = Date.now();
+export function canPerformAction(client: IClient, now?: number) {
+	if (!now) {
+		now = Date.now();
+	}
 	return client.lastExpressionAction < now && client.lastBoopOrKissAction < now;
 }
 
@@ -420,9 +423,7 @@ export function updateEntityPlayerState(client: IClient, entity: ServerEntity) {
 // actions
 
 export function turnHead(client: IClient) {
-	if (canPerformAction(client)) {
-		updateEntityState(client.pony, client.pony.state ^ EntityState.HeadTurned);
-	}
+	updateEntityState(client.pony, client.pony.state ^ EntityState.HeadTurned);
 }
 
 const purpleGrapeTypes = entities.grapesPurple.map(x => x.type);
@@ -471,7 +472,7 @@ function boopEntity(client: IClient, rect: Rect, isOnlyBooping: boolean) {
 }
 
 export function boop(client: IClient, now: number) {
-	if (canPerformAction(client) && canBoopOrKiss(client.pony)) {
+	if (canPerformAction(client, now) && canBoopOrKiss(client.pony)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, Action.Boop);
 		boopEntity(client, getBoopRect(client.pony), false);
@@ -480,20 +481,21 @@ export function boop(client: IClient, now: number) {
 }
 
 export function kiss(client: IClient, now: number) {
-	if (canPerformAction(client) && canBoopOrKiss(client.pony)) {
+	if (canPerformAction(client, now) && canBoopOrKiss(client.pony)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, Action.Kiss);
-		boopEntity(client, getkissRect(client.pony), false);
-		client.lastBoopOrKissAction = now + 3350;
+		boopEntity(client, getKissRect(client.pony), false);
+		client.lastBoopOrKissAction = now + 3400;
 	}
 }
 
 export function sneeze(client: IClient) {
-	if (canPerformAction(client)) {
+	const now = Date.now();
+	if (canPerformAction(client, now)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, Action.Sneeze);
 		boopEntity(client, getSneezeRect(client.pony), true);
-		client.lastExpressionAction = Date.now() + 750;
+		client.lastExpressionAction = now + 750;
 	}
 }
 
@@ -557,10 +559,11 @@ export function fly(client: IClient) {
 }
 
 export function expressionAction(client: IClient, action: Action) {
-	if (canPerformAction(client) && isExpressionAction(action)) {
+	const now = Date.now();
+	if (canPerformAction(client, now) && isExpressionAction(action)) {
 		cancelEntityExpression(client.pony);
 		sendAction(client.pony, action);
-		client.lastExpressionAction = Date.now() + 750;
+		client.lastExpressionAction = now + 750;
 	}
 }
 
@@ -836,7 +839,6 @@ export function switchTool(client: IClient, reverse: boolean) {
 		const newIndex = reverse ? (index === -1 ? tools.length - 1 : index - 1) : ((index + 1) % tools.length);
 		const tool = tools[newIndex];
 		holdItem(client.pony, tool.type);
-		// console.log('isMobile ' + client.isMobile);
 		const text = (client.isMobile && tool.textMobile) ? tool.textMobile : tool.text;
 		saySystem(client, text);
 	}

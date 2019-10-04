@@ -1,37 +1,41 @@
 import { TimingEntry, TimingEntryType } from '../common/adminInterfaces';
+import { MINUTE } from '../common/constants';
+import { counterNow } from '../common/interfaces';
 
-const ENABLED = true;
-const ENTRIES_LIMIT = 50000;
+const ENTRIES_LIMIT = 20000;
 
-const entries: TimingEntry[] = [];
+let entries: TimingEntry[] = [];
 let entriesCount = 0;
+let isProfilingEnabled = false;
+let lastFetchTime = Date.now();
 
-let now: () => number;
-
-if (typeof window !== 'undefined') {
-	now = performance.now;
-} else {
-	const hrtime = process.hrtime;
-	const getNanoSeconds = () => {
-		const hr = hrtime();
-		return hr[0] * 1e9 + hr[1];
-	};
-	const nodeLoadTime = getNanoSeconds() - process.uptime() * 1e9;
-	now = () => (getNanoSeconds() - nodeLoadTime) / 1e6;
+export function getTimingEnabled() {
+	return isProfilingEnabled;
 }
 
-if (ENABLED) {
-	for (let i = 0; i < ENTRIES_LIMIT; i++) {
-		entries.push({ type: 0, time: 0, name: undefined });
+export function setTimingEnabled(isEnabled: boolean) {
+	if (isProfilingEnabled === isEnabled) {
+		return;
+	}
+
+	isProfilingEnabled = isEnabled;
+
+	if (isEnabled) {
+		for (let i = 0; i < ENTRIES_LIMIT; i++) {
+			entries.push({ type: 0, time: 0, name: undefined });
+		}
+	}
+	else {
+		entries = [];
 	}
 }
 
 export function timingStart(name: string) {
-	if (ENABLED) {
+	if (isProfilingEnabled) {
 		if (entriesCount < ENTRIES_LIMIT) {
 			const entry = entries[entriesCount];
 			entry.type = TimingEntryType.Start;
-			entry.time = now();
+			entry.time = counterNow();
 			entry.name = name;
 			entriesCount++;
 		} else {
@@ -41,11 +45,11 @@ export function timingStart(name: string) {
 }
 
 export function timingEnd() {
-	if (ENABLED) {
+	if (isProfilingEnabled) {
 		if (entriesCount < ENTRIES_LIMIT) {
 			const entry = entries[entriesCount];
 			entry.type = TimingEntryType.End;
-			entry.time = now();
+			entry.time = counterNow();
 			entry.name = undefined;
 			entriesCount++;
 		} else {
@@ -55,11 +59,22 @@ export function timingEnd() {
 }
 
 export function timingReset() {
-	if (ENABLED) {
-		entriesCount = 0;
-	}
+	entriesCount = 0;
 }
 
 export function timingEntries() {
+	lastFetchTime = Date.now();
+	if (!isProfilingEnabled) {
+		setTimingEnabled(true);
+		return [];
+	}
 	return entries.slice(0, entriesCount);
+}
+
+export function timingUpdate() {
+	if (isProfilingEnabled) {
+		if (Date.now() - lastFetchTime > MINUTE) {
+			setTimingEnabled(false);
+		}
+	}
 }

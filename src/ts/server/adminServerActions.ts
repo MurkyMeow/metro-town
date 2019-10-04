@@ -547,6 +547,16 @@ export class AdminServerActions implements IAdminServerActions, SocketServer {
 		return server.api.getTimings();
 	}
 	@Method({ promise: true })
+	async setTimingEnabled(serverId: string, isEnabled: boolean) {
+		const server = getServer(serverId);
+		server.api.setTimingEnabled(isEnabled);
+	}
+	@Method({ promise: true })
+	async getWorldPerfStats(serverId: string) {
+		const server = getServer(serverId);
+		return server.api.getWorldPerfStats();
+	}
+	@Method({ promise: true })
 	async teleportTo(accountId: string) {
 		const adminAccountId = this.account._id.toString();
 		await forAllGameServers(server => server.api.teleportTo(adminAccountId, accountId));

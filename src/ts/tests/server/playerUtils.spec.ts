@@ -114,6 +114,7 @@ describe('playerUtils', () => {
 				account,
 				character,
 				ip: '',
+				isMobile: false,
 				map,
 				isSwitchingMap: false,
 				pony,
@@ -132,7 +133,7 @@ describe('playerUtils', () => {
 				safeX: 10,
 				safeY: 20,
 				lastPacket: 123,
-				lastBoopAction: 0,
+				lastBoopOrKissAction: 0,
 				lastExpressionAction: 0,
 				lastX: 10,
 				lastY: 20,
@@ -591,7 +592,7 @@ describe('playerUtils', () => {
 
 			boop(client, 100);
 
-			expect(client.lastBoopOrKissAction).equal(100 + 500);
+			expect(client.lastBoopOrKissAction).equal(100 + 850);
 		});
 
 		it('executes boop on found entity', () => {
@@ -615,6 +616,7 @@ describe('playerUtils', () => {
 			boop(client, 0);
 
 			assert.notCalled(stubBoop);
+			expect(client.pony.region!.entityUpdates.length).eql(0);
 		});
 
 		it('does nothing if cannot perform action', () => {
@@ -622,7 +624,7 @@ describe('playerUtils', () => {
 
 			boop(client, 0);
 
-			expect(client.pony.region!.entityUpdates).eql([]);
+			expect(client.pony.region!.entityUpdates.length).eql(0);
 		});
 
 		it('does nothing if moving', () => {
@@ -630,7 +632,7 @@ describe('playerUtils', () => {
 
 			boop(client, 0);
 
-			expect(client.pony.region!.entityUpdates).eql([]);
+			expect(client.pony.region!.entityUpdates.length).eql(0);
 		});
 	});
 
@@ -663,6 +665,8 @@ describe('playerUtils', () => {
 
 		it('updates entity flag to standing', () => {
 			client.pony.state = EntityState.PonySitting;
+			client.lastBoopOrKissAction = 0;
+			client.lastExpressionAction = 0;
 
 			stand(client);
 
@@ -882,6 +886,8 @@ describe('playerUtils', () => {
 		});
 
 		it('sends given action', () => {
+			client.lastExpressionAction = 0;
+			client.lastBoopOrKissAction = 0;
 			expressionAction(client, Action.Yawn);
 
 			expect(client.pony.region!.entityUpdates).eql([
@@ -896,7 +902,7 @@ describe('playerUtils', () => {
 		});
 
 		it('does nothing if cannot perform action', () => {
-			client.lastExpressionAction = Date.now() + 1000;
+			client.lastExpressionAction = Date.now() + 2500;
 
 			expressionAction(client, Action.Yawn);
 
@@ -913,6 +919,7 @@ describe('playerUtils', () => {
 
 		it('updates last expression action', () => {
 			client.lastExpressionAction = 0;
+			client.lastBoopOrKissAction = 0;
 
 			expressionAction(client, Action.Yawn);
 

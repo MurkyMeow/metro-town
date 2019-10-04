@@ -20,7 +20,7 @@ export function createBodyFrame([
 }
 
 export function createBodyAnimation(
-	name: string, fps: number, loop: boolean, frames: number[][], shadowOffsets?: number[][]
+	name: string, fps: number, loop: boolean, frames: number[][], shadowOffsets?: number[][], disableHeadTurnFrames?: number
 ): Readonly<BodyAnimation> {
 	if (shadowOffsets && shadowOffsets.length !== frames.length) {
 		throw new Error(`Incorrect frame count for shadowOffsets for ${name}, animation frames ${frames.length}, shadow frames ${shadowOffsets.length}`);
@@ -28,7 +28,7 @@ export function createBodyAnimation(
 
 	const shadow = shadowOffsets && shadowOffsets.map<BodyShadow>(([frame, offset]) => ({ frame, offset }));
 
-	return { name, loop, fps, frames: frames.map(createBodyFrame), shadow };
+	return { name, loop, fps, frames: frames.map(createBodyFrame), shadow, disableHeadTurnFrames: disableHeadTurnFrames || 0 };
 }
 
 export const stand = createBodyAnimation('stand', 24, true, [
@@ -468,7 +468,7 @@ export const kissBody = createBodyAnimation('kiss-body', 24, false, [
 	...repeat(2, [5, 1, 1, 0, 26, 26, 19, 19, -10, -6, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1]),
 	[5, 1, 1, 0, 28, 28, 18, 18, -9, -5, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1],
 	...repeat(2, [2, 1, 1, 0, 1, 1, 1, 1, -1, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1])
-]);
+], undefined, 12);
 
 export const kissLiftHoofBody = createBodyAnimation('kiss-lift-hoof-body', 24, false, [
 	...repeat(3, [2, 1, 0, 0, 1, 1, 1, 1, -1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1]),
@@ -479,7 +479,7 @@ export const kissLiftHoofBody = createBodyAnimation('kiss-lift-hoof-body', 24, f
 	...repeat(2, [5, 1, 1, 0, 8, 26, 19, 19, -10, -6, 1, 0, 1, 2, 1, 1, 1, -1, 1, -1]),
 	[5, 1, 1, 0, 28, 28, 18, 18, -9, -5, 1, 0, 1, 1, 1, 1, 1, -1, 1, -1],
 	...repeat(2, [2, 1, 1, 0, 1, 1, 1, 1, -1, 0, -1, 1, 1, 0, 1, 0, 1, 0, 1])
-]);
+], undefined, 12);
 
 export const kissFlyBody = createBodyAnimation('kiss-fly-body', 16, false, [
 	[1, 1, 3, 0, 8, 10, 6, 5, 0, -16],
@@ -514,7 +514,7 @@ export const kissFlyBody = createBodyAnimation('kiss-fly-body', 16, false, [
 	[1, 1, 12, 0, 9, 10, 4, 4, 0, -17, -1, 0, 0, 0, 0, -1],
 	[1, 1, 3, 0, 8, 10, 5, 4, 0, -16, 0, 0, 0, 0, 0, -1],
 	[1, 1, 4, 0, 8, 10, 6, 5, 0, -15]
-]);
+], undefined, 12);
 
 export const kissFlyBugBody = createBodyAnimation('kiss-fly-bug-body', 24, false, [
 	[1, 1, 3, 0, 8, 10, 6, 5, 0, -16],
@@ -557,7 +557,7 @@ export const kissFlyBugBody = createBodyAnimation('kiss-fly-bug-body', 24, false
 	[1, 1, 4, 0, 9, 10, 4, 4, 0, -17, -1, 0, 0, 0, 0, -1],
 	[1, 1, 5, 0, 8, 10, 5, 4, 0, -17, 0, 0, 0, 0, 0, -1],
 	[1, 1, 4, 0, 8, 10, 6, 5, 0, -17]
-]);
+], undefined, 12);
 
 export const kissLieBody = createBodyAnimation('kiss-lie-body', 24, false, [
 	...repeat(3, [14, 1, 0, 2, 38, 38, 26, 26]),
@@ -569,7 +569,7 @@ export const kissLieBody = createBodyAnimation('kiss-lie-body', 24, false, [
 	[13, 1, 0, 2, 38, 38, 26, 26, 0, 0, -1],
 	...repeat(2, [14, 1, 0, 2, 38, 38, 26, 26, 0, 0, -1]),
 	...repeat(2, [14, 1, 0, 2, 38, 38, 26, 26])
-], [...repeat(72, [3, 3])]);
+], [...repeat(72, [3, 3])], 70);
 
 export const kissSitBody = createBodyAnimation('kiss-sit-body', 24, false, [
 	...repeat(3, [8, 1, 2, 2, 34, 34, 25, 25]),
@@ -579,7 +579,7 @@ export const kissSitBody = createBodyAnimation('kiss-sit-body', 24, false, [
 	...repeat(60, [9, 1, 2, 2, 39, 39, 26, 26, -1, -1, -2, 0, 0, 1, 0, 1, 1, 1, 1, 1]),
 	...repeat(2, [9, 1, 2, 2, 34, 34, 26, 26, 0, -1, -2, 0, 0, 1, 0, 1, 0, 1, 0, 1]),
 	...repeat(2, [9, 1, 2, 2, 34, 34, 26, 26, 0, 0, -1])
-], [...repeat(72, [0, 6])]);
+], [...repeat(72, [0, 6])], 68);
 
 export const kissSwimBody = createBodyAnimation('kiss-swim-body', 8, false, [
 	...repeat(2, [1, 1, 0, 0, 8, 10, 6, 5, 0, 14]),
@@ -596,7 +596,7 @@ export const kissSwimBody = createBodyAnimation('kiss-swim-body', 8, false, [
 	...repeat(2, [1, 1, 0, 0, 9, 10, 4, 4, -1, 12, -1, 0, 0, 0, 0, -1]),
 	[1, 1, 0, 0, 8, 10, 4, 4, 0, 13, -1, 0, 0, 0, 0, -1],
 	[1, 1, 0, 0, 8, 10, 5, 5, 0, 13]
-]);
+], undefined, 12);
 
 export const kissToTrot = createBodyAnimation('kiss-to-trot-body', 24, false, [
 	[2, 1, 0, 0, 8, 4, 19, 4, -1, 0, -1, 1, 0, 0, 0, 0, 1, -1],
@@ -626,6 +626,7 @@ export function mergeAnimations(name: string, fps: number, loop: boolean, animat
 		name,
 		fps,
 		loop,
+		disableHeadTurnFrames: Math.min(...animations.map(a => a.disableHeadTurnFrames)),
 		frames: flatten(animations.map(a => a.frames)),
 		shadow: flatten(animations.map(a => a.shadow || a.frames.map(() => ({ frame: 0, offset: 0 })))),
 	};

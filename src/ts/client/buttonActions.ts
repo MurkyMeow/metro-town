@@ -39,7 +39,7 @@ const ICON_SIZE = 16;
 const headX = -26;
 const headY = -30;
 const headlessBoopFrame = { ...cloneDeep(boop.frames[7]), head: 0 };
-const headlessBoop: BodyAnimation = { name: '', loop: false, fps: 1, frames: [headlessBoopFrame] };
+const headlessBoop: BodyAnimation = { name: '', loop: false, fps: 1, frames: [headlessBoopFrame], disableHeadTurnFrames: 0 };
 
 function createPony(coatColor: string, wings = false, horn = false) {
 	const info = createDefaultPony();

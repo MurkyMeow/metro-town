@@ -320,6 +320,7 @@ export class ServerActions implements IServerActions, SocketServer {
 
 				let totalEditableEntities = 0;
 
+				// TODO: optimize
 				for (const region of this.map.regions) {
 					for (const entity of region.entities) {
 						if (hasFlag(entity.state, EntityState.Editable)) {
