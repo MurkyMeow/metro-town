@@ -9,7 +9,7 @@ function isKeyEventInvalid(e: KeyboardEvent) {
 }
 
 function allowKey(key: number) {
-	return key === Key.ESCAPE || key === Key.F5 || key === Key.F12 || key === Key.F11 || key === Key.TAB;
+	return key === Key.ESCAPE || key === Key.F5 || key === Key.F12 || key === Key.F11 || key === Key.TAB || key === Key.KEY_C || key === Key.KEY_I;
 }
 
 function fixKeyCode(key: number) {

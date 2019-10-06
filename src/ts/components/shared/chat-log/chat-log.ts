@@ -281,6 +281,9 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 				updateEntityId(this.party, update.old, update.new);
 				updateEntityId(this.whisper, update.old, update.new);
 			}),
+			this.game.onSearch.subscribe(() => {
+				this.focus();
+			}),
 		);
 	}
 	get linesElement() {
@@ -457,7 +460,6 @@ export class ChatLog implements AfterViewInit, OnDestroy, DoCheck {
 		let value = this.filterInput.nativeElement.value;
 		if (!value) {
 			this.clearTimeOutAutoClear();
-			this.unFocus();
 			this.filterChatLogLines('', false);
 			return;
 		} else {

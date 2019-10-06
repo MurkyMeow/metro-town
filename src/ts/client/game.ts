@@ -175,6 +175,7 @@ export class PonyTownGame implements Game {
 	shadowColor = SHADOW_COLOR;
 	onChat = new Subject<void>();
 	onToggleChat = new Subject<void>();
+	onSearch = new Subject<void>();
 	onCommand = new Subject<void>();
 	onCancel = () => false;
 	onClock = new BehaviorSubject<string>('');
@@ -458,7 +459,16 @@ export class PonyTownGame implements Game {
 				interact(this, this.input.isPressed(Key.SHIFT));
 			});
 			this.input.onPressed([Key.KEY_X, Key.GAMEPAD_BUTTON_DOWN], () => downAction(this));
-			this.input.onPressed([Key.KEY_C, Key.GAMEPAD_BUTTON_UP], () => upAction(this));
+			this.input.onPressed([Key.KEY_C, Key.GAMEPAD_BUTTON_UP], () => {
+				if (!this.input.isPressed(Key.CTRL)) {
+					upAction(this);
+				}
+			});
+			this.input.onPressed(Key.KEY_F, () => {
+				if (this.input.isPressed(Key.CTRL)) {
+					this.onSearch.next();
+				}
+			});
 			this.input.onPressed(Key.F2, () => {
 				if (!this.settings.browser.disableFKeys) {
 					this.hideText = !this.hideText;
