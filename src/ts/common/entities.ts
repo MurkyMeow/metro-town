@@ -783,6 +783,7 @@ function createWalls(baseName: string, spriteFull: ColorExtra[], spritesHalf: Co
 
 export const woodenWalls = createWalls('wall', sprites.wall_wood_full, sprites.wall_wood_half);
 export const stoneWalls = createWalls('wall-stone', sprites.wall_stone_full, sprites.wall_stone_half);
+export const metroWalls = createWalls('wall-metro', sprites.wall_metro_full, sprites.wall_metro_half);
 
 const rockMinimap = mixMinimap(0x78716aff, rect(0, 0, 1, 1));
 

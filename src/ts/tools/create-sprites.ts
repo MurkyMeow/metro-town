@@ -1072,6 +1072,10 @@ function createWalls(result: Result, rootPath: string) {
 	createWall(result, 'wall_stone', openPsd(path.join(rootPath, 'stone.psd')), {
 		thickness: 8, fullHeight: 85, halfHeight: 22, fullHeightVertical: 97, halfHeightVertical: 34,
 	});
+
+	createWall(result, 'wall_metro', openPsd(path.join(rootPath, 'metro.psd')), {
+		thickness: 8, fullHeight: 85, halfHeight: 22, fullHeightVertical: 97, halfHeightVertical: 34,
+	});
 }
 
 function createWall(result: Result, name: string, psd: Psd, config: WallConfig) {
