@@ -5,7 +5,7 @@ import {
 	EntityState, Pony, Notification, TileType, Action, IServerActions, Season, WorldState, Holiday,
 	TileSets, ChatMessage, PartyInfo, Entity, DrawOptions, Engine, defaultDrawOptions, PonyStateFlags,
 	DoAction, ChatType, WorldStateFlags, DebugFlags, MessageType, AccountSettings, Matrix4,
-	FakeEntity, SelectFlags, WorldMap, MapType, MapFlags, EntityFlags, houseTiles, isValidTile, GraphicsQuality
+	FakeEntity, SelectFlags, WorldMap, MapFlags, EntityFlags, houseTiles, isValidTile, GraphicsQuality
 } from '../common/interfaces';
 import {
 	clamp, lengthOfXY, setFlag, hasFlag, boundsIntersect, point, toInt, lerpColor, distanceXY
@@ -21,7 +21,7 @@ import {
 	pickEntities, updateEntitiesTriggers, getElevation, setElevation, createWorldMap
 } from '../common/worldMap';
 import { updateCamera, centerCameraOn, screenToWorld, createCamera } from '../common/camera';
-import { WHITE, BLACK, SHADOW_COLOR, getTileColor, RED, CAVE_LIGHT, CAVE_SHADOW } from '../common/colors';
+import { WHITE, BLACK, SHADOW_COLOR, getTileColor, RED } from '../common/colors';
 import { formatHourMinutes, getLightColor, getShadowColor, createLightData } from '../common/timeUtils';
 import { toggleWalls } from '../common/mixins';
 import { getEntityTypeName, hammer, broom, createAnEntity, saw, placeableEntities, shovel } from '../common/entities';
@@ -1251,13 +1251,8 @@ export class PonyTownGame implements Game {
 		let lightColor = WHITE;
 		let shadowColor = 0;
 
-		if (this.map.type === MapType.Cave) {
-			lightColor = CAVE_LIGHT;
-			shadowColor = CAVE_SHADOW;
-		} else {
-			lightColor = getLightColor(this.lightData, this.time);
-			shadowColor = getShadowColor(this.lightData, this.time);
-		}
+		lightColor = getLightColor(this.lightData, this.time);
+		shadowColor = getShadowColor(this.lightData, this.time);
 
 		if (BETA && this.editor.customLight) {
 			lightColor = parseColor(this.editor.lightColor);
