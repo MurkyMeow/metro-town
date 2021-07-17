@@ -25,7 +25,7 @@ import { toWorldX } from '../../common/positionUtils';
 import { deserializeTiles } from '../../common/compress';
 import { WallController } from '../controllers';
 
-const mainMapData = JSON.parse(fs.readFileSync(pathTo('src', 'maps', 'main.json'), 'utf8'));
+const mainMapData = JSON.parse(fs.readFileSync(pathTo('store', 'main.json'), 'utf8'));
 const mainMapTiles = deserializeTiles(mainMapData.tiles);
 
 function createCookieTable(x: number, y: number) {
@@ -1503,6 +1503,7 @@ export function createMainMap(world: World): ServerMap {
 	map.spawns.set('cave', rect(75.5, 27, 2, 2));
 
 	const wallController = new WallController(world, map, entities.metroWalls);
+	wallController.isTall = () => true;
 	map.controllers.push(wallController);
 
 	// tiles
