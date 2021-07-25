@@ -202,6 +202,17 @@ export function deserializeMap(map: ServerMap, { tiles, width }: MapData, { offs
 	}
 }
 
+export function deserializeEntities(world: World, map: ServerMap, data: string) {
+	for (const line of data.split('\n')) {
+		const [type, x, y] = line.split(' ');
+
+		const typeNumber = getEntityType(type);
+		const entity = createAnEntity(typeNumber, 0, Number(x), Number(y), {}, mockPaletteManager, world);
+
+		world.addEntity(entity, map);
+	}
+}
+
 export function saveMap(map: ServerMap, saveOptions: MapSaveOptions): MapData {
 	const data: MapData = { width: map.width, height: map.height };
 

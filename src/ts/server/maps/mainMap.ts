@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { sample, random } from 'lodash';
 import { pathTo } from '../paths';
 import { World } from '../world';
-import { createServerMap, deserializeMap, snapshotTiles, setTile, lockTile } from '../serverMap';
+import { createServerMap, deserializeMap, snapshotTiles, setTile, lockTile, deserializeEntities } from '../serverMap';
 import { TileType, Season, MapType, Holiday, ServerFlags, MapFlags } from '../../common/interfaces';
 import { rect } from '../../common/rect';
 import * as entities from '../../common/entities';
@@ -26,6 +26,7 @@ import { deserializeTiles } from '../../common/compress';
 import { WallController } from '../controllers';
 
 const mainMapData = JSON.parse(fs.readFileSync(pathTo('store', 'main.json'), 'utf8'));
+const mainMapEntities = fs.readFileSync(pathTo('store', 'main.txt'), 'utf8');
 const mainMapTiles = deserializeTiles(mainMapData.tiles);
 
 function createCookieTable(x: number, y: number) {
@@ -1509,6 +1510,7 @@ export function createMainMap(world: World): ServerMap {
 	// tiles
 
 	deserializeMap(map, mainMapData);
+	deserializeEntities(world, map, mainMapEntities);
 
 	if (!DEVELOPMENT) {
 		snapshotTiles(map);
