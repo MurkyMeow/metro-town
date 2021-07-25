@@ -37,7 +37,7 @@ import { bitWriter } from '../common/bitUtils';
 const head0Indices = [0, 1, 2, 4, 7, 8, 9, 10, 12, 13, 14, 16, 18, 19]; // regular (right facing)
 const head1Indices = [0, 1, 3, 5, 6, 8, 9, 11, 12, 13, 15, 17, 18, 19]; // clipped (left facing, displayed in char creator)
 
-const MAX_PALETTE_SIZE = 128;
+const MAX_PALETTE_SIZE = 512;
 const { assetsPath } = require('../../../config.json');
 const rootPath = path.join(__dirname, '..', '..', '..');
 const sourcePath = path.join(assetsPath);
