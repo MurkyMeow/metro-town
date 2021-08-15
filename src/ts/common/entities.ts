@@ -201,6 +201,16 @@ export const pony = registerMix(n('pony'),
 	},
 	mixServerFlags(ServerFlags.DoNotSave));
 
+export const tent = registerMix(n('tent'),
+	mixDraw(sprites.tent, 0, 0),
+	mixColliders(
+		collider(10, 10, 20, 72, true),
+		collider(58, 10, 28, 72, true),
+		collider(30, 10, 28, 40, true),
+	),
+	mixCover(30, 10, 28, 72),
+);
+
 // triggers
 
 export const triggerDoor = registerMix(n('trigger-door'),
