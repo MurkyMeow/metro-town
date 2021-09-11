@@ -1,0 +1,7 @@
+version: "3.1"
+
+services:
+  dev:
+    build: .
+    ports:
+      - 8081:80
