@@ -1393,6 +1393,8 @@ export const bunny = registerMix(n('bunny'),
 	}),
 	mixFlags(EntityFlags.Movable));
 
+export const biggus_pigus = doodad(n('biggus_pigus'), sprites.biggus_pigus, 0, 30, 0);
+
 // eyes
 
 const spritesEyes: AnimatedRenderable = {
