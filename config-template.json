@@ -1,18 +1,18 @@
 {
-	"title": "Your Town",
+	"title": "Metro Town",
 	"discordLink": "<LINK_TO_DISCORD_INVITE>",
 	"twitterLink": "<LINK_TO_TWITTER>",
 	"contactEmail": "your_contact_email@example.com",
 	"contactDiscord": "your_contact_discord#0000",
-	"port": 8090,
-	"adminPort": 8091,
-	"host": "http://localhost:8090/",
-	"local": "localhost:8090",
-	"adminLocal": "localhost:8091",
+	"port": 8080,
+	"adminPort": 8081,
+	"host": "http://localhost:8080/",
+	"local": "localhost:8080",
+	"adminLocal": "localhost:8081",
 	"proxy": false,
 	"secret": "<some_random_string_here>",
 	"token": "<some_other_random_string_here>",
-	"db": "mongodb://<username>:<password>@localhost:27017/<database_name>",
+	"db": "mongodb://mongo:27017/pony_db",
 	"oauth": {
 		"google": {
 			"clientID": "<CLIENT_ID_HERE>",
@@ -25,9 +25,9 @@
 	"servers": [
 		{
 			"id": "test",
-			"port": 8090,
+			"port": 8080,
 			"path": "/s00/ws",
-			"local": "localhost:8090",
+			"local": "localhost:8080",
 			"name": "Test server",
 			"season": "spring",
 			"holiday": "none",

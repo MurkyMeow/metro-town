@@ -1,7 +1,19 @@
 version: "3.1"
 
 services:
-  dev:
+  app:
+    container_name: metro-town-app
     build: .
     ports:
-      - 8081:80
+      - 8080:8080
+      - 8081:8081
+      - 8091:8091
+    depends_on:
+      - mongo
+  mongo:
+    container_name: metro-town-mongo
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: pony_db

@@ -1510,7 +1510,7 @@ export function createMainMap(world: World): ServerMap {
 	// tiles
 
 	deserializeMap(map, mainMapData);
-	deserializeEntities(world, map, mainMapEntities);
+	if (mainMapEntities) deserializeEntities(world, map, mainMapEntities);
 
 	if (!DEVELOPMENT) {
 		snapshotTiles(map);

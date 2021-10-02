@@ -9,6 +9,30 @@ The assets cannot be used for commercial purposes in any way including crowdfund
 See `LICENSE_CODE.txt`, `LICENSE_ART.txt` and `LICENSE_MUSIC.txt` files for definitions.
 To discuss licensing, contact `ponytownhelp@gmail.com`.
 
+## Сокращённая инструкция для тех, кто предпочитает Docker
+
+- Создать файл конфига
+
+```bash
+cp config-template.json config.json
+```
+
+- В конфиге обязательно заполнить поля `secret` и `token`. Сгенерировать их можно этой командой:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('base64'))"
+```
+
+- Настроить oauth по инструкции ниже (Setting up OAuth keys)
+
+- поднять приложение
+
+```bash
+docker-compose up
+```
+
+Может занять довольно продолжительное время. В процессе билда **могут** выводиться ошибки и ворнинги. По умолчанию приложение запустится на порту 8080. К контейнеру можно подключиться и разрабатывать прямо в нём (для vscode расширение "Remote - SSH")
+
 ## Prerequisites
 
 * [Node.js](https://nodejs.org/download/release/v9.11.2/) (version 9)
