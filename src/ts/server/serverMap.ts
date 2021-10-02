@@ -16,9 +16,10 @@ import { World } from './world';
 import { REGION_SIZE, REGION_HEIGHT, REGION_WIDTH, tileWidth, tileHeight } from '../common/constants';
 import { pathTo } from './paths';
 import { createCanvas } from './canvasUtilsNode';
+import { checkNotCollecting, pickEntity } from './mapUtils';
 import { mockPaletteManager } from '../common/ponyInfo';
 import { setEntityName } from './entityUtils';
-import { WallController } from './controllers/wallController';
+import { CollectableController, WallController } from './controllers';
 
 export interface EntityData {
 	type: string;
@@ -209,7 +210,28 @@ export function deserializeEntities(world: World, map: ServerMap, data: string) 
 		const typeNumber = getEntityType(type);
 		const entity = createAnEntity(typeNumber, 0, Number(x), Number(y), {}, mockPaletteManager, world);
 
-		world.addEntity(entity, map);
+		// if we saved a pickable entity it won't be  pickable by default
+		// we push a CollectableController into map in order for it to work
+		if (entity.pickableX !== undefined && entity.pickableY !== undefined) {
+			const entityConstructor = Object.assign(() => entity, {
+				type: entity.type,
+				typeName: entity.name || '',
+			})
+
+			const collectableController = new CollectableController(
+				world,
+				map,
+				[entityConstructor],
+				1,
+				pickEntity,
+				checkNotCollecting,
+				1,
+				() => ({ x: entity.x, y: entity.y })
+			)
+			map.controllers.push(collectableController)
+		} else {
+			world.addEntity(entity, map);
+		}
 	}
 }
 
