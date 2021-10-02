@@ -676,6 +676,15 @@ export const barrel = doodad(n('barrel'), sprites.barrel, 13, 27, 0,
 	mixFlags(EntityFlags.Interactive),
 	base => base.interactRange = 3);
 
+const metroBarrelCollider = mixColliderRounded(-11, -6, 18, 11, 5);
+
+export const metro_barrel_1 = doodad(n('metro_barrel_1'), sprites.metro_barrel_1, 13, 27, 0,
+	metroBarrelCollider);
+export const metro_barrel_2 = doodad(n('metro_barrel_2'), sprites.metro_barrel_2, 13, 27, 0,
+	metroBarrelCollider);
+export const metro_barrel_3 = doodad(n('metro_barrel_3'), sprites.metro_barrel_3, 13, 27, 0,
+	metroBarrelCollider);
+
 export const bench1 = doodad(n('bench-1'), sprites.bench_1, 37, 20, 0, mixColliderRect(-37, -3, 75, 8));
 export const benchSeat = doodad(n('bench-seat'), sprites.bench_seat, 37, 0);
 export const benchBack = doodad(n('bench-back'), sprites.bench_back, 37, 22, 0, mixColliderRect(-37, -3, 75, 8));
