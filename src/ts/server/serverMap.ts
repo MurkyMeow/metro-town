@@ -216,7 +216,7 @@ export function deserializeEntities(world: World, map: ServerMap, data: string) 
 			const entityConstructor = Object.assign(() => entity, {
 				type: entity.type,
 				typeName: entity.name || '',
-			})
+			});
 
 			const collectableController = new CollectableController(
 				world,
@@ -227,8 +227,8 @@ export function deserializeEntities(world: World, map: ServerMap, data: string) 
 				checkNotCollecting,
 				1,
 				() => ({ x: entity.x, y: entity.y })
-			)
-			map.controllers.push(collectableController)
+			);
+			map.controllers.push(collectableController);
 		} else {
 			world.addEntity(entity, map);
 		}

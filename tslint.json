@@ -73,5 +73,10 @@
 			true,
 			"array"
 		]
+	},
+	"linterOptions": {
+		"exclude": [
+			"src/ts/generated/**/*"
+		]
 	}
 }
