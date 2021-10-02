@@ -23,7 +23,7 @@ import { tileHeight } from '../../common/constants';
 import { updateEntityOptions, setEntityAnimation } from '../entityUtils';
 import { toWorldX } from '../../common/positionUtils';
 import { deserializeTiles } from '../../common/compress';
-import { WallController } from '../controllers';
+import { UpdateController, WallController } from '../controllers';
 
 const mainMapData = JSON.parse(fs.readFileSync(pathTo('store', 'main.json'), 'utf8'));
 const mainMapEntities = fs.readFileSync(pathTo('store', 'main.txt'), 'utf8');
@@ -1501,12 +1501,6 @@ export function createMainMap(world: World): ServerMap {
 
 	map.spawnArea = rect(51, 21, 8, 8);
 
-	map.spawns.set('cave', rect(75.5, 27, 2, 2));
-
-	const wallController = new WallController(world, map, entities.metroWalls);
-	wallController.isTall = () => true;
-	map.controllers.push(wallController);
-
 	// tiles
 
 	deserializeMap(map, mainMapData);
@@ -1519,6 +1513,11 @@ export function createMainMap(world: World): ServerMap {
 	if (DEVELOPMENT) {
 		addSpawnPointIndicators(world, map);
 	}
+
+	const wallController = new WallController(world, map, entities.metroWalls);
+	wallController.isTall = () => true;
+	map.controllers.push(wallController);
+	map.controllers.push(new UpdateController(map))
 
 	return map;
 }
