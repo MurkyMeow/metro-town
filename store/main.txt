@@ -1,0 +1,10 @@
+spawn-pole 51 21
+spawn-pole 59 21
+spawn-pole 51 29
+spawn-pole 59 29
+revolver 56.15625 28
+spawn-pole 75.5 27
+spawn-pole 77.5 27
+spawn-pole 75.5 29
+spawn-pole 77.5 29
+sign-question 75 69

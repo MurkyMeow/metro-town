@@ -434,6 +434,9 @@ export const letter = doodad(n('letter'), sprites.letter, 4, 10, 0,
 export const rose = doodad(n('rose'), sprites.rose, 8, 1, 0,
 	mixPickable(30, 41));
 
+export const revolver = collectable(n('revolver'), sprites.revolver, 0,
+	mixPickable(24, 42));
+
 // tools
 
 export const hammer = doodad(n('hammer'), sprites.hammer, 8, 10, 0,
