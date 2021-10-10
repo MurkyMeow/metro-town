@@ -622,8 +622,8 @@ export function drawHead(
 		nose.mouth && batch.drawSprite(nose.mouth, WHITE, info.defaultPalette, x, y);
 
 		if (holding !== undefined && holding.draw !== undefined) {
-			holding.x = toWorldX(x + toInt(holding.pickableX));
-			holding.y = toWorldY(y + toInt(holding.pickableY));
+			holding.x = toWorldX(x + toInt(holding.pickableX) - (options.hasMagic ? 30 : 0));
+			holding.y = toWorldY(y + toInt(holding.pickableY) - (options.hasMagic ? 5 : 0));
 			holding.draw(batch, holdingDrawOptions);
 		}
 

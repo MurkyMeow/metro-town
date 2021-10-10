@@ -1473,6 +1473,7 @@ export interface DrawPonyOptions {
 	shadowColor: number;
 	noEars: boolean;
 	gameTime: number;
+	hasMagic: boolean;
 
 	// sheet generation switches
 	no: NoDraw;

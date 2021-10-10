@@ -52,5 +52,6 @@ export function defaultDrawPonyOptions(): DrawPonyOptions {
 		no: NoDraw.None,
 		useAllHooves: false,
 		gameTime: 0,
+		hasMagic: false,
 	};
 }

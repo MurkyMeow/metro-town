@@ -437,6 +437,9 @@ export function updatePonyEntity(pony: Pony, delta: number, gameTime: number, sa
 	const state = pony.ponyState;
 	const walking = pony.vx !== 0 || pony.vy !== 0;
 	const animationState = flagsToState(pony.state, walking, pony.swimming);
+	const hasMagic = pony.magicEffect.currentAnimation !== undefined;
+
+	pony.drawingOptions.hasMagic = hasMagic;
 
 	if (pony.inTheAirDelay > 0) {
 		pony.inTheAirDelay -= delta;
