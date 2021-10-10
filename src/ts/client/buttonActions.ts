@@ -323,8 +323,10 @@ export function useAction(game: PonyTownGame, action: ButtonAction | undefined) 
 				}
 				break;
 			case 'entity':
-				if (BETA) {
-					game.editor.type = action.entity;
+				const types = getEntityTypesFromName(action.entity);
+				const type = types && types[0];
+				if (type !== undefined) {
+					game.send(server => server.holdItem(type));
 				}
 				break;
 			default:

@@ -1171,6 +1171,7 @@ export interface IServerActions {
 	say(entityId: number, text: string, type: ChatType): void;
 	select(entityId: number, flags: SelectFlags): void;
 	interact(entityId: number): void;
+	holdItem(entityType: number): void;
 	use(): void;
 	action(action: Action): void;
 	actionParam(action: Action, param: any): void;
