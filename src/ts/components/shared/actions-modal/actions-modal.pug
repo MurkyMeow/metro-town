@@ -71,6 +71,11 @@
 					action-button.mb-0.mr-2([draggableItem]="a" [action]="a" [shadow]="false")
 					b {{a.title}}
 
+		tab(title="Items" [icon]="devIcon")
+			div(*tabContent)
+				.d-flex.flex-wrap(style="height: 250px; overflow-y: scroll")
+					action-button(*ngFor="let a of itemActions" [draggableItem]="a" [action]="a")
+
 		tab(title="Options" [icon]="optionsIcon")
 			div(*tabContent)
 				button.btn.btn-outline-secondary.mr-2.mb-2((click)="resetToDefault()")

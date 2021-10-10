@@ -211,6 +211,13 @@ export function createDefaultButtonActions(): ButtonActionSlot[] {
 		];
 }
 
+export function createDefaultItemActions(): EntityButtonAction[] {
+	return [
+		entityButtonAction('apple'),
+		entityButtonAction('revolver'),
+	];
+}
+
 export function serializeActions(slots: ButtonActionSlot[]): string {
 	const serialized = slots.slice(0, ACTIONS_LIMIT).map(serializeAction);
 
