@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/cor
 import { Subscription } from 'rxjs';
 import {
 	createButtionActionActions, expressionButtonAction, createButtonCommandActions,
-	createDefaultButtonActions, actionExpressionDefaultPalette, entityButtonAction, serializeActions, deserializeActions
+	createDefaultButtonActions, actionExpressionDefaultPalette, entityButtonAction, serializeActions, deserializeActions, createDefaultItemActions
 } from '../../../client/buttonActions';
 import * as sprites from '../../../generated/sprites';
 import {
@@ -41,6 +41,7 @@ export class ActionsModal implements OnInit, OnDestroy {
 	emoteAction = expressionButtonAction(createExpression(Eye.Neutral, Eye.Neutral, Muzzle.Smile));
 	entityAction = entityButtonAction('apple');
 	entityActions: EntityButtonAction[] = [];
+	itemActions = createDefaultItemActions();
 	entityName = 'apple';
 	lockEyes = true;
 	lockIrises = true;
