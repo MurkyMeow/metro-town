@@ -211,6 +211,13 @@ export function createDefaultButtonActions(): ButtonActionSlot[] {
 		];
 }
 
+export function createDefaultItemActions(): EntityButtonAction[] {
+	return [
+		entityButtonAction('apple'),
+		entityButtonAction('revolver'),
+	];
+}
+
 export function serializeActions(slots: ButtonActionSlot[]): string {
 	const serialized = slots.slice(0, ACTIONS_LIMIT).map(serializeAction);
 
@@ -323,8 +330,10 @@ export function useAction(game: PonyTownGame, action: ButtonAction | undefined) 
 				}
 				break;
 			case 'entity':
-				if (BETA) {
-					game.editor.type = action.entity;
+				const types = getEntityTypesFromName(action.entity);
+				const type = types && types[0];
+				if (type !== undefined) {
+					game.send(server => server.holdItem(type));
 				}
 				break;
 			default:

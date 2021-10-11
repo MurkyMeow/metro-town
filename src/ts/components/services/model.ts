@@ -181,10 +181,8 @@ export class Model {
 					modStatus.editor = account.editor || modStatus.editor;
 				} catch { }
 
-				if (modStatus.editor) {
-					modStatus.editor.typeToName.forEach(({ type, name }) => entityTypeToName.set(type, name));
-					modStatus.editor.nameToTypes.forEach(({ types, name }) => entityNameToTypes.set(name, types));
-				}
+				modStatus.editor.typeToName.forEach(({ type, name }) => entityTypeToName.set(type, name));
+				modStatus.editor.nameToTypes.forEach(({ types, name }) => entityNameToTypes.set(name, types));
 
 				this.account = account;
 				this.sites = [noneSite, ...(account.sites || []).map(toSocialSiteInfo)];

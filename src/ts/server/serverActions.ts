@@ -17,7 +17,8 @@ import { World, findClientByAccountId, findAllOnlineFriends } from './world';
 import { HidingService } from './services/hiding';
 import {
 	createCharacterState, interactWith, useHeldItem, setEntityExpression, getPlayerState, execAction,
-	updateEntityPlayerState
+	updateEntityPlayerState,
+	holdItem
 } from './playerUtils';
 import { allEntities } from './api/account';
 import { CounterService } from './services/counter';
@@ -184,6 +185,11 @@ export class ServerActions implements IServerActions, SocketServer {
 			return;
 
 		interactWith(this.client, this.world.getEntityById(entityId));
+	}
+	@Method({ rateLimit: '1/s', binary: [Bin.U8] })
+	holdItem(entityType: number) {
+		this.updateLastAction();
+		holdItem(this.client.pony, entityType);
 	}
 	@Method({ rateLimit: '2/s', binary: [] })
 	use() {
