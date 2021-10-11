@@ -625,14 +625,34 @@ export function drawHead(
 		if (holding !== undefined && holding.draw !== undefined) {
 			const { hasMagic, gameTime } = options;
 
+			holding.x = toWorldX(x + toInt(holding.pickableX) + (hasMagic ? MAGIC_SHIFT_X : 0));
+			holding.y = toWorldY(y + toInt(holding.pickableY) + (hasMagic ? MAGIC_SHIFT_Y : 0));
+
 			if (hasMagic) {
 				const bobs = MAGIC_BOBS;
 				const frame = (((gameTime / 1000) * MAGIC_BOB_FPS) | 0) % bobs.length;
 				holding.z = toWorldZ(bobs[frame]);
+
+				const magic2Frame = sprites.magic2.frames[(((gameTime / 1000) * 9) | 0) % sprites.magic2.frames.length];
+				const magic3Frame = sprites.magic3.frames[(((gameTime / 1000) * 9) | 0) % sprites.magic3.frames.length];
+
+				batch.drawSprite(
+					magic2Frame,
+					-2147450753,
+					info.defaultPalette,
+					holding.x + (hasMagic ? MAGIC_SHIFT_X : 0) - 7,
+					holding.y + (hasMagic ? MAGIC_SHIFT_Y : 0) + 10,
+				);
+
+				batch.drawSprite(
+					magic3Frame,
+					-9849652,
+					info.defaultPalette,
+					holding.x + (hasMagic ? MAGIC_SHIFT_X : 0) - 7,
+					holding.y + (hasMagic ? MAGIC_SHIFT_Y : 0) + 10,
+				);
 			}
 
-			holding.x = toWorldX(x + toInt(holding.pickableX) + (hasMagic ? MAGIC_SHIFT_X : 0));
-			holding.y = toWorldY(y + toInt(holding.pickableY) + (hasMagic ? MAGIC_SHIFT_Y : 0));
 			holding.draw(batch, holdingDrawOptions);
 		}
 
