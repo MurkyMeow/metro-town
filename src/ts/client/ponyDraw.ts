@@ -9,7 +9,7 @@ import { toInt, hasFlag, repeat, flatten, point } from '../common/utils';
 import * as sprites from '../generated/sprites';
 import * as offsets from '../common/offsets';
 import { defaultHeadAnimation, defaultBodyFrame, defaultHeadFrame } from './ponyAnimations';
-import { toWorldX, toWorldY } from '../common/positionUtils';
+import { toWorldX, toWorldY, toWorldZ } from '../common/positionUtils';
 import {
 	frontHooves, PONY_WIDTH, PONY_HEIGHT, wings, chestBehind, tails, chest, neckAccessories, waistAccessories,
 	SLEEVED_ACCESSORIES, blinkFrames, flipIris, claws, Sets, backAccessories, SLEEVED_BACK_ACCESSORIES,
@@ -19,6 +19,7 @@ import {
 import { HEAD_ACCESSORY_OFFSETS, EAR_ACCESSORY_OFFSETS, EXTRA_ACCESSORY_OFFSETS } from '../common/offsets';
 import { createMat2D, identityMat2D, translateMat2D, copyMat2D, rotateMat2D, scaleMat2D } from '../common/mat2d';
 import { darkenForOutline } from '../common/ponyInfo';
+import { MAGIC_BOBS, MAGIC_BOB_FPS, MAGIC_SHIFT_X, MAGIC_SHIFT_Y } from '../common/constants';
 
 type Batch = PaletteSpriteBatch;
 type Info = Readonly<PalettePonyInfo>;
@@ -622,8 +623,16 @@ export function drawHead(
 		nose.mouth && batch.drawSprite(nose.mouth, WHITE, info.defaultPalette, x, y);
 
 		if (holding !== undefined && holding.draw !== undefined) {
-			holding.x = toWorldX(x + toInt(holding.pickableX) - (options.hasMagic ? 30 : 0));
-			holding.y = toWorldY(y + toInt(holding.pickableY) - (options.hasMagic ? 5 : 0));
+			const { hasMagic, gameTime } = options;
+
+			if (hasMagic) {
+				const bobs = MAGIC_BOBS;
+				const frame = (((gameTime / 1000) * MAGIC_BOB_FPS) | 0) % bobs.length;
+				holding.z = toWorldZ(bobs[frame]);
+			}
+
+			holding.x = toWorldX(x + toInt(holding.pickableX) + (hasMagic ? MAGIC_SHIFT_X : 0));
+			holding.y = toWorldY(y + toInt(holding.pickableY) + (hasMagic ? MAGIC_SHIFT_Y : 0));
 			holding.draw(batch, holdingDrawOptions);
 		}
 

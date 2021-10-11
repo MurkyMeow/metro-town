@@ -52,6 +52,11 @@ export function isChatlogRangeUnlimited(range: number | undefined) {
 export const WATER_FPS = 6;
 export const WATER_HEIGHT = [0, -1, -2, -1];
 
+export const MAGIC_SHIFT_X = -20;
+export const MAGIC_SHIFT_Y = -5;
+export const MAGIC_BOB_FPS = 6;
+export const MAGIC_BOBS = [0, -1, -2, -1];
+
 export const CM_SIZE = 5;
 export const MIN_SCALE = 1;
 export const MAX_SCALE = 4;
